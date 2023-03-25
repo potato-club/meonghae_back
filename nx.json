@@ -1,0 +1,25 @@
+{
+  "extends": "nx/presets/npm.json",
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "affected": {
+    "defaultBase": "master"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/nx-cloud",
+      "options": {
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "test",
+          "e2e"
+        ],
+        "accessToken": "Nzc1OTg4N2QtMTcwMC00MjE1LWEyNjYtMmI0Yjc2MWJmNmIxfHJlYWQtd3JpdGU="
+      }
+    }
+  },
+  "plugins": [
+    "@nxrocks/nx-flutter",
+    "@nxrocks/nx-spring-boot"
+  ]
+}
