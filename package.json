@@ -4,10 +4,11 @@
   "license": "MIT",
   "scripts": {},
   "private": true,
-  "dependencies": {},
   "devDependencies": {
     "@nrwl/nx-cloud": "latest",
-    "nx": "15.8.9",
+    "@nxrocks/nx-flutter": "^5.3.0",
+    "@nxrocks/nx-spring-boot": "^6.3.0",
+    "nx": "^15.8.9",
     "prettier": "^2.6.2"
   },
   "workspaces": [
