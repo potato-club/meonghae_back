@@ -6,7 +6,7 @@ plugins {
 	id 'com.diffplug.spotless' version '6.8.0'
 }
 
-group = 'com.meonghea'
+group = 'com.meonghae'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
@@ -31,28 +31,26 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+	implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
+//	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 //	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
-
-//	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-sleuth-zipkin
-//	implementation group: 'org.springframework.cloud', name: 'spring-cloud-sleuth-zipkin', version: '3.1.4'
-//
-//	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-sleuth
-//	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-sleuth', version: '3.1.4'
-
+//	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+//	implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
 //	implementation 'io.micrometer:micrometer-registry-prometheus'
-	implementation 'com.h2database:h2:1.4.199'
-	implementation 'org.modelmapper:modelmapper:2.3.8'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'com.h2database:h2:1.4.200'
+	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 	implementation 'javax.validation:validation-api:2.0.1.Final'
-	implementation 'io.jsonwebtoken:jjwt:0.9.1'
-	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
