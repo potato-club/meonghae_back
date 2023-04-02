@@ -2,6 +2,7 @@ package com.meonghae.communityservice.Entity.Board;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "board_comments")
 public class BoardComment {
     @Id
@@ -34,6 +36,10 @@ public class BoardComment {
     public void addReply(BoardComment reply) {
         replies.add(reply);
         reply.setParent(this);
+    }
+
+    public boolean isParent() {
+        return this.parent == null;
     }
 
     private void setParent(BoardComment parent) {

@@ -13,6 +13,6 @@ public enum BoardType {
     private final String title;
 
     public static BoardType findWithKey(int key) {
-        return Arrays.stream(values()).filter(state -> state.key == key).findAny().orElse(null);
+        return Arrays.stream(values()).filter(state -> state.key == key).findAny().orElse(SHOW);
     }
 }
