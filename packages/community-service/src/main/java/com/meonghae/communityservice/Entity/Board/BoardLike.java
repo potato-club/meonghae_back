@@ -32,7 +32,13 @@ public class BoardLike {
         this.status = true;
     }
 
-    public void changeStatus() {
+    public void cancelLike(Board board) {
+        board.setLikes(board.getLikes() - 1);
+        this.status = !this.status;
+    }
+
+    public void addLike(Board board) {
+        board.setLikes(board.getLikes() + 1);
         this.status = !this.status;
     }
 }

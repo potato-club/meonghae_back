@@ -1,6 +1,7 @@
 package com.meonghae.communityservice.Service;
 
 import com.meonghae.communityservice.Dto.CommentRequestDto;
+import com.meonghae.communityservice.Dto.CommentUpdateDto;
 import com.meonghae.communityservice.Entity.Board.Board;
 import com.meonghae.communityservice.Entity.Board.BoardComment;
 import com.meonghae.communityservice.Repository.BoardCommentRepository;
@@ -44,10 +45,31 @@ public class BoardCommentService {
         return result;
     }
 
+    @Transactional
+    public void updateComment(Long id, CommentUpdateDto updateDto) {
+        BoardComment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("comment is not exist"));
+        if(!comment.getUserId().equals(updateDto.getUserId())) {
+            throw new RuntimeException("댓글 작성자만 수정 가능합니다.");
+        }
+        comment.updateComment(updateDto.getComment());
+    }
+
+    @Transactional
+    public void deleteComment(Long id, String userId) {
+        BoardComment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("comment is not exist"));
+        if(!comment.getUserId().equals(userId)) {
+            throw new RuntimeException("댓글 작성자만 삭제 가능합니다.");
+        }
+        commentRepository.delete(comment);
+    }
+
     private BoardComment createComment(Board findBoard, CommentRequestDto requestDto) {
         BoardComment comment = BoardComment.builder()
                 .board(findBoard)
                 .comment(requestDto.getComment())
+                .update(false)
                 .userId(requestDto.getUserId()).build();
         return comment;
     }

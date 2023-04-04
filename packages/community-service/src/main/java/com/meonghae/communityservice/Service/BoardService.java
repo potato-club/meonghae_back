@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class BoardService {
     private final BoardRepository boardRepository;
 
+    @Transactional
     public List<BoardListDto> getBoardList(int typeKey) {
         BoardType type = BoardType.findWithKey(typeKey);
         List<Board> list = boardRepository.findByType(type);
@@ -28,12 +29,14 @@ public class BoardService {
         return listDto;
     }
 
+    @Transactional
     public BoardDetailDto getBoard(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(() -> new RuntimeException("board is not exist"));
         BoardDetailDto dto = new BoardDetailDto(board);
         return dto;
     }
 
+    @Transactional
     public void createBoard(int typeKey, BoardRequestDto requestDto) {
         BoardType type = BoardType.findWithKey(typeKey);
         Board board = requestDto.toEntity(type);
@@ -43,5 +46,25 @@ public class BoardService {
 
         // 이미지 추가하는 부분도 추후에 수정
         boardRepository.save(board);
+    }
+
+    @Transactional
+    public void modifyBoard(Long id, BoardRequestDto requestDto) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("board is not exist"));
+        if(!board.getOwner().equals(requestDto.getUserId())) {
+            throw new RuntimeException("글 작성자만 수정 가능합니다.");
+        }
+        board.updateBoard(requestDto.getTitle(), requestDto.getContent());
+    }
+
+    @Transactional
+    public void deleteBoard(Long id, String userId) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("board is not exist"));
+        if(!board.getOwner().equals(userId)) {
+            throw new RuntimeException("글 작성자만 삭제 가능합니다.");
+        }
+        boardRepository.delete(board);
     }
 }

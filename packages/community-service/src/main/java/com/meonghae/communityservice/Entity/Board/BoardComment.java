@@ -33,6 +33,9 @@ public class BoardComment {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<BoardComment> replies = new ArrayList<>();
 
+    @Column(nullable = false)
+    private Boolean update;
+
     public void addReply(BoardComment reply) {
         replies.add(reply);
         reply.setParent(this);
@@ -44,5 +47,10 @@ public class BoardComment {
 
     private void setParent(BoardComment parent) {
         this.parent = parent;
+    }
+
+    public void updateComment(String newComment) {
+        this.comment = newComment;
+        this.update = true;
     }
 }

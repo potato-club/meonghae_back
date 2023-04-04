@@ -13,12 +13,14 @@ public class CommentResponseDto {
     private Long id;
     private String userId;
     private String comment;
+    private Boolean update;
     private List<CommentResponseDto> replies;
 
     public CommentResponseDto(BoardComment comment) {
         this.id = comment.getId();
         this.userId = comment.getUserId();
         this.comment = comment.getComment();
+        this.update = comment.getUpdate();
         this.replies = comment.getReplies().stream().map(CommentResponseDto::new).collect(Collectors.toList());
     }
 }
