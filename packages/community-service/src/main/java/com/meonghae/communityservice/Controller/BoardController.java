@@ -1,6 +1,9 @@
 package com.meonghae.communityservice.Controller;
 
 import com.meonghae.communityservice.Dto.*;
+import com.meonghae.communityservice.Dto.BoardDto.BoardDetailDto;
+import com.meonghae.communityservice.Dto.BoardDto.BoardListDto;
+import com.meonghae.communityservice.Dto.BoardDto.BoardRequestDto;
 import com.meonghae.communityservice.Service.BoardCommentService;
 import com.meonghae.communityservice.Service.BoardLikeService;
 import com.meonghae.communityservice.Service.BoardService;
@@ -16,7 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoardController {
     private final BoardService boardService;
-    private final BoardCommentService commentService;
     private final BoardLikeService likeService;
     @GetMapping("")
     public ResponseEntity<?> getBoardList(
@@ -35,13 +37,6 @@ public class BoardController {
                                               @RequestBody BoardRequestDto requestDto) {
         boardService.createBoard(type, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글 생성 완료");
-    }
-
-    @PostMapping("/{id}/comments")
-    public ResponseEntity<String> createComment(@PathVariable(name = "id") Long id,
-                                                @RequestBody CommentRequestDto requestDto) {
-        String result = commentService.addComment(id, requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @PostMapping("/{id}/like")

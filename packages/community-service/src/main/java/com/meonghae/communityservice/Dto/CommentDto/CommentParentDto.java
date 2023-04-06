@@ -1,26 +1,24 @@
-package com.meonghae.communityservice.Dto;
+package com.meonghae.communityservice.Dto.CommentDto;
 
 import com.meonghae.communityservice.Entity.Board.BoardComment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.util.CollectionUtils;
 
 @Getter
 @NoArgsConstructor
-public class CommentResponseDto {
+public class CommentParentDto {
     private Long id;
     private String userId;
     private String comment;
     private Boolean update;
-    private List<CommentResponseDto> replies;
+    private int replies;
 
-    public CommentResponseDto(BoardComment comment) {
+    public CommentParentDto(BoardComment comment) {
         this.id = comment.getId();
         this.userId = comment.getUserId();
         this.comment = comment.getComment();
         this.update = comment.getUpdate();
-        this.replies = comment.getReplies().stream().map(CommentResponseDto::new).collect(Collectors.toList());
+        this.replies = CollectionUtils.isEmpty(comment.getReplies()) ? 0 : comment.getReplies().size();
     }
 }

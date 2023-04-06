@@ -1,8 +1,8 @@
 package com.meonghae.communityservice.Service;
 
-import com.meonghae.communityservice.Dto.BoardDetailDto;
-import com.meonghae.communityservice.Dto.BoardListDto;
-import com.meonghae.communityservice.Dto.BoardRequestDto;
+import com.meonghae.communityservice.Dto.BoardDto.BoardDetailDto;
+import com.meonghae.communityservice.Dto.BoardDto.BoardListDto;
+import com.meonghae.communityservice.Dto.BoardDto.BoardRequestDto;
 import com.meonghae.communityservice.Entity.Board.Board;
 import com.meonghae.communityservice.Enum.BoardType;
 import com.meonghae.communityservice.Repository.BoardRepository;

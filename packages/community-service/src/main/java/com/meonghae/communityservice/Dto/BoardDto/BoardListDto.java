@@ -1,4 +1,4 @@
-package com.meonghae.communityservice.Dto;
+package com.meonghae.communityservice.Dto.BoardDto;
 
 import com.meonghae.communityservice.Entity.Board.Board;
 import lombok.Getter;
