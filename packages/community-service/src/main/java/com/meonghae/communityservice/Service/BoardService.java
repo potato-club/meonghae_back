@@ -2,12 +2,18 @@ package com.meonghae.communityservice.Service;
 
 import com.meonghae.communityservice.Dto.BoardDto.BoardDetailDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardListDto;
+import com.meonghae.communityservice.Dto.BoardDto.BoardMainDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardRequestDto;
 import com.meonghae.communityservice.Entity.Board.Board;
 import com.meonghae.communityservice.Enum.BoardType;
+import com.meonghae.communityservice.Exception.Custom.BoardException;
+import com.meonghae.communityservice.Exception.Error.ErrorCode;
 import com.meonghae.communityservice.Repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,18 +28,27 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public List<BoardListDto> getBoardList(int typeKey) {
+    public Slice<BoardListDto> getBoardList(int typeKey, int page) {
         BoardType type = BoardType.findWithKey(typeKey);
-        List<Board> list = boardRepository.findByType(type);
-        List<BoardListDto> listDto = list.stream().map(BoardListDto::new).collect(Collectors.toList());
+        PageRequest request = PageRequest.of(page - 1, 20,
+                Sort.by(Sort.Direction.DESC, "createdDate"));
+        Slice<Board> list = boardRepository.findByType(type, request);
+        Slice<BoardListDto> listDto = list.map(BoardListDto::new);
         return listDto;
     }
 
     @Transactional
     public BoardDetailDto getBoard(Long id) {
-        Board board = boardRepository.findById(id).orElseThrow(() -> new RuntimeException("board is not exist"));
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
         BoardDetailDto dto = new BoardDetailDto(board);
         return dto;
+    }
+
+    @Transactional
+    public List<BoardMainDto> getMainBoard() {
+        List<Board> mainBoardList = boardRepository.findTop1LikedPerType();
+        return mainBoardList.stream().map(BoardMainDto::new).collect(Collectors.toList());
     }
 
     @Transactional
@@ -51,9 +66,9 @@ public class BoardService {
     @Transactional
     public void modifyBoard(Long id, BoardRequestDto requestDto) {
         Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("board is not exist"));
+                .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
         if(!board.getOwner().equals(requestDto.getUserId())) {
-            throw new RuntimeException("글 작성자만 수정 가능합니다.");
+            throw new BoardException(ErrorCode.UNAUTHORIZED, "글 작성자만 수정 가능합니다.");
         }
         board.updateBoard(requestDto.getTitle(), requestDto.getContent());
     }
@@ -63,7 +78,7 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("board is not exist"));
         if(!board.getOwner().equals(userId)) {
-            throw new RuntimeException("글 작성자만 삭제 가능합니다.");
+            throw new BoardException(ErrorCode.UNAUTHORIZED, "글 작성자만 삭제 가능합니다.");
         }
         boardRepository.delete(board);
     }

@@ -1,6 +1,7 @@
 package com.meonghae.communityservice.Entity.Board;
 
 
+import com.meonghae.communityservice.Entity.BaseTimeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "board_comments")
-public class BoardComment {
+public class BoardComment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
