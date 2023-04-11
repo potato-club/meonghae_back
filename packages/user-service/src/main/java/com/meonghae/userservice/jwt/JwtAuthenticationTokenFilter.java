@@ -22,26 +22,22 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String accessToken = jwtTokenProvider.resolveAccessToken(request);
         String path = request.getRequestURI();
 
-        if (path.equals("/login") || path.equals("/signup")) {
+        if (path.equals("/login") || path.equals("/signup") || path.contains("/users")) {
             filterChain.doFilter(request, response);
         }
 
-        if (accessToken == null) {
-            String newAccessToken = jwtTokenProvider.resolveAccessToken(response);
-            if (jwtTokenProvider.validateToken(newAccessToken)) {
-                this.setAuthentication(newAccessToken);
-            }
-        } else {
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
+
+        if (jwtTokenProvider.validateToken(accessToken)) {
             this.setAuthentication(accessToken);
         }
 
         filterChain.doFilter(request, response);
     }
 
-    public void setAuthentication(String token) {
+    private void setAuthentication(String token) {
         // 토큰으로부터 유저 정보를 받아옵니다.
         Authentication authentication = jwtTokenProvider.getAuthentication(token);
         // SecurityContext 에 Authentication 객체를 저장합니다.

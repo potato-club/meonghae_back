@@ -1,6 +1,5 @@
 package com.meonghae.userservice.controller;
 
-import com.meonghae.userservice.dto.UserDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
 import com.meonghae.userservice.repository.UserRepository;
@@ -26,14 +25,6 @@ public class UserController {
         return userRepository.findByEmail(email).get().getUserRole().toString();
     }
 
-    @GetMapping("/users/{username}")
-    public UserDto getUsername(@PathVariable String username) {
-        UserDto userDto = userRepository.findByNickname(username);
-        userDto.setRoles(userDto.getUserRole().toString());
-
-        return userDto;
-    }
-
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto) {
         userService.signUp(userDto);
@@ -46,15 +37,14 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        userService.logout(request, response);
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        userService.logout(request);
         return ResponseEntity.ok("로그아웃 되었습니다");
     }
 
     @PutMapping("/")
-    public ResponseEntity<String> updateNickname(@RequestBody UserRequestDto userDto,
-                                          HttpServletRequest request, HttpServletResponse response) {
-        userService.update(userDto, request, response);
+    public ResponseEntity<String> updateNickname(@RequestBody UserRequestDto userDto, HttpServletRequest request) {
+        userService.update(userDto, request);
         return ResponseEntity.ok("닉네임이 변경되었습니다.");
     }
 }

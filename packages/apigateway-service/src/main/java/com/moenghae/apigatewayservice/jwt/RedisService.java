@@ -19,13 +19,9 @@ public class RedisService {
         return values.get(token);
     }
 
-    public boolean isRefreshTokenValid(String token, String ipAddress) {
+    public boolean isRefreshTokenValid(String token) {
         Map<String, String> values = getValues(token);
-        if (values == null) {
-            return false;
-        }
-        String storedIpAddress = values.get("ipAddress");
-        return ipAddress.equals(storedIpAddress);
+        return !values.isEmpty();
     }
 
     public boolean isTokenInBlacklist(String token) {
