@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,9 +32,9 @@ public class Board extends BaseTimeEntity {
     private int likes;
 
     @OneToMany(mappedBy = "board", orphanRemoval = true)
-    private List<BoardImage> images;
+    private List<BoardImage> images = new ArrayList<>();
     @OneToMany(mappedBy = "board", orphanRemoval = true)
-    private List<BoardComment> comments;
+    private List<BoardComment> comments = new ArrayList<>();
 
     public void setOwner(String userId) {
         this.owner = userId;

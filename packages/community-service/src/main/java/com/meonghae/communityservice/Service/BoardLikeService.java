@@ -22,14 +22,14 @@ public class BoardLikeService {
     public String addLike(Long id, String userId) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("board is not exist"));
-        BoardLike like = likeRepository.findByUserId(userId);
+        BoardLike like = likeRepository.findByUserIdAndBoard(userId, board);
         // 좋아요
         if(like == null) {
             BoardLike newLike = new BoardLike(userId, board);
             board.setLikes(board.getLikes() + 1);
             likeRepository.save(newLike);
             return "추천 완료";
-        } else if (like.getStatus() == true) {
+        } else if (like.getStatus()) {
             like.cancelLike(board);
             return "추천 취소";
         }

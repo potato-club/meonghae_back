@@ -10,41 +10,41 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/comments")
+@RequestMapping("/boardComments")
 @RequiredArgsConstructor
-public class CommentController {
+public class BoardCommentController {
     private final BoardCommentService commentService;
 
-    @GetMapping("/boards/{id}")
-    public Slice<CommentParentDto> getParentComments(@PathVariable(name = "id") Long id,
+    @GetMapping("/{boardId}")
+    public Slice<CommentParentDto> getParentComments(@PathVariable(name = "boardId") Long id,
                                                      @RequestParam(required = false,
                                                             defaultValue = "1", value = "page") int page) {
         return commentService.getParentComments(page, id);
     }
-    @GetMapping("/{id}/reply")
-    public Slice<CommentChildDto> getChildComments(@PathVariable(name = "id") Long parentId,
+    @GetMapping("/{parentId}/reply")
+    public Slice<CommentChildDto> getChildComments(@PathVariable(name = "parentId") Long parentId,
                                                   @RequestParam(required = false,
                                                           defaultValue = "1", value = "page") int page) {
         return commentService.getChildComments(page, parentId);
     }
 
-    @PostMapping("/boards/{id}")
-    public ResponseEntity<Slice<CommentParentDto>> createComment(@PathVariable(name = "id") Long id,
+    @PostMapping("/{boardId}")
+    public ResponseEntity<Slice<CommentParentDto>> createComment(@PathVariable(name = "boardId") Long id,
                                                                 @RequestBody CommentRequestDto requestDto) {
         commentService.addParentComment(id, requestDto);
         Slice<CommentParentDto> result = commentService.getParentComments(1, id);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
-    @PostMapping("/{id}/reply")
-    public ResponseEntity<Slice<CommentChildDto>> addChildComment(@PathVariable(name = "id") Long parentId,
+    @PostMapping("/{parentId}/reply")
+    public ResponseEntity<Slice<CommentChildDto>> addChildComment(@PathVariable(name = "parentId") Long parentId,
                                   @RequestBody CommentRequestDto requestDto) {
         commentService.addChildComment(parentId, requestDto);
         Slice<CommentChildDto> result = commentService.getChildComments(1, parentId);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Slice<?>> modifyingComment(@PathVariable(name = "id") Long id,
+    @PutMapping("/{commentId}")
+    public ResponseEntity<Slice<?>> modifyingComment(@PathVariable(name = "commentId") Long id,
                                                     @RequestBody CommentUpdateDto updateDto) {
         ReloadCommentDto reload = commentService.updateComment(id, updateDto);
         if(reload.getParent()) {
@@ -53,8 +53,8 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getChildComments(1, reload.getId()));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Slice<?>> deleteComment(@PathVariable(name = "id") Long id,
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Slice<?>> deleteComment(@PathVariable(name = "commentId") Long id,
                                                 @RequestBody UserDto userDto) {
         ReloadCommentDto reload = commentService.deleteComment(id, userDto.getUserId());
         if(reload.getParent()) {
