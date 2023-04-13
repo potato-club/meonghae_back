@@ -17,18 +17,21 @@ public class RedisService {
     private final RedisTemplate redisTemplate;
 
     // RefreshToken, email, IP Address 설정
-    public void setValues(String token, String email, String ipAddress) {
-        ValueOperations<String, Map<String, String>> values = redisTemplate.opsForValue();
+    public void setValues(String token, String email) {
+        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         Map<String, String> map = new HashMap<>();
         map.put("email", email);
-        map.put("ipAddress", ipAddress);
-        values.set(token, map, Duration.ofDays(7));  // 7일 뒤 메모리에서 삭제된다.
+        operations.set(token, map, Duration.ofDays(7)); // 7일 뒤 메모리에서 삭제됨
     }
 
     // 키값으로 벨류 가져오기
     public Map<String, String> getValues(String token){
-        ValueOperations<String, Map<String, String>> values = redisTemplate.opsForValue();
-        return values.get(token);
+        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
+        Object object = operations.get(token);
+        if (object != null && object instanceof Map) {
+            return (Map<String, String>) object;
+        }
+        return null;
     }
 
     public void addTokenToBlacklist(String token, long expiration) {

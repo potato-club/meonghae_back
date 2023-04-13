@@ -7,24 +7,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
     private final RedisService redisService;
+    private final RestTemplate restTemplate;
 
     // 키
     @Value("${jwt.secret}")
@@ -59,30 +59,31 @@ public class JwtTokenProvider {
                 .compact(); // 생성
     }
 
-    public String reissueAccessToken(String refreshToken, String ipAddress) {
-        String email = redisService.getValues(refreshToken).get("email");
-        String savedIp = redisService.getValues(refreshToken).get("ipAddress");
+    public String reissueAccessToken(String refreshToken) {
+        Map<String, String> values = redisService.getValues(refreshToken);
+        String email = values.get("email");
 
-        if (Objects.isNull(email) || Objects.isNull(savedIp) || !savedIp.equals(ipAddress)) {
+        if (Objects.isNull(email)) {
             throw new ForbiddenClassException(Exception.class);
         }
 
-        String roles = WebClient.create()
-                .get()
-                .uri("http://user-service/users/{email}", email)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        String url = "http://localhost:8000/user-service/users/" + email;
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 
-        String accessToken = createAccessToken(email, roles);
+        String accessToken = createAccessToken(email, responseEntity.getBody());
 
         return accessToken;
     }
 
     // Request의 Header에서 AccessToken 값을 가져옵니다. "Authorization" : "token"
     public String resolveAccessToken(ServerHttpRequest request) {
-        if(request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION))
-            return request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0).substring(7);
+        List<String> authorizationHeaders = request.getHeaders().get(HttpHeaders.AUTHORIZATION);
+        if (authorizationHeaders != null && !authorizationHeaders.isEmpty()) {
+            String authorizationHeader = authorizationHeaders.get(0);
+            if (authorizationHeader.startsWith("Bearer ")) {
+                return authorizationHeader.substring(7);
+            }
+        }
         return null;
     }
 

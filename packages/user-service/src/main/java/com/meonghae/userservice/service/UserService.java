@@ -24,12 +24,11 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
 
-    public UserResponseDto login(String code, HttpServletRequest request, HttpServletResponse response) {
+    public UserResponseDto login(String code, HttpServletResponse response) {
         String access_token = kakaoApi.getAccessToken(code);
         String email = kakaoApi.getUserInfo(access_token);
 
         if (userRepository.existsByEmail(email)) {
-            String ipAddress = request.getHeader("X-Forwarded-For");
             UserRole userRole = userRepository.findByEmail(email).get().getUserRole();
 
             String accessToken = jwtTokenProvider.createAccessToken(email, userRole);
@@ -38,7 +37,7 @@ public class UserService {
             jwtTokenProvider.setHeaderAccessToken(response, accessToken);
             jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
 
-            redisService.setValues(refreshToken, email, ipAddress);
+            redisService.setValues(refreshToken, email);
 
             return UserResponseDto.builder()
                     .responseCode("200_OK")
@@ -55,34 +54,24 @@ public class UserService {
         userRepository.save(userDto.toEntity());
     }
 
-    public void update(UserRequestDto userDto, HttpServletRequest request, HttpServletResponse response) {
-        String email = this.findByEmailFromAccessToken(request, response);
+    public void update(UserRequestDto userDto, HttpServletRequest request) {
+        String email = this.findByEmailFromAccessToken(request);
         User user = userRepository.findByEmail(email).orElseThrow();
 
         user.update(userDto);
         userRepository.save(user);
     }
 
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
+    public void logout(HttpServletRequest request) {
         redisService.delValues(jwtTokenProvider.resolveRefreshToken(request));
-        jwtTokenProvider.expireToken(this.findByAccessToken(request, response));
+        jwtTokenProvider.expireToken(this.findByAccessToken(request));
     }
 
-    private String findByEmailFromAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        if (jwtTokenProvider.resolveAccessToken(request) == null) {
-            // accessToken을 재발급 받은 경우
-            String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(response));
-            return email;
-        }
-
-        // accessToken이 정상적인 경우
-        String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
-        return email;
+    private String findByEmailFromAccessToken(HttpServletRequest request) {
+        return jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
     }
 
-    private String findByAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        if (jwtTokenProvider.resolveAccessToken(request) == null)
-            return jwtTokenProvider.resolveAccessToken(response);   // accessToken을 재발급 받은 경우
-        return jwtTokenProvider.resolveAccessToken(request);        // accessToken이 정상적인 경우
+    private String findByAccessToken(HttpServletRequest request) {
+        return jwtTokenProvider.resolveAccessToken(request);
     }
 }

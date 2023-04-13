@@ -1,10 +1,8 @@
 package com.meonghae.userservice.jwt;
 
 import com.meonghae.userservice.enums.UserRole;
-import com.meonghae.userservice.repository.UserRepository;
 import com.meonghae.userservice.service.Jwt.CustomUserDetailService;
 import com.meonghae.userservice.service.Jwt.RedisService;
-import com.thoughtworks.xstream.security.ForbiddenClassException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +24,6 @@ import java.util.*;
 @Transactional
 public class JwtTokenProvider {
 
-    private final UserRepository userRepository;
     private final RedisService redisService;
     private final CustomUserDetailService customUserDetailService;
 
@@ -84,34 +81,19 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String reissueAccessToken(String refreshToken) {
-        String email = redisService.getValues(refreshToken).get("email");
-        if (Objects.isNull(email)) {
-            throw new ForbiddenClassException(Exception.class);
-        }
-
-        String accessToken = createAccessToken(email, userRepository.findByEmail(email).get().getUserRole());
-        return accessToken;
-    }
-
     // Request의 Header에서 AccessToken 값을 가져옵니다. "authorization" : "token"
+    // Gateway 서비스에서 이미 Substring(7)을 했기 때문에 헤더에서 바로 가져온다.
     public String resolveAccessToken(HttpServletRequest request) {
-        if(request.getHeader("authorization") != null )
-            return request.getHeader("authorization").substring(7);
-        return null;
-    }
-
-    // Response의 Header에서 재발급 된 AccessToken 값을 가져옵니다. "authorization" : "token"
-    public String resolveAccessToken(HttpServletResponse response) {
-        if(response.getHeader("authorization") != null )
-            return response.getHeader("authorization").substring(7);
+        if(request.getHeader("Authorization") != null )
+            return request.getHeader("Authorization");
         return null;
     }
 
     // Request의 Header에서 RefreshToken 값을 가져옵니다. "refreshToken" : "token"
+    // Gateway 서비스에서 이미 Substring(7)을 했기 때문에 헤더에서 바로 가져온다.
     public String resolveRefreshToken(HttpServletRequest request) {
         if(request.getHeader("refreshToken") != null )
-            return request.getHeader("refreshToken").substring(7);
+            return request.getHeader("refreshToken");
         return null;
     }
 
@@ -145,21 +127,11 @@ public class JwtTokenProvider {
 
     // 어세스 토큰 헤더 설정
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
-        response.setHeader("authorization", "bearer "+ accessToken);
+        response.setHeader("Authorization", "bearer "+ accessToken);
     }
 
     // 리프레시 토큰 헤더 설정
     public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
         response.setHeader("refreshToken", "bearer "+ refreshToken);
-    }
-
-    // RefreshToken 존재유무 확인
-    public boolean existsRefreshToken(String refreshToken) {
-        return redisService.getValues(refreshToken) != null;
-    }
-
-    // Email로 권한 정보 가져오기
-    public String getRoles(String email) {
-        return userRepository.findByEmail(email).get().getUserRole().toString();
     }
 }
