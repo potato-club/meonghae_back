@@ -24,7 +24,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
 
-    public UserResponseDto login(String code, HttpServletRequest request, HttpServletResponse response) {
+    public UserResponseDto login(String code, HttpServletResponse response) {
         String access_token = kakaoApi.getAccessToken(code);
         String email = kakaoApi.getUserInfo(access_token);
 

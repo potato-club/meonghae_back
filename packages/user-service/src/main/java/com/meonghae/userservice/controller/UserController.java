@@ -32,8 +32,8 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public UserResponseDto login(@RequestParam String code, HttpServletRequest request, HttpServletResponse response) {
-        return userService.login(code, request, response);
+    public UserResponseDto login(@RequestParam String code, HttpServletResponse response) {
+        return userService.login(code, response);
     }
 
     @GetMapping("/logout")
