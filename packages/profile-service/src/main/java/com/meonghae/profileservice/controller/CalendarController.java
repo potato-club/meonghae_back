@@ -15,7 +15,7 @@ public class CalendarController {
     private final CalendarService calendarService;
 
     @GetMapping()
-    // 특정 년, 월에 대한 모든 Calendar와 CalendarData 가져오기
+
     public List<Calendar> getAll(@RequestParam("year")int year,@RequestParam("month")int month){
         return calendarService.getAll(year,month);
     }
