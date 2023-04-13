@@ -12,10 +12,10 @@ plugins {
 	//querydsl 추가
 //	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/dev-server
+//<<<<<<< HEAD
+//=======
+//
+//>>>>>>> origin/dev-server
 group = 'com.meonghae'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
