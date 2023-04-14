@@ -11,6 +11,8 @@ import com.meonghae.communityservice.Exception.Custom.BoardException;
 import com.meonghae.communityservice.Exception.Error.ErrorCode;
 import com.meonghae.communityservice.Repository.BoardRepository;
 import com.querydsl.core.QueryFactory;
+import com.querydsl.core.QueryResults;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,16 +52,24 @@ public class BoardService {
     }
 
     public List<BoardMainDto> getMainBoard() {
-//        List<Board> mainBoardList = boardRepository.findTop1LikedPerType();
 
         QBoard qBoard = QBoard.board;
-        List<Board> mainBoardLists = jpaQueryFactory.select(qBoard)
-                .from(qBoard)
-                .where(qBoard.type.in(BoardType.SHOW, BoardType.FUN, BoardType.MISSING))
-                .groupBy(qBoard.type)
-                .orderBy(qBoard.likes.desc())
-                .distinct()
-                .fetch();
+        LocalDateTime midnight = LocalDateTime.now().toLocalDate().atStartOfDay();
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Board> mainBoardLists = jpaQueryFactory.selectFrom(qBoard)
+                .where(qBoard.createdDate.between(midnight, now))
+                .orderBy(qBoard.type.asc(), qBoard.likes.desc())
+                .fetch()
+                .stream()
+                .collect(Collectors.groupingBy(Board::getType))
+                .values()
+                .stream()
+                .map(boards -> boards.stream()
+                        .max(Comparator.comparing(Board::getLikes))
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
         return mainBoardLists.stream().map(BoardMainDto::new).collect(Collectors.toList());
     }
