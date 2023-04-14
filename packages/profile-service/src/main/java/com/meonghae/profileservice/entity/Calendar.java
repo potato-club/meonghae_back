@@ -1,35 +1,43 @@
 package com.meonghae.profileservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.meonghae.profileservice.dto.CalendarPK;
+import com.meonghae.profileservice.dto.calendar.CalendarRequestDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
-@Builder
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@IdClass(CalendarPK.class)
-
 public class Calendar {
     @Id
-    private int year;
-    @Id
-    private int month;
-    @Id
-    private int day;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String user;
+    @ManyToOne
+    @JoinColumn(name = "petEntityId")
+    private PetEntity petEntity;
+    @Column(nullable = false)
+    private String text;
+    @Column(nullable = false)
+    private LocalDateTime scheduleTime;
+    private LocalDateTime createTime;
+    private LocalDateTime modifiedDate;
 
-    @OneToMany(mappedBy = "calendar",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    @JsonManagedReference
-    List<CalendarData> calendarDataList;
-
+    public void update(CalendarRequestDTO calendarRequestDTO, PetEntity petEntity){
+        LocalTime scheduleTime = LocalTime.of(calendarRequestDTO.getHour(), calendarRequestDTO.getMinute());
+        LocalDate scheduleDate = LocalDate.of(calendarRequestDTO.getYear(), calendarRequestDTO.getMonth(), calendarRequestDTO.getDay());
+        this.petEntity = petEntity;
+        this.text = calendarRequestDTO.getText();
+        this.scheduleTime = LocalDateTime.of(scheduleDate, scheduleTime);
+        this.modifiedDate = LocalDateTime.now();
+    }
 }

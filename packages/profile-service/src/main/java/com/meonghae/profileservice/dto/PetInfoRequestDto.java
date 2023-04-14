@@ -13,7 +13,6 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 public class PetInfoRequestDto {
-    private String userName;
     private PetType petType;
     private String petName;
 

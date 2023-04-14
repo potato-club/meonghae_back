@@ -34,13 +34,4 @@ public class PetEntity {
     @Column(nullable = false)
     private String petSpecies;
 
-    @Builder
-    public PetEntity (PetInfoRequestDto petDto){
-        this.userName = petDto.getUserName();
-        this.petType = petDto.getPetType();
-        this.petName = petDto.getPetName();
-        this.petGender = petDto.getPetGender();
-        this.petBirth = petDto.getPetBirth();
-        this.petSpecies = petDto.getPetSpecies();
-    }
 }

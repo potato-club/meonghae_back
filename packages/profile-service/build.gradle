@@ -1,25 +1,20 @@
-//buildscript {
-//	ext {
-//		queryDslVersion = "5.0.0"
-//	}
-//}
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.8'
 	id 'io.spring.dependency-management' version '1.1.0'
 	id 'maven-publish'
 	id 'com.diffplug.spotless' version '6.8.0'
-	//querydsl 추가
-//	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+	//dsl
+	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
-//<<<<<<< HEAD
-//=======
-//
-//>>>>>>> origin/dev-server
+
 group = 'com.meonghae'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+//dsl설정
+apply plugin: "com.ewerk.gradle.plugins.querydsl"
+//
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -38,9 +33,6 @@ ext {
 }
 
 dependencies {
-//	//querydsl 추가
-//	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}" // querydsl 라이브러리
-//	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}" //  Querydsl 관련 코드 생성 기능 제공
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -54,6 +46,10 @@ dependencies {
 //	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'com.h2database:h2:1.4.200'
+	//밑에 두줄 dsl설정
+	implementation 'com.querydsl:querydsl-jpa'
+	implementation 'com.querydsl:querydsl-apt'
+
 	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
 	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 	compileOnly 'org.projectlombok:lombok'
@@ -72,6 +68,32 @@ dependencyManagement {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+//dsl설정 -----
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	library = "com.querydsl:querydsl-apt"
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/java', querydslDir]
+		}
+	}
+}
+
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+//--------
 springBoot {
 	buildInfo()
 }
@@ -108,22 +130,3 @@ spotless {
 		googleJavaFormat()
 	}
 }
-//querydsl 추가 시작 (위에 plugin 추가 부분과 맞물림)
-//def querydslDir = "$buildDir/generated/querydsl"
-//querydsl {
-//	jpa = true
-//	querydslSourcesDir = querydslDir
-//}
-//
-//sourceSets { // IDE의 소스 폴더에 자동으로 넣어준다.
-//	main.java.srcDir querydslDir
-//}
-//
-//configurations {
-//	querydsl.extendsFrom compileClasspath // 컴파일이 될때 같이 수행
-//}
-//
-//compileQuerydsl {
-//	options.annotationProcessorPath = configurations.querydsl // Q파일을 생성해준다.
-//}
-//querydsl 추가 끝

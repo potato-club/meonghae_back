@@ -2,7 +2,7 @@
 
 ---
 ### 애완동물 정보 관리 기능
-![img_3.png](img_3.png)
+![img.png](img.png)
 > getUserPet
 > > User의 애완동물들 리턴
 >
@@ -20,13 +20,14 @@
 
 
 ---
-### 캘린더 기능
-![img_2.png](img_2.png)
+### 일정 관리 기능
+![img_1.png](img_1.png)
 
-> getALL("/calendar?year={int}&month={int}")
-> > 특정 년, 월에 대한 모든 Calendar와 CalendarData 가져오기
->
-> addCalendarData -> RequestBody: CalendarDTO 참고
-> > 바디에 있는 year, month, day 참고해서 해당 날짜에 일정 추가
+> 제공 기능
+> > getProfileSchedule : 금일 포함 앞으로의 일정들 최대 30개 리턴
 > 
-> 수정 미구현
+> > getSchedule : 선택된 날짜에 대한 일정들 리턴
+> 
+> > getMonthSechedule : 선택된 년도와 달의 일정들 리턴
+> 
+> > 이 외에 C,U,D 있음

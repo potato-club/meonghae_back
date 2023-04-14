@@ -6,12 +6,12 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public class ErrorEntity {
-    private String errorCode;
+    private int errorCode;
 
     private String errorMessage;
 
     @Builder
-    public ErrorEntity(HttpStatus httpStatus, String errorCode, String errorMessage){
+    public ErrorEntity(HttpStatus httpStatus, int errorCode, String errorMessage){
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
