@@ -99,7 +99,7 @@ public class BoardCommentService {
         BoardComment comment = BoardComment.builder()
                 .board(findBoard)
                 .comment(requestDto.getComment())
-                .update(false)
+                .updated(false)
                 .userId(requestDto.getUserId()).build();
         return comment;
     }

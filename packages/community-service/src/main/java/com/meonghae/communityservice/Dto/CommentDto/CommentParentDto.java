@@ -18,7 +18,7 @@ public class CommentParentDto {
         this.id = comment.getId();
         this.userId = comment.getUserId();
         this.comment = comment.getComment();
-        this.update = comment.getUpdate();
+        this.update = comment.getUpdated();
         this.replies = CollectionUtils.isEmpty(comment.getReplies()) ? 0 : comment.getReplies().size();
     }
 }

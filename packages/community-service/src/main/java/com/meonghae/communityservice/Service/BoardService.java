@@ -59,7 +59,7 @@ public class BoardService {
 
         List<Board> mainBoardLists = jpaQueryFactory.selectFrom(qBoard)
                 .where(qBoard.createdDate.between(midnight, now))
-                .orderBy(qBoard.type.asc(), qBoard.likes.desc())
+                .orderBy(qBoard.likes.desc())
                 .fetch()
                 .stream()
                 .collect(Collectors.groupingBy(Board::getType))
