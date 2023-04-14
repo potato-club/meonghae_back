@@ -5,10 +5,13 @@ import com.meonghae.communityservice.Dto.BoardDto.BoardListDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardMainDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardRequestDto;
 import com.meonghae.communityservice.Entity.Board.Board;
+import com.meonghae.communityservice.Entity.Board.QBoard;
 import com.meonghae.communityservice.Enum.BoardType;
 import com.meonghae.communityservice.Exception.Custom.BoardException;
 import com.meonghae.communityservice.Exception.Error.ErrorCode;
 import com.meonghae.communityservice.Repository.BoardRepository;
+import com.querydsl.core.QueryFactory;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -26,8 +29,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
+    private final JPAQueryFactory jpaQueryFactory;
 
-    @Transactional
+
     public Slice<BoardListDto> getBoardList(int typeKey, int page) {
         BoardType type = BoardType.findWithKey(typeKey);
         PageRequest request = PageRequest.of(page - 1, 20,
@@ -37,7 +41,6 @@ public class BoardService {
         return listDto;
     }
 
-    @Transactional
     public BoardDetailDto getBoard(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
@@ -45,13 +48,21 @@ public class BoardService {
         return dto;
     }
 
-    @Transactional
     public List<BoardMainDto> getMainBoard() {
-        List<Board> mainBoardList = boardRepository.findTop1LikedPerType();
-        return mainBoardList.stream().map(BoardMainDto::new).collect(Collectors.toList());
+//        List<Board> mainBoardList = boardRepository.findTop1LikedPerType();
+
+        QBoard qBoard = QBoard.board;
+        List<Board> mainBoardLists = jpaQueryFactory.select(qBoard)
+                .from(qBoard)
+                .where(qBoard.type.in(BoardType.SHOW, BoardType.FUN, BoardType.MISSING))
+                .groupBy(qBoard.type)
+                .orderBy(qBoard.likes.desc())
+                .distinct()
+                .fetch();
+
+        return mainBoardLists.stream().map(BoardMainDto::new).collect(Collectors.toList());
     }
 
-    @Transactional
     public void createBoard(int typeKey, BoardRequestDto requestDto) {
         BoardType type = BoardType.findWithKey(typeKey);
         Board board = requestDto.toEntity(type);
@@ -63,7 +74,6 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    @Transactional
     public void modifyBoard(Long id, BoardRequestDto requestDto) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
@@ -73,7 +83,6 @@ public class BoardService {
         board.updateBoard(requestDto.getTitle(), requestDto.getContent());
     }
 
-    @Transactional
     public void deleteBoard(Long id, String userId) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("board is not exist"));
