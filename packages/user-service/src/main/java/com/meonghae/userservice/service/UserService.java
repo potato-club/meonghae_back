@@ -14,64 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@RequiredArgsConstructor
-@Transactional
-@Service
-public class UserService {
+public interface UserService {
 
-    private final UserRepository userRepository;
-    private final KakaoApi kakaoApi;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final RedisService redisService;
+    UserResponseDto login(String code, HttpServletResponse response);
 
-    public UserResponseDto login(String code, HttpServletResponse response) {
-        String access_token = kakaoApi.getAccessToken(code);
-        String email = kakaoApi.getUserInfo(access_token);
+    void signUp(UserRequestDto userDto);
 
-        if (userRepository.existsByEmail(email)) {
-            UserRole userRole = userRepository.findByEmail(email).get().getUserRole();
+    void update(UserRequestDto userDto, HttpServletRequest request);
 
-            String accessToken = jwtTokenProvider.createAccessToken(email, userRole);
-            String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole);
+    void logout(HttpServletRequest request);
 
-            jwtTokenProvider.setHeaderAccessToken(response, accessToken);
-            jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
+    String findByEmailFromAccessToken(HttpServletRequest request);
 
-            redisService.setValues(refreshToken, email);
-
-            return UserResponseDto.builder()
-                    .responseCode("200_OK")
-                    .build();
-        }
-
-        return UserResponseDto.builder()
-                .email(email)
-                .responseCode("201_CREATED")
-                .build();
-    }
-
-    public void signUp(UserRequestDto userDto) {
-        userRepository.save(userDto.toEntity());
-    }
-
-    public void update(UserRequestDto userDto, HttpServletRequest request) {
-        String email = this.findByEmailFromAccessToken(request);
-        User user = userRepository.findByEmail(email).orElseThrow();
-
-        user.update(userDto);
-        userRepository.save(user);
-    }
-
-    public void logout(HttpServletRequest request) {
-        redisService.delValues(jwtTokenProvider.resolveRefreshToken(request));
-        jwtTokenProvider.expireToken(this.findByAccessToken(request));
-    }
-
-    private String findByEmailFromAccessToken(HttpServletRequest request) {
-        return jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
-    }
-
-    private String findByAccessToken(HttpServletRequest request) {
-        return jwtTokenProvider.resolveAccessToken(request);
-    }
+    String findByAccessToken(HttpServletRequest request);
 }
