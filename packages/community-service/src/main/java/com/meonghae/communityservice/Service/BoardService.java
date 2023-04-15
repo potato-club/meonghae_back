@@ -10,9 +10,6 @@ import com.meonghae.communityservice.Enum.BoardType;
 import com.meonghae.communityservice.Exception.Custom.BoardException;
 import com.meonghae.communityservice.Exception.Error.ErrorCode;
 import com.meonghae.communityservice.Repository.BoardRepository;
-import com.querydsl.core.QueryFactory;
-import com.querydsl.core.QueryResults;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,23 +50,17 @@ public class BoardService {
 
     public List<BoardMainDto> getMainBoard() {
 
-        QBoard qBoard = QBoard.board;
-        LocalDateTime midnight = LocalDateTime.now().toLocalDate().atStartOfDay();
-        LocalDateTime now = LocalDateTime.now();
+        List<Board> mainBoardLists;
 
-        List<Board> mainBoardLists = jpaQueryFactory.selectFrom(qBoard)
-                .where(qBoard.createdDate.between(midnight, now))
-                .orderBy(qBoard.likes.desc())
-                .fetch()
-                .stream()
-                .collect(Collectors.groupingBy(Board::getType))
-                .values()
-                .stream()
-                .map(boards -> boards.stream()
-                        .max(Comparator.comparing(Board::getLikes))
-                        .orElse(null))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        QBoard qBoard = QBoard.board;
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime yesterday = now.minusDays(1).toLocalDate().atStartOfDay();
+
+        mainBoardLists = Arrays.stream(BoardType.values()).map(type -> jpaQueryFactory.selectFrom(qBoard)
+                .where(qBoard.type.eq(type), qBoard.createdDate.between(yesterday, now))
+                .orderBy(qBoard.likes.desc(), qBoard.createdDate.desc())
+                .limit(1)
+                .fetchOne()).filter(Objects::nonNull).collect(Collectors.toList());
 
         return mainBoardLists.stream().map(BoardMainDto::new).collect(Collectors.toList());
     }
