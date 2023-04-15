@@ -17,7 +17,7 @@ public class CommentChildDto {
         this.id = child.getId();
         this.comment = child.getComment();
         this.userId = child.getUserId();
-        this.update = child.getUpdate();
+        this.update = child.getUpdated();
         this.parentId = child.getParent().getId();
     }
 }

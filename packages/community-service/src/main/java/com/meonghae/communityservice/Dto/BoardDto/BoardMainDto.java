@@ -19,7 +19,13 @@ public class BoardMainDto {
         this.title = board.getTitle();
         this.type = board.getType();
         this.userId = board.getOwner();
-        this.commentSize = board.getComments().size();
+
+        if (board.getComments().isEmpty()) {
+            this.commentSize = 0;
+        } else {
+            this.commentSize = board.getComments().size();
+        }
+//        this.commentSize = board.getComments().size();
         this.likes = board.getLikes();
         this.image = !board.getImages().isEmpty();
     }

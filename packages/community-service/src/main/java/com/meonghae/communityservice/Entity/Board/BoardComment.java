@@ -35,7 +35,7 @@ public class BoardComment extends BaseTimeEntity {
     private List<BoardComment> replies = new ArrayList<>();
 
     @Column(nullable = false)
-    private Boolean update;
+    private Boolean updated;
 
     public void addReply(BoardComment reply) {
         replies.add(reply);
@@ -52,6 +52,6 @@ public class BoardComment extends BaseTimeEntity {
 
     public void updateComment(String newComment) {
         this.comment = newComment;
-        this.update = true;
+        this.updated = true;
     }
 }
