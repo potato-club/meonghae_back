@@ -19,14 +19,13 @@ import java.util.List;
 public class PetController {
     private final PetService petService;
 
-   /* @GetMapping("/admin") // 관리자용
-    public List<PetInfoRequestDto> findAll() {
-        return petService.findAll();
-    }*/
-
-    @GetMapping
-    public List<PetInfoResponseDTO> getUserPet(HttpServletRequest request){
-        return petService.getUserPet(request);
+    @GetMapping // uset의 반려동물 리스트
+    public List<PetInfoResponseDTO> getUserPetList(HttpServletRequest request){
+        return petService.getUserPetList(request);
+    }
+    @GetMapping("/{id}") // 하나의 반려동물
+    public PetInfoResponseDTO getUserPet(@PathVariable Long id,HttpServletRequest request){
+        return petService.getUserPet(id,request);
     }
 
     @PostMapping
@@ -40,7 +39,7 @@ public class PetController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteById(@PathVariable Long id) {
-        return petService.deleteById(id);
+    public String deleteById(@PathVariable Long id, HttpServletRequest request) {
+        return petService.deleteById(id,request);
     }
 }

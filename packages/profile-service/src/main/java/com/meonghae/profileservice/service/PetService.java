@@ -8,7 +8,9 @@ import com.meonghae.profileservice.error.exception.NotFoundException;
 import com.meonghae.profileservice.repository.PetRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -21,18 +23,24 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PetService {
-    private final EntityManager entityManager;
     private final PetRepository petRepository;
 
-    public List<PetInfoResponseDTO> getUserPet(HttpServletRequest request){
-        //user at에서 네임 빼오기
-        Query query = entityManager.createQuery("SELECT p FROM PetEntity p WHERE userName= :targetName");
-        query.setParameter("targetName","명재");
-        List<PetEntity> petEntities = query.getResultList();
-        return petEntities.stream().map(PetInfoResponseDTO::new).collect(Collectors.toList());
+    public List<PetInfoResponseDTO> getUserPetList(HttpServletRequest request){
+        //인증 로직
+
+        List<PetEntity> petEntityList = petRepository.findByUserNameOrderById("명재");
+        return petEntityList.stream().map(PetInfoResponseDTO::new).collect(Collectors.toList());
     }
-    //하나 가져오는건 없어도 됌 해당 동물 캘린더 필요
+    // 한 마리의 정보
+    public PetInfoResponseDTO getUserPet(Long id, HttpServletRequest request){
+        //인증 로직
+
+        PetEntity petEntity = petRepository.findById(id).orElseThrow(()->{throw new NotFoundException(ErrorCode.NOT_FOUND_PET,ErrorCode.NOT_FOUND_PET.getMessage());});
+        return new PetInfoResponseDTO(petEntity);
+    }
     public String save(PetInfoRequestDto petInfoRequestDto, HttpServletRequest request) {
+        //인증 로직
+
         PetEntity petEntity = new PetEntity().builder()
                 .userName("명재")
                 .petType(petInfoRequestDto.getPetType())
@@ -46,7 +54,9 @@ public class PetService {
     }
 
     public String update(Long id, PetInfoRequestDto petDTO,HttpServletRequest request) {
-       PetEntity petEntity = petRepository.findById(id).orElseThrow(()->{throw new NotFoundException(ErrorCode.NOT_FOUND_PET,ErrorCode.NOT_FOUND_PET.getMessage());});
+        //인증 로직
+
+        PetEntity petEntity = petRepository.findById(id).orElseThrow(()->{throw new NotFoundException(ErrorCode.NOT_FOUND_PET,ErrorCode.NOT_FOUND_PET.getMessage());});
        petEntity.builder()
                .petSpecies(petDTO.getPetSpecies())
                .petGender(petDTO.getPetGender())
@@ -57,7 +67,9 @@ public class PetService {
        return "수정 완료";
     }
 
-    public String deleteById(Long id) {
+    public String deleteById(Long id,HttpServletRequest request) {
+        //인증 로직
+
         petRepository.deleteById(id);
         return "삭제 완료";
     }

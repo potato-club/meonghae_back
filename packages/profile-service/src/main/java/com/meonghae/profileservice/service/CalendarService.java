@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class CalendarService {
-    private final EntityManager entityManager;
     private final PetRepository petRepository;
 
     private final CalendarRepository calendarRepository;

@@ -8,5 +8,5 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface PetRepository extends JpaRepository<PetEntity,Long> {
-
+    List<PetEntity> findByUserNameOrderById(String userName);
 }
