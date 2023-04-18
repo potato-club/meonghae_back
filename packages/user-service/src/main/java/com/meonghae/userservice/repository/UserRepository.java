@@ -1,6 +1,5 @@
 package com.meonghae.userservice.repository;
 
-import com.meonghae.userservice.dto.UserDto;
 import com.meonghae.userservice.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

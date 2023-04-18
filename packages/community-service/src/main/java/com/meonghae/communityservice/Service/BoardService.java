@@ -10,8 +10,7 @@ import com.meonghae.communityservice.Enum.BoardType;
 import com.meonghae.communityservice.Exception.Custom.BoardException;
 import com.meonghae.communityservice.Exception.Error.ErrorCode;
 import com.meonghae.communityservice.Repository.BoardRepository;
-import com.querydsl.core.QueryFactory;
-import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -55,10 +54,9 @@ public class BoardService {
 
         QBoard qBoard = QBoard.board;
         LocalDateTime midnight = LocalDateTime.now().toLocalDate().atStartOfDay();
-        LocalDateTime now = LocalDateTime.now();
 
         List<Board> mainBoardLists = jpaQueryFactory.selectFrom(qBoard)
-                .where(qBoard.createdDate.between(midnight, now))
+                .where(qBoard.createdDate.goe(midnight))
                 .orderBy(qBoard.likes.desc())
                 .fetch()
                 .stream()
