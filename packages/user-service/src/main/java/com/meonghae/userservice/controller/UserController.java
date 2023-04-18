@@ -40,6 +40,13 @@ public class UserController {
         return userService.login(code, response);
     }
 
+    @Operation(summary = "테스트용 로그인 API")
+    @GetMapping("/login/test")
+    public ResponseEntity<String> loginTest(HttpServletResponse response) {
+        userService.loginTest(response);
+        return ResponseEntity.ok("테스트 로그인 성공");
+    }
+
     @Operation(summary = "로그아웃 API")
     @GetMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {

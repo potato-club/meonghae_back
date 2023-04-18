@@ -24,8 +24,14 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        if (path.equals("/login") || path.equals("/signup") || path.contains("/users")) {
+        if (path.contains("/swagger") || path.contains("/v2/api-docs")) {
             filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (path.contains("/login") || path.equals("/signup") || path.contains("/users")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
