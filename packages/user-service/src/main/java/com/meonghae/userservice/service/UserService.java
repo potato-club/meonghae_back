@@ -18,6 +18,8 @@ public interface UserService {
 
     UserResponseDto login(String code, HttpServletResponse response);
 
+    void loginTest(HttpServletResponse response);
+
     void signUp(UserRequestDto userDto);
 
     void update(UserRequestDto userDto, HttpServletRequest request);
