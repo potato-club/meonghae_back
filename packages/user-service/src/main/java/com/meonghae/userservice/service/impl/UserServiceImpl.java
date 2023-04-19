@@ -54,6 +54,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void loginTest(HttpServletResponse response) {
+        String email = "test1234@test.com";
+        UserRole userRole = UserRole.USER;
+
+        String accessToken = jwtTokenProvider.createAccessToken(email, userRole);
+        String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole);
+
+        jwtTokenProvider.setHeaderAccessToken(response, accessToken);
+        jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
+
+        redisService.setValues(refreshToken, email);
+    }
+
+    @Override
     public void signUp(UserRequestDto userDto) {
         userRepository.save(userDto.toEntity());
     }
