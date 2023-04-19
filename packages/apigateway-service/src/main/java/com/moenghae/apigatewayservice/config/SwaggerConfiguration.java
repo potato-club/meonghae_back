@@ -89,15 +89,15 @@ public class SwaggerConfiguration {
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("user-service", r -> r.path("/user-service/**")
+                .route("user-service", r -> r.path("/user-service/v2/api-docs")
                         .filters(f -> f.rewritePath("/user-service/(?<segment>.*)", "/${segment}")
                                 .setPath("/v2/api-docs"))
                         .uri("lb://USER-SERVICE"))
-                .route("community-service", r -> r.path("/community-service/**")
+                .route("community-service", r -> r.path("/community-service/v2/api-docs")
                         .filters(f -> f.rewritePath("/community-service/(?<segment>.*)", "/${segment}")
                                 .setPath("/v2/api-docs"))
                         .uri("lb://COMMUNITY-SERVICE"))
-                .route("profile-service", r -> r.path("/profile-service/**")
+                .route("profile-service", r -> r.path("/profile-service/v2/api-docs")
                         .filters(f -> f.rewritePath("/profile-service/(?<segment>.*)", "/${segment}")
                                 .setPath("/v2/api-docs"))
                         .uri("lb://PROFILE-SERVICE"))
