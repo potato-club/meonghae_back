@@ -60,4 +60,10 @@ public class UserController {
         userService.update(userDto, request);
         return ResponseEntity.ok("닉네임이 변경되었습니다.");
     }
+
+    @PutMapping("/withdrawal")
+    public ResponseEntity<String> withdrawalMembership(HttpServletRequest request) {
+        userService.withdrawalMembership(request);
+        return ResponseEntity.ok("회원탈퇴 처리 되었습니다");
+    }
 }

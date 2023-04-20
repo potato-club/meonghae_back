@@ -47,4 +47,8 @@ public class User {
     public void update(UserRequestDto userDto) {
         this.nickname = userDto.getNickname();
     }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }
