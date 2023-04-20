@@ -26,7 +26,5 @@ public interface UserService {
 
     void logout(HttpServletRequest request);
 
-    String findByEmailFromAccessToken(HttpServletRequest request);
-
-    String findByAccessToken(HttpServletRequest request);
+    void withdrawalMembership(HttpServletRequest request);
 }
