@@ -17,11 +17,13 @@ import javax.transaction.Transactional;
 public class BoardLikeService {
     private final BoardLikeRepository likeRepository;
     private final BoardRepository boardRepository;
+    private final RedisService redisService;
 
     @Transactional
-    public String addLike(Long id, String userId) {
+    public String addLike(Long id, String nickname) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("board is not exist"));
+        String userId = redisService.getUserId(nickname);
         BoardLike like = likeRepository.findByUserIdAndBoard(userId, board);
         // 좋아요
         if(like == null) {

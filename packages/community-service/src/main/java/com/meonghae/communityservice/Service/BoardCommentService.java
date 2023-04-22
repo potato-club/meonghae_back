@@ -24,6 +24,7 @@ import javax.transaction.Transactional;
 public class BoardCommentService {
     private final BoardRepository boardRepository;
     private final BoardCommentRepository commentRepository;
+    private final RedisService redisService;
 
     @Transactional
     public Slice<CommentParentDto> getParentComments(int page, Long boardId) {
@@ -31,7 +32,10 @@ public class BoardCommentService {
                 .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
         PageRequest request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.DESC, "id"));
         Slice<BoardComment> comments = commentRepository.findByBoardAndParentIsNull(request, board);
-        Slice<CommentParentDto> dtoPage = comments.map(CommentParentDto::new);
+        Slice<CommentParentDto> dtoPage = comments.map(comment -> {
+            String nickname = redisService.getNickname(comment.getUserId());
+            return new CommentParentDto(comment, nickname);
+        });
         return dtoPage;
     }
 
@@ -43,7 +47,10 @@ public class BoardCommentService {
         }
         PageRequest request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.ASC, "id"));
         Slice<BoardComment> childComments = commentRepository.findByParent(request, parent);
-        Slice<CommentChildDto> dtoPage = childComments.map(CommentChildDto::new);
+        Slice<CommentChildDto> dtoPage = childComments.map(comment -> {
+            String nickname = redisService.getNickname(comment.getUserId());
+            return new CommentChildDto(comment, nickname);
+        });
         return dtoPage;
     }
 
@@ -68,39 +75,40 @@ public class BoardCommentService {
     }
 
     @Transactional
-    public ReloadCommentDto updateComment(Long id, CommentUpdateDto updateDto) {
+    public String updateComment(Long id, CommentRequestDto updateDto) {
         BoardComment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("comment is not exist"));
-        if(!comment.getUserId().equals(updateDto.getUserId())) {
+        if(!comment.getUserId().equals(redisService.getUserId(updateDto.getNickname()))) {
             throw new CommentException(ErrorCode.UNAUTHORIZED, "댓글 작성자만 수정 가능합니다.");
         }
         comment.updateComment(updateDto.getComment());
         if(comment.isParent()) {
-            return new ReloadCommentDto(comment.getBoard().getId(), comment.isParent());
+            return "부모댓글 수정 완료";
         }
-        return new ReloadCommentDto(comment.getParent().getId(), comment.isParent());
+        return "자식댓글 수정 완료";
     }
 
     @Transactional
-    public ReloadCommentDto deleteComment(Long id, String userId) {
+    public String deleteComment(Long id, String nickname) {
         BoardComment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("comment is not exist"));
-        if(!comment.getUserId().equals(userId)) {
+        if(!comment.getUserId().equals(redisService.getUserId(nickname))) {
             throw new CommentException(ErrorCode.UNAUTHORIZED, "댓글 작성자만 삭제 가능합니다.");
         }
         commentRepository.delete(comment);
         if(comment.isParent()) {
-            return new ReloadCommentDto(comment.getBoard().getId(), comment.isParent());
+            return "부모댓글 삭제 완료";
         }
-        return new ReloadCommentDto(comment.getParent().getId(), comment.isParent());
+        return "자식댓글 삭제 완료";
     }
 
     private BoardComment createComment(Board findBoard, CommentRequestDto requestDto) {
+        String userId = redisService.getUserId(requestDto.getNickname());
         BoardComment comment = BoardComment.builder()
                 .board(findBoard)
                 .comment(requestDto.getComment())
                 .updated(false)
-                .userId(requestDto.getUserId()).build();
+                .userId(userId).build();
         return comment;
     }
 }

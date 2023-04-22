@@ -21,7 +21,7 @@ public class Board extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private String owner;
+    private String userId;
     @Column(nullable = false)
     private String title;
     @Column(nullable = false)
@@ -31,13 +31,14 @@ public class Board extends BaseTimeEntity {
     private BoardType type;
     private int likes;
 
+    // 추후 수정 필요 -> S3 업로드 MSA 로 구현 -> name 만 가져와서 String 타입으로 가질듯?
     @OneToMany(mappedBy = "board", orphanRemoval = true)
     private List<BoardImage> images = new ArrayList<>();
     @OneToMany(mappedBy = "board", orphanRemoval = true)
     private List<BoardComment> comments = new ArrayList<>();
 
     public void setOwner(String userId) {
-        this.owner = userId;
+        this.userId = userId;
     }
 
     public void setLikes(int likes) {

@@ -26,6 +26,8 @@ public class Review extends BaseTimeEntity {
     private String content;
     @Column(nullable = false)
     private String userId;
+
+    // 추후 수정 필요 -> S3 업로드 MSA 로 구현 -> name 만 가져와서 String 타입으로 가질듯?
     @OneToMany(mappedBy = "review", orphanRemoval = true)
     private List<ReviewImage> images = new ArrayList<>();
     @Column(name = "rating", nullable = false, columnDefinition = "int")
