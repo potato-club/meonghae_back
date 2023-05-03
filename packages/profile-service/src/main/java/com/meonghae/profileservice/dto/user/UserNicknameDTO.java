@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UserNicknameDTO {
-    private String nickname;
+  private String nickname;
 }

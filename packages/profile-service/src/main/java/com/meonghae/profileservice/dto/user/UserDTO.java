@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UserDTO {
-    private String uid;
+  private String uid;
 }
