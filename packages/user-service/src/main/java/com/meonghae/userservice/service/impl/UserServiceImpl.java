@@ -68,6 +68,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String sendEmail(HttpServletRequest request) {
+        return this.findByEmailFromAccessToken(request);
+    }
+
+    @Override
     public void signUp(UserRequestDto userDto) {
         userRepository.save(userDto.toEntity());
     }
@@ -84,14 +89,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public void logout(HttpServletRequest request) {
         redisService.delValues(jwtTokenProvider.resolveRefreshToken(request));
-        jwtTokenProvider.expireToken(this.findByAccessToken(request));
+        jwtTokenProvider.expireToken(jwtTokenProvider.resolveAccessToken(request));
+    }
+
+    @Override
+    public void withdrawalMembership(HttpServletRequest request) {
+        String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        user.setDeleted(true);
+        this.logout(request);
     }
 
     public String findByEmailFromAccessToken(HttpServletRequest request) {
         return jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
-    }
-
-    public String findByAccessToken(HttpServletRequest request) {
-        return jwtTokenProvider.resolveAccessToken(request);
     }
 }
