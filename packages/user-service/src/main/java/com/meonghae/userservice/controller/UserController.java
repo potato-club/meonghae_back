@@ -27,6 +27,12 @@ public class UserController {
         return userRepository.findByEmail(email).get().getUserRole().toString();
     }
 
+    @Operation(summary = "Feign Client 전송용 API")
+    @PostMapping("/send/email")
+    public String sendEmail(HttpServletRequest request) {
+        return userService.sendEmail(request);
+    }
+
     @Operation(summary = "회원가입 API")
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto) {
@@ -59,5 +65,11 @@ public class UserController {
     public ResponseEntity<String> updateNickname(@RequestBody UserRequestDto userDto, HttpServletRequest request) {
         userService.update(userDto, request);
         return ResponseEntity.ok("닉네임이 변경되었습니다.");
+    }
+
+    @PutMapping("/withdrawal")
+    public ResponseEntity<String> withdrawalMembership(HttpServletRequest request) {
+        userService.withdrawalMembership(request);
+        return ResponseEntity.ok("회원탈퇴 처리 되었습니다");
     }
 }
