@@ -27,6 +27,12 @@ public class UserController {
         return userRepository.findByEmail(email).get().getUserRole().toString();
     }
 
+    @Operation(summary = "Feign Client 전송용 API")
+    @PostMapping("/send/email")
+    public String sendEmail(HttpServletRequest request) {
+        return userService.sendEmail(request);
+    }
+
     @Operation(summary = "회원가입 API")
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto) {

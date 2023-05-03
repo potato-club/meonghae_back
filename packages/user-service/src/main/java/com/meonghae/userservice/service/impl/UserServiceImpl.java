@@ -68,6 +68,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String sendEmail(HttpServletRequest request) {
+        return this.findByEmailFromAccessToken(request);
+    }
+
+    @Override
     public void signUp(UserRequestDto userDto) {
         userRepository.save(userDto.toEntity());
     }
