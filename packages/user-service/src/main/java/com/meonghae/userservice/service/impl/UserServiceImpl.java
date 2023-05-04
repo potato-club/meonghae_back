@@ -8,7 +8,7 @@ import com.meonghae.userservice.jwt.JwtTokenProvider;
 import com.meonghae.userservice.repository.UserRepository;
 import com.meonghae.userservice.service.Jwt.RedisService;
 import com.meonghae.userservice.service.KakaoApi;
-import com.meonghae.userservice.service.UserService;
+import com.meonghae.userservice.service.Interface.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +70,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public String sendEmail(HttpServletRequest request) {
         return this.findByEmailFromAccessToken(request);
+    }
+
+    @Override
+    public String sendNickname(String email) {
+        return userRepository.findByEmail(email).get().getNickname();
     }
 
     @Override
