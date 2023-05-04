@@ -16,16 +16,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PetService {
   private final PetRepository petRepository;
+  private final RedisService redisService;
 
   public List<PetInfoResponseDTO> getUserPetList(HttpServletRequest request) {
-    // 인증 로직
+    String userEmail = redisService.getUserEmail(request);
 
-    List<PetEntity> petEntityList = petRepository.findByUserNameOrderById("명재");
+    List<PetEntity> petEntityList = petRepository.findByUserEmailOrderById(userEmail);
     return petEntityList.stream().map(PetInfoResponseDTO::new).collect(Collectors.toList());
   }
   // 한 마리의 정보
-  public PetInfoResponseDTO getUserPet(Long id, HttpServletRequest request) {
-    // 인증 로직
+  public PetInfoResponseDTO getUserPet(Long id) {
 
     PetEntity petEntity =
         petRepository
@@ -39,12 +39,12 @@ public class PetService {
   }
 
   public String save(PetInfoRequestDto petInfoRequestDto, HttpServletRequest request) {
-    // 인증 로직
+    String userEmail = redisService.getUserEmail(request);
 
     PetEntity petEntity =
         new PetEntity()
             .builder()
-            .userId("명재")
+            .userEmail(userEmail)
             .petType(petInfoRequestDto.getPetType())
             .petName(petInfoRequestDto.getPetName())
             .petGender(petInfoRequestDto.getPetGender())
@@ -56,8 +56,6 @@ public class PetService {
   }
 
   public String update(Long id, PetInfoRequestDto petDTO, HttpServletRequest request) {
-    // 인증 로직
-
     PetEntity petEntity =
         petRepository
             .findById(id)
@@ -66,6 +64,7 @@ public class PetService {
                   throw new NotFoundException(
                       ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());
                 });
+
     petEntity
         .builder()
         .petSpecies(petDTO.getPetSpecies())

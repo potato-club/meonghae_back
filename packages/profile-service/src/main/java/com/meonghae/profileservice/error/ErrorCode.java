@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
   RUNTIME_EXCEPTION(HttpStatus.BAD_REQUEST, 001, "잘못된 요청방식입니다."),
   USER_NOT_FOUND(HttpStatus.BAD_REQUEST,002,"없는 유저입니다."),
+  CANT_READ_TOKEN(HttpStatus.UNAUTHORIZED,003,"토큰 값을 읽을 수 없습니다."),
+
   //    ACCESS_DENIED_EXCEPTION(HttpStatus.UNAUTHORIZED,"E0001","로그인하세요."),
   //    WRONG_ID_PW_EXCEPTION(HttpStatus.UNAUTHORIZED,"E0011","잘못된 아이디 또는 비밀번호입니다."),
   //    UNDEFINED_TIME(HttpStatus.FORBIDDEN,"E00032","정의되어있는 시간이 없습니다."),
