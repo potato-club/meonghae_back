@@ -22,6 +22,7 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
+    private final RedisService redisService;
 
     @Transactional
     public Slice<ReviewListDto> getReviewByType(int key, int page, String keyword, String sort) {
@@ -40,17 +41,21 @@ public class ReviewService {
         } else {
             reviews = reviewRepository.findByCatalogAndKeywordAndSort(request, catalog, keyword, sort);
         }
-        return reviews.map(ReviewListDto::new);
+        return reviews.map(review -> {
+            String nickname = redisService.getNickname(review.getUserId());
+            return new ReviewListDto(review, nickname);
+        });
     }
 
     @Transactional
     public void createReview(int key, ReviewRequestDto requestDto) {
         ReviewCatalog catalog = ReviewCatalog.findWithKey(key);
+        String userId = redisService.getUserId(requestDto.getNickname());
         if(catalog == null) throw new ReviewException(ErrorCode.BAD_REQUEST, "잘못된 Catalog Type 입니다.");
         Review review = Review.builder()
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
-                .userId(requestDto.getUserId())
+                .userId(userId)
                 .rating(requestDto.getRating())
                 .catalog(catalog).build();
         reviewRepository.save(review);
