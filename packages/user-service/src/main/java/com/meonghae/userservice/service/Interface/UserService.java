@@ -12,7 +12,7 @@ public interface UserService {
 
     void loginTest(HttpServletResponse response);
 
-    String sendEmail(HttpServletRequest request);
+    String sendEmail(String token);
 
     String sendNickname(String email);
 

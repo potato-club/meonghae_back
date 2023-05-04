@@ -68,8 +68,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String sendEmail(HttpServletRequest request) {
-        return this.findByEmailFromAccessToken(request);
+    public String sendEmail(String token) {
+        return jwtTokenProvider.getUserEmail(token);
     }
 
     @Override
