@@ -29,8 +29,8 @@ public class UserController {
 
     @Operation(summary = "Feign Client 전송용 API - 이메일")
     @GetMapping("/send/email")
-    public String sendEmail(HttpServletRequest request) {
-        return userService.sendEmail(request);
+    public String sendEmail(@RequestHeader("Authorization") String token) {
+        return userService.sendEmail(token);
     }
 
     @Operation(summary = "Feign Client 전송용 API - 닉네임")
