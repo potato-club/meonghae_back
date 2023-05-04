@@ -36,7 +36,7 @@ public class CalendarService {
   // 프로필 화면에서 가까운 일정 순서대로 표시하기위함.
   @Transactional
   public List<CalendarResponseDTO> getProfileSchedule(HttpServletRequest request) {
-    //인증로직
+    String userEmail = redisService.getUserEmail(request);
 
     QCalendar qCalendar = QCalendar.calendar;
     QPetEntity qPetEntity = QPetEntity.petEntity;
@@ -47,8 +47,8 @@ public class CalendarService {
             .innerJoin(qCalendar.petEntity, qPetEntity)
             .where(
                 qCalendar
-                    .userId
-                    .eq("명재")
+                    .userEmail
+                    .eq(userEmail)
                     .and(qCalendar.scheduleTime.after(LocalDate.now().atStartOfDay())))
             .limit(30)
             .orderBy(qCalendar.scheduleTime.asc())
@@ -70,6 +70,8 @@ public class CalendarService {
             .atStartOfDay();
     LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1); // ex) 13일 23시 59분
 
+    String userEmail = redisService.getUserEmail(request);
+
     QCalendar qCalendar = QCalendar.calendar;
     QPetEntity qPetEntity = QPetEntity.petEntity;
 
@@ -79,7 +81,7 @@ public class CalendarService {
             .from(qCalendar)
             .innerJoin(qCalendar.petEntity, qPetEntity)
             .where(
-                qCalendar.userId.eq("명재").and(qCalendar.scheduleTime.between(startOfDay, endOfDay)))
+                qCalendar.userEmail.eq(userEmail).and(qCalendar.scheduleTime.between(startOfDay, endOfDay)))
             .orderBy(qCalendar.scheduleTime.asc())
             .fetch();
 
@@ -94,6 +96,8 @@ public class CalendarService {
         LocalDate.of(calendarRequestDTO.getYear(), calendarRequestDTO.getMonth(), 1);
     LocalDate endOfDate = startOfDate.plusMonths(1).minusDays(1);
 
+    String userEmail = redisService.getUserEmail(request);
+
     QCalendar qCalendar = QCalendar.calendar;
     QPetEntity qPetEntity = QPetEntity.petEntity;
 
@@ -104,8 +108,8 @@ public class CalendarService {
             .innerJoin(qCalendar.petEntity, qPetEntity)
             .where(
                 qCalendar
-                    .userId
-                    .eq("명재")
+                    .userEmail
+                    .eq(userEmail)
                     .and(
                         qCalendar.scheduleTime.between(
                             startOfDate.atStartOfDay(), endOfDate.atStartOfDay())))
@@ -130,10 +134,12 @@ public class CalendarService {
     PetEntity petEntity = petRepository.findById(calendarRequestDTO.getPetId())
             .orElseThrow(() -> {throw new NotFoundException(ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
 
+    String userEmail = redisService.getUserEmail(request);
+
     Calendar calendar =
         new Calendar()
             .builder()
-            .userId("명재")
+            .userEmail(userEmail)
             .petEntity(petEntity)
             .scheduleTime(scheduleDateTime)
             .text(calendarRequestDTO.getText())

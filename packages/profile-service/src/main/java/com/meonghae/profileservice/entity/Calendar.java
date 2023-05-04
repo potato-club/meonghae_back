@@ -21,7 +21,7 @@ public class Calendar extends BaseTimeEntity{
   private Long id;
 
   @Column(nullable = false)
-  private String userId;
+  private String userEmail;
 
   @ManyToOne
   @JoinColumn(name = "petEntityId")

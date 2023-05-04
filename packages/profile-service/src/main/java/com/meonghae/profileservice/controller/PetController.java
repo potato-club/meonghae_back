@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-/** user -> profile 요청시 펫 id와 이름 list 리턴 -> 추가, 삭제, 업데이트 */
+
 @RestController
 @RequestMapping("/profile")
 @RequiredArgsConstructor
@@ -21,8 +21,8 @@ public class PetController {
   }
   // @Operation(summary = "한 마리의 반려동물 정보")
   @GetMapping("/{id}") // 하나의 반려동물
-  public PetInfoResponseDTO getUserPet(@PathVariable Long id, HttpServletRequest request) {
-    return petService.getUserPet(id, request);
+  public PetInfoResponseDTO getUserPet(@PathVariable Long id) {
+    return petService.getUserPet(id);
   }
   // @Operation(summary = "반려동물 추가")
   @PostMapping

@@ -21,7 +21,7 @@ public class PetEntity extends BaseTimeEntity {
   private Long id;
 
   @Column(nullable = false)
-  private String userId;
+  private String userEmail;
 
   @Column(nullable = false)
   private PetType petType;
