@@ -26,8 +26,8 @@ public class RedisService {
     private final RedisCacheManager cacheManager;
     private final UserServiceClient userServiceClient;
 
-    @Value("${cacheName.getByAT}")
-    private String byAT;
+//    @Value("${cacheName.getByAT}")
+//    private String byAT;
 //    @Value("${cacheName.getByUid}")
 //    private String byUserId;
 //    @Value("${cacheName.getByName}")
@@ -35,43 +35,13 @@ public class RedisService {
 
     @Transactional
     public String getUserEmail(HttpServletRequest request) {
-        String userAT = request.getHeader("Authorization");
-        String userEmail = cacheManager.getCache(byAT).get(userAT, String.class);
+        String userEmail = userServiceClient.getUserEmail(request);
         if (userEmail == null) {
-            String tempEmail = userServiceClient.getUserEmail(request);
-            if (tempEmail == null) {
-                throw new UnAuthorizedException(ErrorCode.CANT_READ_TOKEN, ErrorCode.CANT_READ_TOKEN.getMessage());
-            }
-            userEmail = tempEmail;
-            cacheManager.getCache(byAT).put(userAT, userEmail);
+            throw new UnAuthorizedException(ErrorCode.CANT_READ_TOKEN, ErrorCode.CANT_READ_TOKEN.getMessage());
         }
         return userEmail;
     }
+
 }
-//    @Transactional
-//    public String getByNickname(String uuid){
-//        String nickName = cacheManager.getCache(byUserId).get(uuid,String.class);
-//        if (nickName == null){
-//           UserNicknameDTO dto = userServiceClient.getNickname(uuid);
-//           if (dto == null){
-//               throw new BadRequestException(ErrorCode.NOT_FOUND_PET,ErrorCode.NOT_FOUND_PET.getMessage());
-//           }
-//           nickName = dto.getNickname();
-//           cacheManager.getCache(byUserId).put(uuid,nickName);
-//        }
-//        return nickName;
-//    }
-//    @Transactional
-//    public String getUserId(String nickname) {
-//        String uuid = cacheManager.getCache(byNickname).get(nickname, String.class);
-//        if(uuid == null) {
-//            UserDTO dto = userServiceClient.getUserId(nickname);
-//            if(dto == null) {
-//                throw new BadRequestException(ErrorCode.NOT_FOUND_PET,ErrorCode.NOT_FOUND_PET.getMessage());
-//            }
-//            uuid = dto.getUid();
-//            cacheManager.getCache(byNickname).put(nickname, uuid);
-//        }
-//        return uuid;
-//    }
+
 
