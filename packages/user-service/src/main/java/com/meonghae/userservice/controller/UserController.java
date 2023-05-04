@@ -34,8 +34,8 @@ public class UserController {
     }
 
     @Operation(summary = "Feign Client 전송용 API - 닉네임")
-    @GetMapping("/send/nickname")
-    public String sendNickname(@RequestParam String email) {
+    @GetMapping("/send/{email}")
+    public String sendNickname(@PathVariable String email) {
         return userService.sendNickname(email);
     }
 
