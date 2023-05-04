@@ -3,7 +3,7 @@ package com.meonghae.userservice.controller;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
 import com.meonghae.userservice.repository.UserRepository;
-import com.meonghae.userservice.service.UserService;
+import com.meonghae.userservice.service.Interface.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +27,16 @@ public class UserController {
         return userRepository.findByEmail(email).get().getUserRole().toString();
     }
 
-    @Operation(summary = "Feign Client 전송용 API")
+    @Operation(summary = "Feign Client 전송용 API - 이메일")
     @GetMapping("/send/email")
     public String sendEmail(HttpServletRequest request) {
         return userService.sendEmail(request);
+    }
+
+    @Operation(summary = "Feign Client 전송용 API - 닉네임")
+    @GetMapping("/send/nickname")
+    public String sendNickname(@RequestParam String email) {
+        return userService.sendNickname(email);
     }
 
     @Operation(summary = "회원가입 API")

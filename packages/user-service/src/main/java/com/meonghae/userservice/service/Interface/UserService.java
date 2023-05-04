@@ -1,4 +1,4 @@
-package com.meonghae.userservice.service;
+package com.meonghae.userservice.service.Interface;
 
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
@@ -13,6 +13,8 @@ public interface UserService {
     void loginTest(HttpServletResponse response);
 
     String sendEmail(HttpServletRequest request);
+
+    String sendNickname(String email);
 
     void signUp(UserRequestDto userDto);
 
