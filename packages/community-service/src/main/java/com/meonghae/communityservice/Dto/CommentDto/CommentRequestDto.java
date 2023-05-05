@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CommentRequestDto {
-    @ApiModelProperty("댓글 작성자 닉네임")
-    private String nickname;
     @ApiModelProperty("댓글 내용")
     private String comment;
 }

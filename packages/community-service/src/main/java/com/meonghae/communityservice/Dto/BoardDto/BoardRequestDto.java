@@ -11,12 +11,10 @@ public class BoardRequestDto {
     private String title;
     @ApiModelProperty("게시글 내용")
     private String content;
-    @ApiModelProperty("게시글 작성자 닉네임")
-    private String nickname;
 
-    public Board toEntity(BoardType type, String uid) {
+    public Board toEntity(BoardType type, String email) {
         return Board.builder()
-                .userId(uid)
+                .email(email)
                 .likes(0)
                 .title(title)
                 .content(content)

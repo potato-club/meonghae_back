@@ -21,7 +21,7 @@ public class Board extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private String userId;
+    private String email;
     @Column(nullable = false)
     private String title;
     @Column(nullable = false)
@@ -36,10 +36,6 @@ public class Board extends BaseTimeEntity {
     private List<BoardImage> images = new ArrayList<>();
     @OneToMany(mappedBy = "board", orphanRemoval = true)
     private List<BoardComment> comments = new ArrayList<>();
-
-    public void setOwner(String userId) {
-        this.userId = userId;
-    }
 
     public void setLikes(int likes) {
         this.likes = likes;

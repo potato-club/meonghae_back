@@ -5,5 +5,5 @@ import com.meonghae.communityservice.Entity.Board.BoardLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BoardLikeRepository extends JpaRepository<BoardLike, Long> {
-    BoardLike findByUserIdAndBoard(String userId, Board board);
+    BoardLike findByEmailAndBoard(String email, Board board);
 }

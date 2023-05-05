@@ -4,7 +4,6 @@ import com.meonghae.communityservice.Dto.BoardDto.BoardDetailDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardListDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardMainDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardRequestDto;
-import com.meonghae.communityservice.Dto.UserDto.UserNicknameDto;
 import com.meonghae.communityservice.Service.BoardLikeService;
 import com.meonghae.communityservice.Service.BoardService;
 import io.swagger.annotations.Api;
@@ -51,32 +50,34 @@ public class BoardController {
     @Operation(summary = "게시글 생성 API")
     @PostMapping("/{type}")
     public ResponseEntity<String> createBoard(@PathVariable(name = "type") int type,
-                                              @RequestBody BoardRequestDto requestDto) {
-        boardService.createBoard(type, requestDto);
+                                              @RequestBody BoardRequestDto requestDto,
+                                              @RequestHeader("Authorization") String token) {
+        boardService.createBoard(type, requestDto, token);
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글 생성 완료");
     }
 
     @Operation(summary = "게시글 좋아요 기능 API")
     @PostMapping("/{id}/like")
     public ResponseEntity<String> addLike(@PathVariable(name = "id") Long id,
-                                          @RequestBody UserNicknameDto userDto) {
-        String result = likeService.addLike(id, userDto.getNickname());
+                                          @RequestHeader("Authorization") String token) {
+        String result = likeService.addLike(id, token);
         return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "게시글 수정 API")
     @PutMapping("/{id}")
     public ResponseEntity<String> modifyBoard(@PathVariable(name = "id") Long id,
-                                              @RequestBody BoardRequestDto requestDto) {
-        boardService.modifyBoard(id, requestDto);
+                                              @RequestBody BoardRequestDto requestDto,
+                                              @RequestHeader("Authorization") String token) {
+        boardService.modifyBoard(id, requestDto, token);
         return ResponseEntity.ok("수정 완료");
     }
 
     @Operation(summary = "게시글 삭제 API")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBoard(@PathVariable(name = "id") Long id,
-                                              @RequestBody UserNicknameDto userDto) {
-        boardService.deleteBoard(id, userDto);
+                                              @RequestHeader("Authorization") String token) {
+        boardService.deleteBoard(id, token);
         return ResponseEntity.ok("삭제 완료");
     }
 }

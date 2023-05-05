@@ -1,5 +1,6 @@
 package com.meonghae.communityservice.Service;
 
+import com.meonghae.communityservice.Client.UserServiceClient;
 import com.meonghae.communityservice.Dto.CommentDto.*;
 import com.meonghae.communityservice.Entity.Board.Board;
 import com.meonghae.communityservice.Entity.Board.BoardComment;
@@ -25,6 +26,7 @@ public class BoardCommentService {
     private final BoardRepository boardRepository;
     private final BoardCommentRepository commentRepository;
     private final RedisService redisService;
+    private final UserServiceClient userService;
 
     @Transactional
     public Slice<CommentParentDto> getParentComments(int page, Long boardId) {
@@ -33,7 +35,7 @@ public class BoardCommentService {
         PageRequest request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.DESC, "id"));
         Slice<BoardComment> comments = commentRepository.findByBoardAndParentIsNull(request, board);
         Slice<CommentParentDto> dtoPage = comments.map(comment -> {
-            String nickname = redisService.getNickname(comment.getUserId());
+            String nickname = redisService.getNickname(comment.getEmail());
             return new CommentParentDto(comment, nickname);
         });
         return dtoPage;
@@ -48,37 +50,37 @@ public class BoardCommentService {
         PageRequest request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.ASC, "id"));
         Slice<BoardComment> childComments = commentRepository.findByParent(request, parent);
         Slice<CommentChildDto> dtoPage = childComments.map(comment -> {
-            String nickname = redisService.getNickname(comment.getUserId());
+            String nickname = redisService.getNickname(comment.getEmail());
             return new CommentChildDto(comment, nickname);
         });
         return dtoPage;
     }
 
     @Transactional
-    public void addParentComment(Long boardId, CommentRequestDto requestDto) {
+    public void addParentComment(Long boardId, CommentRequestDto requestDto, String token) {
         Board findBoard = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
-        BoardComment parent = createComment(findBoard, requestDto);
+        BoardComment parent = createComment(findBoard, requestDto, token);
         commentRepository.save(parent);
     }
 
     @Transactional
-    public void addChildComment(Long parentId, CommentRequestDto requestDto) {
+    public void addChildComment(Long parentId, CommentRequestDto requestDto, String token) {
         BoardComment parent = commentRepository.findById(parentId)
                 .orElse(null);
         if(parent == null || !parent.isParent()) {
             throw new CommentException(ErrorCode.BAD_REQUEST, "해당 댓글에는 대댓글을 달 수 없습니다.");
         }
-        BoardComment child = createComment(parent.getBoard(), requestDto);
+        BoardComment child = createComment(parent.getBoard(), requestDto, token);
         commentRepository.save(child);
         parent.addReply(child);
     }
 
     @Transactional
-    public String updateComment(Long id, CommentRequestDto updateDto) {
+    public String updateComment(Long id, CommentRequestDto updateDto, String token) {
         BoardComment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("comment is not exist"));
-        if(!comment.getUserId().equals(redisService.getUserId(updateDto.getNickname()))) {
+        if(!comment.getEmail().equals(userService.getUserEmail(token))) {
             throw new CommentException(ErrorCode.UNAUTHORIZED, "댓글 작성자만 수정 가능합니다.");
         }
         comment.updateComment(updateDto.getComment());
@@ -89,10 +91,10 @@ public class BoardCommentService {
     }
 
     @Transactional
-    public String deleteComment(Long id, String nickname) {
+    public String deleteComment(Long id, String token) {
         BoardComment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("comment is not exist"));
-        if(!comment.getUserId().equals(redisService.getUserId(nickname))) {
+        if(!comment.getEmail().equals(userService.getUserEmail(token))) {
             throw new CommentException(ErrorCode.UNAUTHORIZED, "댓글 작성자만 삭제 가능합니다.");
         }
         commentRepository.delete(comment);
@@ -102,13 +104,13 @@ public class BoardCommentService {
         return "자식댓글 삭제 완료";
     }
 
-    private BoardComment createComment(Board findBoard, CommentRequestDto requestDto) {
-        String userId = redisService.getUserId(requestDto.getNickname());
+    private BoardComment createComment(Board findBoard, CommentRequestDto requestDto, String token) {
+        String email = userService.getUserEmail(token);
         BoardComment comment = BoardComment.builder()
                 .board(findBoard)
                 .comment(requestDto.getComment())
                 .updated(false)
-                .userId(userId).build();
+                .email(email).build();
         return comment;
     }
 }

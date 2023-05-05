@@ -1,5 +1,6 @@
 package com.meonghae.communityservice.Service;
 
+import com.meonghae.communityservice.Client.UserServiceClient;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewListDto;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewRequestDto;
 import com.meonghae.communityservice.Entity.Review.Review;
@@ -23,6 +24,7 @@ import javax.transaction.Transactional;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final RedisService redisService;
+    private final UserServiceClient userService;
 
     @Transactional
     public Slice<ReviewListDto> getReviewByType(int key, int page, String keyword, String sort) {
@@ -42,20 +44,20 @@ public class ReviewService {
             reviews = reviewRepository.findByCatalogAndKeywordAndSort(request, catalog, keyword, sort);
         }
         return reviews.map(review -> {
-            String nickname = redisService.getNickname(review.getUserId());
+            String nickname = redisService.getNickname(review.getEmail());
             return new ReviewListDto(review, nickname);
         });
     }
 
     @Transactional
-    public void createReview(int key, ReviewRequestDto requestDto) {
+    public void createReview(int key, ReviewRequestDto requestDto, String token) {
         ReviewCatalog catalog = ReviewCatalog.findWithKey(key);
-        String userId = redisService.getUserId(requestDto.getNickname());
+        String email = userService.getUserEmail(token);
         if(catalog == null) throw new ReviewException(ErrorCode.BAD_REQUEST, "잘못된 Catalog Type 입니다.");
         Review review = Review.builder()
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
-                .userId(userId)
+                .email(email)
                 .rating(requestDto.getRating())
                 .catalog(catalog).build();
         reviewRepository.save(review);

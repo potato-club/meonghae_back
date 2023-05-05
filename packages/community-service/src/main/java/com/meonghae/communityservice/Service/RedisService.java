@@ -1,8 +1,6 @@
 package com.meonghae.communityservice.Service;
 
 import com.meonghae.communityservice.Client.UserServiceClient;
-import com.meonghae.communityservice.Dto.UserDto.UserDto;
-import com.meonghae.communityservice.Dto.UserDto.UserNicknameDto;
 import com.meonghae.communityservice.Exception.Custom.BoardException;
 import com.meonghae.communityservice.Exception.Error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -21,36 +19,19 @@ public class RedisService {
     private final RedisCacheManager cacheManager;
     private final UserServiceClient userService;
 
-    @Value("${cacheName.getByUid}")
-    private String byUid;
-    @Value("${cacheName.getByName}")
-    private String byNickname;
+    @Value("${cacheName.getByEmail}")
+    private String byEmail;
 
-    @Transactional
-    public String getNickname(String uuid) {
-        String nickname = cacheManager.getCache(byUid).get(uuid, String.class);
+    public String getNickname(String email) {
+        String nickname = cacheManager.getCache(byEmail).get(email, String.class);
         if(nickname == null) {
-            UserNicknameDto dto = userService.getNickname(uuid);
-            if(dto == null) {
+            log.info("=========== Feign 호출 ===========");
+            nickname = userService.getNickname(email);
+            if(nickname == null) {
                 throw new BoardException(ErrorCode.BAD_REQUEST, "User is not exist");
             }
-            nickname = dto.getNickname();
-            cacheManager.getCache(byUid).put(uuid, nickname);
+            cacheManager.getCache(byEmail).put(email, nickname);
         }
         return nickname;
-    }
-
-    @Transactional
-    public String getUserId(String nickname) {
-        String uuid = cacheManager.getCache(byNickname).get(nickname, String.class);
-        if(uuid == null) {
-            UserDto dto = userService.getUserId(nickname);
-            if(dto == null) {
-                throw new BoardException(ErrorCode.BAD_REQUEST, "User is not exist");
-            }
-            uuid = dto.getUid();
-            cacheManager.getCache(byNickname).put(nickname, uuid);
-        }
-        return uuid;
     }
 }

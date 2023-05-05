@@ -40,8 +40,9 @@ public class ReviewController {
     @Operation(summary = "리뷰 생성 API")
     @PostMapping("")
     public ResponseEntity<String> addReview(@RequestParam(value = "type") int type,
-                                            @Valid @RequestBody ReviewRequestDto requestDto) {
-        reviewService.createReview(type, requestDto);
+                                            @Valid @RequestBody ReviewRequestDto requestDto,
+                                            @RequestHeader("Authorization") String token) {
+        reviewService.createReview(type, requestDto, token);
         return ResponseEntity.status(HttpStatus.CREATED).body("리뷰 등록 완료");
     }
 }

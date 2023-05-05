@@ -17,7 +17,7 @@ public class BoardLike {
     private Long id;
 
     @Column(nullable = false)
-    private String userId;
+    private String email;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -26,8 +26,8 @@ public class BoardLike {
     @Column(nullable = false)
     private Boolean status;
 
-    public BoardLike(String userId, Board board) {
-        this.userId = userId;
+    public BoardLike(String email, Board board) {
+        this.email = email;
         this.board = board;
         this.status = true;
     }

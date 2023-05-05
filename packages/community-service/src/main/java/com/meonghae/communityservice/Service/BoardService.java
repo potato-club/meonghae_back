@@ -1,10 +1,10 @@
 package com.meonghae.communityservice.Service;
 
+import com.meonghae.communityservice.Client.UserServiceClient;
 import com.meonghae.communityservice.Dto.BoardDto.BoardDetailDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardListDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardMainDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardRequestDto;
-import com.meonghae.communityservice.Dto.UserDto.UserNicknameDto;
 import com.meonghae.communityservice.Entity.Board.Board;
 import com.meonghae.communityservice.Entity.Board.QBoard;
 import com.meonghae.communityservice.Enum.BoardType;
@@ -32,6 +32,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final RedisService redisService;
+    private final UserServiceClient userService;
 
     @Transactional
     public Slice<BoardListDto> getBoardList(int typeKey, int page) {
@@ -40,7 +41,7 @@ public class BoardService {
                 Sort.by(Sort.Direction.DESC, "createdDate"));
         Slice<Board> list = boardRepository.findByType(type, request);
         Slice<BoardListDto> listDto = list.map(board -> {
-            String nickname = redisService.getNickname(board.getUserId());
+            String nickname = redisService.getNickname(board.getEmail());
             return new BoardListDto(board, nickname);
         });
         return listDto;
@@ -50,7 +51,7 @@ public class BoardService {
     public BoardDetailDto getBoard(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
-        String nickname = redisService.getNickname(board.getUserId());
+        String nickname = redisService.getNickname(board.getEmail());
         return new BoardDetailDto(board, nickname);
     }
 
@@ -70,38 +71,38 @@ public class BoardService {
                 .fetchOne()).filter(Objects::nonNull).collect(Collectors.toList());
 
         return mainBoardLists.stream().map(board -> {
-            String nickname = redisService.getNickname(board.getUserId());
+            String nickname = redisService.getNickname(board.getEmail());
             return new BoardMainDto(board, nickname);
         }).collect(Collectors.toList());
     }
 
     @Transactional
-    public void createBoard(int typeKey, BoardRequestDto requestDto) {
+    public void createBoard(int typeKey, BoardRequestDto requestDto, String token) {
         BoardType type = BoardType.findWithKey(typeKey);
-        String uid = redisService.getUserId(requestDto.getNickname());
-        Board board = requestDto.toEntity(type, uid);
+        String email = userService.getUserEmail(token);
+        Board board = requestDto.toEntity(type, email);
 
         // 이미지 추가하는 부분도 추후에 수정
         boardRepository.save(board);
     }
 
     @Transactional
-    public void modifyBoard(Long id, BoardRequestDto requestDto) {
+    public void modifyBoard(Long id, BoardRequestDto requestDto, String token) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
-        String uid = redisService.getUserId(requestDto.getNickname());
-        if(!board.getUserId().equals(uid)) {
+        String email = userService.getUserEmail(token);
+        if(!board.getEmail().equals(email)) {
             throw new BoardException(ErrorCode.UNAUTHORIZED, "글 작성자만 수정 가능합니다.");
         }
         board.updateBoard(requestDto.getTitle(), requestDto.getContent());
     }
 
     @Transactional
-    public void deleteBoard(Long id, UserNicknameDto userDto) {
+    public void deleteBoard(Long id, String token) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("board is not exist"));
-        String uid = redisService.getUserId(userDto.getNickname());
-        if(!board.getUserId().equals(uid)) {
+        String email = userService.getUserEmail(token);
+        if(!board.getEmail().equals(email)) {
             throw new BoardException(ErrorCode.UNAUTHORIZED, "글 작성자만 삭제 가능합니다.");
         }
         boardRepository.delete(board);
