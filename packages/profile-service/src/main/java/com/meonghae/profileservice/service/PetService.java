@@ -8,7 +8,7 @@ import com.meonghae.profileservice.error.exception.NotFoundException;
 import com.meonghae.profileservice.repository.PetRepository;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PetService {
   private final PetRepository petRepository;
-  private final RedisService redisService;
+  private final FeignService feignService;
 
-  public List<PetInfoResponseDTO> getUserPetList(HttpServletRequest request) {
-    String userEmail = redisService.getUserEmail(request);
+  public List<PetInfoResponseDTO> getUserPetList(String token) {
+    String userEmail = feignService.getUserEmail(token);
 
     List<PetEntity> petEntityList = petRepository.findByUserEmailOrderById(userEmail);
     return petEntityList.stream().map(PetInfoResponseDTO::new).collect(Collectors.toList());
@@ -38,8 +38,8 @@ public class PetService {
     return new PetInfoResponseDTO(petEntity);
   }
 
-  public String save(PetInfoRequestDto petInfoRequestDto, HttpServletRequest request) {
-    String userEmail = redisService.getUserEmail(request);
+  public String save(PetInfoRequestDto petInfoRequestDto, String token) {
+    String userEmail = feignService.getUserEmail(token);
 
     PetEntity petEntity =
         new PetEntity()
@@ -55,7 +55,7 @@ public class PetService {
     return "저장 완료";
   }
 
-  public String update(Long id, PetInfoRequestDto petDTO, HttpServletRequest request) {
+  public String update(Long id, PetInfoRequestDto petDTO) {
     PetEntity petEntity =
         petRepository
             .findById(id)
@@ -76,7 +76,7 @@ public class PetService {
     return "수정 완료";
   }
 
-  public String deleteById(Long id, HttpServletRequest request) {
+  public String deleteById(Long id) {
     // 인증 로직
 
     petRepository.deleteById(id);

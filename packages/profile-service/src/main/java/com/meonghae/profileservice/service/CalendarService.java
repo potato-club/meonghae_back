@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +30,12 @@ public class CalendarService {
   private final CalendarRepository calendarRepository;
   // dsl
   private final JPAQueryFactory jpaQueryFactory;
-  private final RedisService redisService;
+  private final FeignService feignService;
 
   // 프로필 화면에서 가까운 일정 순서대로 표시하기위함.
   @Transactional
-  public List<CalendarResponseDTO> getProfileSchedule(HttpServletRequest request) {
-    String userEmail = redisService.getUserEmail(request);
+  public List<CalendarResponseDTO> getProfileSchedule(String token) {
+    String userEmail = feignService.getUserEmail(token);
 
     QCalendar qCalendar = QCalendar.calendar;
     QPetEntity qPetEntity = QPetEntity.petEntity;
@@ -60,7 +59,7 @@ public class CalendarService {
   // 달력에서 출력하기 위함 - 날짜 하나 클릭시 그 날짜에 대한 일정들 리턴
   @Transactional
   public List<CalendarResponseDTO> getSchedule(
-      CalendarRequestDTO calendarRequestDTO, HttpServletRequest request) {
+      CalendarRequestDTO calendarRequestDTO, String token) {
 
     LocalDateTime startOfDay =
         LocalDate.of(
@@ -70,7 +69,7 @@ public class CalendarService {
             .atStartOfDay();
     LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1); // ex) 13일 23시 59분
 
-    String userEmail = redisService.getUserEmail(request);
+    String userEmail = feignService.getUserEmail(token);
 
     QCalendar qCalendar = QCalendar.calendar;
     QPetEntity qPetEntity = QPetEntity.petEntity;
@@ -90,13 +89,12 @@ public class CalendarService {
 
   // 달력 월단위 일정들 보기 위한 함수 - 같은 해 같은 월 데이터 출력
   @Transactional
-  public List<CalendarResponseDTO> getMonthSechedule(
-      CalendarRequestDTO calendarRequestDTO, HttpServletRequest request) {
+  public List<CalendarResponseDTO> getMonthSechedule(CalendarRequestDTO calendarRequestDTO, String token) {
     LocalDate startOfDate =
         LocalDate.of(calendarRequestDTO.getYear(), calendarRequestDTO.getMonth(), 1);
     LocalDate endOfDate = startOfDate.plusMonths(1).minusDays(1);
 
-    String userEmail = redisService.getUserEmail(request);
+    String userEmail = feignService.getUserEmail(token);
 
     QCalendar qCalendar = QCalendar.calendar;
     QPetEntity qPetEntity = QPetEntity.petEntity;
@@ -119,7 +117,7 @@ public class CalendarService {
   }
 
   @Transactional
-  public String addSchedule(CalendarRequestDTO calendarRequestDTO, HttpServletRequest request) {
+  public String addSchedule(CalendarRequestDTO calendarRequestDTO, String token) {
     // 프론트에서 FM 이면 hour에 +12해서 주겠징
     LocalTime scheduleTime =
         LocalTime.of(calendarRequestDTO.getHour(), calendarRequestDTO.getMinute());
@@ -134,7 +132,7 @@ public class CalendarService {
     PetEntity petEntity = petRepository.findById(calendarRequestDTO.getPetId())
             .orElseThrow(() -> {throw new NotFoundException(ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
 
-    String userEmail = redisService.getUserEmail(request);
+    String userEmail = feignService.getUserEmail(token);
 
     Calendar calendar =
         new Calendar()
@@ -151,7 +149,7 @@ public class CalendarService {
   // Update
   @Transactional
   public String updateSchedule(
-      Long id, CalendarRequestDTO calendarRequestDTO, HttpServletRequest request) {
+      Long id, CalendarRequestDTO calendarRequestDTO) {
     QCalendar qCalendar = QCalendar.calendar;
     QPetEntity qPetEntity = QPetEntity.petEntity;
 
@@ -179,7 +177,7 @@ public class CalendarService {
 
   // Delete
   @Transactional
-  public String deleteSchedule(Long id, HttpServletRequest request) {
+  public String deleteSchedule(Long id) {
 
     calendarRepository.deleteById(id);
     return "삭제 완료";
