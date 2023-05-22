@@ -16,5 +16,4 @@ import javax.servlet.http.HttpServletResponse;
 public interface UserServiceClient {
   @GetMapping("/send/email")
   String getUserEmail(@RequestHeader("Authorization") String token);
-
 }
