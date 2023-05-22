@@ -1,9 +1,9 @@
 package com.meonghae.profileservice.repository;
 
-import com.meonghae.profileservice.entity.PetEntity;
+import com.meonghae.profileservice.entity.Pet;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PetRepository extends JpaRepository<PetEntity, Long> {
-  List<PetEntity> findByUserEmailOrderById(String userEmail);
+public interface PetRepository extends JpaRepository<Pet, Long> {
+  List<Pet> findByUserEmailOrderById(String userEmail);
 }

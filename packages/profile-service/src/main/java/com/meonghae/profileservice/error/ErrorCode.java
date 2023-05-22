@@ -15,7 +15,8 @@ public enum ErrorCode {
   //    UNDEFINED_TIME(HttpStatus.FORBIDDEN,"E00032","정의되어있는 시간이 없습니다."),
   //    NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND,"E0004","잘못된 주소입니다."),
   //    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"E0005","예기치 못한 오류입니다."),
-  NOT_FOUND_PET(HttpStatus.NOT_FOUND, 101, "반려동물을 찾을 수 없습니다.");
+  NOT_FOUND_PET(HttpStatus.NOT_FOUND, 101, "반려동물을 찾을 수 없습니다."),
+  DATE_DOSE_NOT_EXIST(HttpStatus.BAD_REQUEST,110,"존재하지 않는 날짜입니다.");
   private HttpStatus status;
 
   private int code;

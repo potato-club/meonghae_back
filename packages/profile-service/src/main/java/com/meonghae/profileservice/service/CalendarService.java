@@ -3,14 +3,17 @@ package com.meonghae.profileservice.service;
 import com.meonghae.profileservice.dto.calendar.CalendarRequestDTO;
 import com.meonghae.profileservice.dto.calendar.CalendarResponseDTO;
 import com.meonghae.profileservice.entity.Calendar;
-import com.meonghae.profileservice.entity.PetEntity;
+import com.meonghae.profileservice.entity.Pet;
 import com.meonghae.profileservice.entity.QCalendar;
-import com.meonghae.profileservice.entity.QPetEntity;
+import com.meonghae.profileservice.entity.QPet;
 import com.meonghae.profileservice.error.ErrorCode;
+import com.meonghae.profileservice.error.exception.BadRequestException;
 import com.meonghae.profileservice.error.exception.NotFoundException;
 import com.meonghae.profileservice.repository.CalendarRepository;
 import com.meonghae.profileservice.repository.PetRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -38,12 +41,12 @@ public class CalendarService {
     String userEmail = feignService.getUserEmail(token);
 
     QCalendar qCalendar = QCalendar.calendar;
-    QPetEntity qPetEntity = QPetEntity.petEntity;
+    QPet qPet = QPet.pet;
     List<Calendar> result =
         jpaQueryFactory
             .select(qCalendar)
             .from(qCalendar)
-            .innerJoin(qCalendar.petEntity, qPetEntity)
+            .innerJoin(qCalendar.pet, qPet)
             .where(
                 qCalendar
                     .userEmail
@@ -61,24 +64,19 @@ public class CalendarService {
   public List<CalendarResponseDTO> getSchedule(
       CalendarRequestDTO calendarRequestDTO, String token) {
 
-    LocalDateTime startOfDay =
-        LocalDate.of(
-                calendarRequestDTO.getYear(),
-                calendarRequestDTO.getMonth(),
-                calendarRequestDTO.getDay())
-            .atStartOfDay();
+    LocalDateTime startOfDay = calendarRequestDTO.getScheduleTime().toLocalDate().atStartOfDay();
     LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1); // ex) 13일 23시 59분
 
     String userEmail = feignService.getUserEmail(token);
 
     QCalendar qCalendar = QCalendar.calendar;
-    QPetEntity qPetEntity = QPetEntity.petEntity;
+    QPet qPet = QPet.pet;
 
     List<Calendar> result =
         jpaQueryFactory
             .select(qCalendar)
             .from(qCalendar)
-            .innerJoin(qCalendar.petEntity, qPetEntity)
+            .innerJoin(qCalendar.pet, qPet)
             .where(
                 qCalendar.userEmail.eq(userEmail).and(qCalendar.scheduleTime.between(startOfDay, endOfDay)))
             .orderBy(qCalendar.scheduleTime.asc())
@@ -91,19 +89,19 @@ public class CalendarService {
   @Transactional
   public List<CalendarResponseDTO> getMonthSechedule(CalendarRequestDTO calendarRequestDTO, String token) {
     LocalDate startOfDate =
-        LocalDate.of(calendarRequestDTO.getYear(), calendarRequestDTO.getMonth(), 1);
+        LocalDate.of(calendarRequestDTO.getScheduleTime().getYear(), calendarRequestDTO.getScheduleTime().getMonth(), 1);
     LocalDate endOfDate = startOfDate.plusMonths(1).minusDays(1);
 
     String userEmail = feignService.getUserEmail(token);
 
     QCalendar qCalendar = QCalendar.calendar;
-    QPetEntity qPetEntity = QPetEntity.petEntity;
+    QPet qPet = QPet.pet;
 
     List<Calendar> result =
         jpaQueryFactory
             .select(qCalendar)
             .from(qCalendar)
-            .innerJoin(qCalendar.petEntity, qPetEntity)
+            .innerJoin(qCalendar.pet, qPet)
             .where(
                 qCalendar
                     .userEmail
@@ -119,17 +117,9 @@ public class CalendarService {
   @Transactional
   public String addSchedule(CalendarRequestDTO calendarRequestDTO, String token) {
     // 프론트에서 FM 이면 hour에 +12해서 주겠징
-    LocalTime scheduleTime =
-        LocalTime.of(calendarRequestDTO.getHour(), calendarRequestDTO.getMinute());
-    LocalDate scheduleDate =
-        LocalDate.of(
-            calendarRequestDTO.getYear(),
-            calendarRequestDTO.getMonth(),
-            calendarRequestDTO.getDay());
-    LocalDateTime scheduleDateTime = LocalDateTime.of(scheduleDate, scheduleTime);
+    LocalDateTime scheduleDateTime = calendarRequestDTO.getScheduleTime();
 
-    // 반려동물 지정
-    PetEntity petEntity = petRepository.findById(calendarRequestDTO.getPetId())
+    Pet pet = petRepository.findById(calendarRequestDTO.getPetId())
             .orElseThrow(() -> {throw new NotFoundException(ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
 
     String userEmail = feignService.getUserEmail(token);
@@ -138,7 +128,7 @@ public class CalendarService {
         new Calendar()
             .builder()
             .userEmail(userEmail)
-            .petEntity(petEntity)
+            .pet(pet)
             .scheduleTime(scheduleDateTime)
             .text(calendarRequestDTO.getText())
             .build();
@@ -151,9 +141,9 @@ public class CalendarService {
   public String updateSchedule(
       Long id, CalendarRequestDTO calendarRequestDTO) {
     QCalendar qCalendar = QCalendar.calendar;
-    QPetEntity qPetEntity = QPetEntity.petEntity;
+    QPet qPet = QPet.pet;
 
-    PetEntity petEntity =
+    Pet pet =
         petRepository
             .findById(calendarRequestDTO.getPetId())
             .orElseThrow(
@@ -166,11 +156,11 @@ public class CalendarService {
         jpaQueryFactory
             .select(qCalendar)
             .from(qCalendar)
-            .innerJoin(qCalendar.petEntity, qPetEntity)
+            .innerJoin(qCalendar.pet, qPet)
             .where(qCalendar.id.eq(id))
             .fetchOne(); // 단일 건수의 데이터 조회 둘 이상일 경우 NonUniqueResultException
 
-    calendar.update(calendarRequestDTO, petEntity);
+    calendar.update(calendarRequestDTO, pet);
     calendarRepository.save(calendar);
     return "수정 완료";
   }
