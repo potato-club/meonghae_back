@@ -1,6 +1,6 @@
-package com.meonghae.profileservice.dto;
+package com.meonghae.profileservice.dto.pet;
 
-import com.meonghae.profileservice.entity.PetEntity;
+import com.meonghae.profileservice.entity.Pet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +14,8 @@ public class PetInfoResponseDTO {
   private Long id;
   private String petName;
 
-  public PetInfoResponseDTO(PetEntity petEntity) {
-    this.id = petEntity.getId();
-    this.petName = petEntity.getPetName();
+  public PetInfoResponseDTO(Pet pet) {
+    this.id = pet.getId();
+    this.petName = pet.getPetName();
   }
 }
