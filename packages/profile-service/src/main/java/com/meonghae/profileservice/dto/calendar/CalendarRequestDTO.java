@@ -2,13 +2,11 @@ package com.meonghae.profileservice.dto.calendar;
 
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class CalendarRequestDTO {
   private Long petId;
-  private int year;
-  private int month;
-  private int day;
-  private int hour;
-  private int minute;
+  private LocalDateTime ScheduleTime;
   private String text;
 }

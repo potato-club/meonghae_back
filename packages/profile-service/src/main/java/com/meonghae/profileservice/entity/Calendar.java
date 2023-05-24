@@ -23,9 +23,9 @@ public class Calendar extends BaseTimeEntity{
   @Column(nullable = false)
   private String userEmail;
 
-  @ManyToOne
-  @JoinColumn(name = "petEntityId")
-  private PetEntity petEntity;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "pet_id",nullable = false)
+  private Pet pet;
 
   @Column(nullable = false)
   private String text;
@@ -34,16 +34,9 @@ public class Calendar extends BaseTimeEntity{
   private LocalDateTime scheduleTime;
 
 
-  public void update(CalendarRequestDTO calendarRequestDTO, PetEntity petEntity) {
-    LocalTime scheduleTime =
-        LocalTime.of(calendarRequestDTO.getHour(), calendarRequestDTO.getMinute());
-    LocalDate scheduleDate =
-        LocalDate.of(
-            calendarRequestDTO.getYear(),
-            calendarRequestDTO.getMonth(),
-            calendarRequestDTO.getDay());
-    this.petEntity = petEntity;
+  public void update(CalendarRequestDTO calendarRequestDTO, Pet pet) {
+    this.pet = pet;
     this.text = calendarRequestDTO.getText();
-    this.scheduleTime = LocalDateTime.of(scheduleDate, scheduleTime);
+    this.scheduleTime = calendarRequestDTO.getScheduleTime();
   }
 }
