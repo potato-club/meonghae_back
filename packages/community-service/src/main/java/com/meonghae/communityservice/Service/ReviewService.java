@@ -59,7 +59,9 @@ public class ReviewService {
                 .content(requestDto.getContent())
                 .email(email)
                 .rating(requestDto.getRating())
-                .catalog(catalog).build();
+                .catalog(catalog)
+                .likes(0)
+                .dislikes(0).build();
         reviewRepository.save(review);
     }
 }

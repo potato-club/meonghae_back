@@ -35,4 +35,26 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ReviewCatalog catalog;
+
+    @Column(nullable = false)
+    private int likes;
+
+    @Column(nullable = false)
+    private int dislikes;
+
+    public void addLikes() {
+        this.likes++;
+    }
+
+    public void addDislikes() {
+        this.dislikes++;
+    }
+
+    public void cancelLikes() {
+        this.likes--;
+    }
+
+    public void cancelDislikes() {
+        this.dislikes--;
+    }
 }

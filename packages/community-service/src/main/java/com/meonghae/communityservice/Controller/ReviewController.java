@@ -1,7 +1,9 @@
 package com.meonghae.communityservice.Controller;
 
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewListDto;
+import com.meonghae.communityservice.Dto.ReviewDto.ReviewReactionTypeDto;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewRequestDto;
+import com.meonghae.communityservice.Service.ReviewReactionService;
 import com.meonghae.communityservice.Service.ReviewService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +22,7 @@ import javax.validation.Valid;
 @Api(value = "REVIEW_CONTROLLER", tags = "리뷰 서비스 컨트롤러")
 public class ReviewController {
     private final ReviewService reviewService;
+    private final ReviewReactionService reactionService;
 
     @Operation(summary = "타입별 리뷰 조회 API")
     @GetMapping("/{type}")
@@ -44,5 +47,14 @@ public class ReviewController {
                                             @RequestHeader("Authorization") String token) {
         reviewService.createReview(type, requestDto, token);
         return ResponseEntity.status(HttpStatus.CREATED).body("리뷰 등록 완료");
+    }
+
+    @Operation(summary = "리뷰 추천 API")
+    @PostMapping("/{reviewId}/recommend")
+    public ResponseEntity<String> likeReview(@PathVariable(name = "reviewId") Long reviewId,
+                                             @RequestHeader("Authorization") String token,
+                                             @RequestBody ReviewReactionTypeDto typeDto) {
+        String result = reactionService.toggleRecommendedReview(reviewId, token, typeDto);
+        return ResponseEntity.ok(result);
     }
 }
