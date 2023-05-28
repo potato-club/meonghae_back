@@ -66,36 +66,22 @@
                  && (StringUtils.hasText(basePath) ||
                  ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT));
      }
-     @Bean(name = "defaultApi")
-     public Docket defaultApi() {
+     @Bean
+     public Docket api() {
          return new Docket(DocumentationType.SWAGGER_2)
-                 .ignoredParameterTypes(java.sql.Date.class)
-                 .forCodeGeneration(true)
                  .select()
                  .apis(RequestHandlerSelectors.basePackage("com.meonghae"))
                  .paths(PathSelectors.any())
                  .build()
-                 .apiInfo(profileApiInfo())
+                 .apiInfo(apiInfo("2.0"))
                  .enable(true);
      }
 
-     @Bean(name = "ProfileApi")
-     public Docket profileApi() {
-         Predicate<String> path = PathSelectors.ant("/profile-service/**");
-
-         return new Docket(DocumentationType.SWAGGER_2)
-                 .groupName("Profile Service API")
-                 .select()
-                 .paths(path)
-                 .build()
-                 .apiInfo(profileApiInfo());
-     }
-
-     private ApiInfo profileApiInfo() {
+     private ApiInfo apiInfo(String version){
          return new ApiInfoBuilder()
-                 .title("멍해 커뮤니티 서비스 API")
+                 .title("멍해 API")
                  .description("API 상세소개 및 사용법")
-                 .version("1.0")
+                 .version(version)
                  .build();
      }
  }

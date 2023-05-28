@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/profile/calendar")
-@Api(value = "Calendar Controller", tags = "유저 일정 컨트롤러")
+@Api(value = "Calendar Controller", tags = "유저 / 반려동물 관련 일정 서비스 API")
 @RequiredArgsConstructor
 public class CalendarController {
   private final CalendarService calendarService;

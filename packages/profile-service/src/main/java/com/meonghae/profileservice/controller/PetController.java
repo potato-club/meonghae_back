@@ -5,6 +5,7 @@ import com.meonghae.profileservice.dto.pet.PetInfoResponseDTO;
 import com.meonghae.profileservice.service.PetService;
 import java.util.List;
 
+import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/profile")
+@Api(value = "Pet Controller", tags = "반려동물 관련 서비스 API")
 @RequiredArgsConstructor
 public class PetController {
   private final PetService petService;
