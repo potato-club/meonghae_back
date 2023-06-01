@@ -30,10 +30,7 @@ public class Board extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private BoardType type;
     private int likes;
-
-    // 추후 수정 필요 -> S3 업로드 MSA 로 구현 -> name 만 가져와서 String 타입으로 가질듯?
-    @OneToMany(mappedBy = "board", orphanRemoval = true)
-    private List<BoardImage> images = new ArrayList<>();
+    private Boolean hasImage;
     @OneToMany(mappedBy = "board", orphanRemoval = true)
     private List<BoardComment> comments = new ArrayList<>();
 
@@ -44,5 +41,8 @@ public class Board extends BaseTimeEntity {
     public void updateBoard(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+    public void setHasImage() {
+        this.hasImage = true;
     }
 }

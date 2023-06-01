@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -26,10 +24,8 @@ public class Review extends BaseTimeEntity {
     private String content;
     @Column(nullable = false)
     private String email;
-
-    // 추후 수정 필요 -> S3 업로드 MSA 로 구현 -> name 만 가져와서 String 타입으로 가질듯?
-    @OneToMany(mappedBy = "review", orphanRemoval = true)
-    private List<ReviewImage> images = new ArrayList<>();
+    @Column(nullable = false)
+    private Boolean hasImage;
     @Column(name = "rating", nullable = false, columnDefinition = "int")
     private int rating;
     @Column(nullable = false)
@@ -56,5 +52,8 @@ public class Review extends BaseTimeEntity {
 
     public void cancelDislikes() {
         this.dislikes--;
+    }
+    public void setHasImage() {
+        this.hasImage = true;
     }
 }

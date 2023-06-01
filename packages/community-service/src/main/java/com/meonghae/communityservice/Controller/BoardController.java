@@ -13,6 +13,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -50,9 +51,10 @@ public class BoardController {
     @Operation(summary = "게시글 생성 API")
     @PostMapping("/{type}")
     public ResponseEntity<String> createBoard(@PathVariable(name = "type") int type,
-                                              @RequestBody BoardRequestDto requestDto,
+                                              @RequestPart List<MultipartFile> images,
+                                              @RequestPart BoardRequestDto requestDto,
                                               @RequestHeader("Authorization") String token) {
-        boardService.createBoard(type, requestDto, token);
+        boardService.createBoard(type, images, requestDto, token);
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글 생성 완료");
     }
 

@@ -12,8 +12,10 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @RestController
@@ -43,9 +45,10 @@ public class ReviewController {
     @Operation(summary = "리뷰 생성 API")
     @PostMapping("")
     public ResponseEntity<String> addReview(@RequestParam(value = "type") int type,
-                                            @Valid @RequestBody ReviewRequestDto requestDto,
+                                            @RequestPart List<MultipartFile> images,
+                                            @Valid @RequestPart ReviewRequestDto requestDto,
                                             @RequestHeader("Authorization") String token) {
-        reviewService.createReview(type, requestDto, token);
+        reviewService.createReview(type, images, requestDto, token);
         return ResponseEntity.status(HttpStatus.CREATED).body("리뷰 등록 완료");
     }
 

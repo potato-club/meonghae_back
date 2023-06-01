@@ -1,10 +1,13 @@
 package com.meonghae.communityservice.Service;
 
+import com.meonghae.communityservice.Client.S3ServiceClient;
 import com.meonghae.communityservice.Client.UserServiceClient;
 import com.meonghae.communityservice.Dto.BoardDto.BoardDetailDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardListDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardMainDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardRequestDto;
+import com.meonghae.communityservice.Dto.S3Dto.S3RequestDto;
+import com.meonghae.communityservice.Dto.S3Dto.S3ResponseDto;
 import com.meonghae.communityservice.Entity.Board.Board;
 import com.meonghae.communityservice.Entity.Board.QBoard;
 import com.meonghae.communityservice.Enum.BoardType;
@@ -18,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -33,6 +37,7 @@ public class BoardService {
     private final JPAQueryFactory jpaQueryFactory;
     private final RedisService redisService;
     private final UserServiceClient userService;
+    private final S3ServiceClient s3Service;
 
     @Transactional
     public Slice<BoardListDto> getBoardList(int typeKey, int page) {
@@ -52,7 +57,12 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
         String nickname = redisService.getNickname(board.getEmail());
-        return new BoardDetailDto(board, nickname);
+        BoardDetailDto detailDto = new BoardDetailDto(board, nickname);
+        if(board.getHasImage()) {
+            List<S3ResponseDto> images = s3Service.getImages(new S3RequestDto(board.getId(), "BOARD"));
+            detailDto.setImages(images);
+        }
+        return detailDto;
     }
 
     @Transactional
@@ -77,15 +87,20 @@ public class BoardService {
     }
 
     @Transactional
-    public void createBoard(int typeKey, BoardRequestDto requestDto, String token) {
+    public void createBoard(int typeKey, List<MultipartFile> images, BoardRequestDto requestDto, String token) {
         BoardType type = BoardType.findWithKey(typeKey);
         String email = userService.getUserEmail(token);
         Board board = requestDto.toEntity(type, email);
 
-        // 이미지 추가하는 부분도 추후에 수정
-        boardRepository.save(board);
+        Board saveBoard = boardRepository.save(board);
+        if(images != null) {
+            S3RequestDto s3Dto = new S3RequestDto(saveBoard.getId(), "BOARD");
+            s3Service.uploadImage(images, s3Dto);
+            saveBoard.setHasImage();
+        }
     }
 
+    // 이미지 업로드 수정시 변경 로직 추가
     @Transactional
     public void modifyBoard(Long id, BoardRequestDto requestDto, String token) {
         Board board = boardRepository.findById(id)

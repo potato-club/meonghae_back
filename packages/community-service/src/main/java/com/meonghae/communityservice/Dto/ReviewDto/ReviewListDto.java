@@ -1,12 +1,14 @@
 package com.meonghae.communityservice.Dto.ReviewDto;
 
+import com.meonghae.communityservice.Dto.S3Dto.ImageListDto;
+import com.meonghae.communityservice.Dto.S3Dto.S3ResponseDto;
 import com.meonghae.communityservice.Entity.Review.Review;
-import com.meonghae.communityservice.Entity.Review.ReviewImage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -19,7 +21,8 @@ public class ReviewListDto {
     private String title;
     @ApiModelProperty("리뷰 내용")
     private String content;
-    private List<ReviewImage> images;
+    @ApiModelProperty("리뷰 이미지 리스트")
+    private List<ImageListDto> images;
     @ApiModelProperty("리뷰 별점")
     private int rating;
 
@@ -28,7 +31,10 @@ public class ReviewListDto {
         this.nickname = nickname;
         this.title = review.getTitle();
         this.content = review.getContent();
-        this.images = review.getImages();
         this.rating = review.getRating();
+    }
+
+    public void setImages(List<S3ResponseDto> imageList) {
+        this.images = imageList.stream().map(ImageListDto::new).collect(Collectors.toList());
     }
 }

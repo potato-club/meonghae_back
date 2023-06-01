@@ -19,6 +19,7 @@ public class BoardRequestDto {
                 .title(title)
                 .content(content)
                 .type(type)
+                .hasImage(false)
                 .build();
     }
 }

@@ -1,12 +1,14 @@
 package com.meonghae.communityservice.Dto.BoardDto;
 
+import com.meonghae.communityservice.Dto.S3Dto.ImageListDto;
+import com.meonghae.communityservice.Dto.S3Dto.S3ResponseDto;
 import com.meonghae.communityservice.Entity.Board.Board;
-import com.meonghae.communityservice.Entity.Board.BoardImage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -19,7 +21,8 @@ public class BoardDetailDto {
     private String title;
     @ApiModelProperty("게시글 내용")
     private String content;
-    private List<BoardImage> images;
+    @ApiModelProperty("게시글 이미지 리스트")
+    private List<ImageListDto> images;
     @ApiModelProperty("게시글 댓글 총 개수")
     private int commentSize;
     @ApiModelProperty("게시글 좋아요 개수")
@@ -31,7 +34,10 @@ public class BoardDetailDto {
         this.title = board.getTitle();
         this.content = board.getContent();
         this.commentSize = board.getComments().isEmpty() ? 0 : board.getComments().size();
-        this.images = board.getImages();
         this.likes = board.getLikes();
+    }
+
+    public void setImages(List<S3ResponseDto> imageList) {
+        this.images = imageList.stream().map(ImageListDto::new).collect(Collectors.toList());
     }
 }

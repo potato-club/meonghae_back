@@ -31,6 +31,6 @@ public class BoardMainDto {
         this.type = board.getType();
         this.commentSize = board.getComments().isEmpty() ? 0 : board.getComments().size();
         this.likes = board.getLikes();
-        this.image = !board.getImages().isEmpty();
+        this.image = board.getHasImage();
     }
 }

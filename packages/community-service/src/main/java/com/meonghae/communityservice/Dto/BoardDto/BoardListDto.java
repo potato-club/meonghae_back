@@ -30,6 +30,6 @@ public class BoardListDto {
         this.content = board.getContent();
         this.likes = board.getLikes();
         this.commentSize = board.getComments().isEmpty() ? 0 : board.getComments().size();
-        this.hasImage = !board.getImages().isEmpty();
+        this.hasImage = board.getHasImage();
     }
 }
