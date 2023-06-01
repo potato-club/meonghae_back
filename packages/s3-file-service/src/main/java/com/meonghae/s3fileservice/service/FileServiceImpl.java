@@ -8,6 +8,7 @@ import com.meonghae.s3fileservice.dto.FileResponseDto;
 import com.meonghae.s3fileservice.dto.FileUpdateDto;
 import com.meonghae.s3fileservice.dto.FileUserResponseDto;
 import com.meonghae.s3fileservice.entity.File;
+import com.meonghae.s3fileservice.entity.QFile;
 import com.meonghae.s3fileservice.enums.EntityType;
 import com.meonghae.s3fileservice.repository.FileRepository;
 import com.querydsl.core.types.Projections;
@@ -95,7 +96,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileUserResponseDto viewUserFile(String email) {
+    public FileUserResponseDto viewUserProfile(String email) {
         return jpaQueryFactory
                 .select(
                         Projections.constructor(
@@ -108,12 +109,12 @@ public class FileServiceImpl implements FileService {
                 )
                 .from(QFile.file)
                 .where(QFile.file.email.eq(email))
-                .fetch();
+                .fetchOne();
     }
 
     @Override
     public byte[] downloadImage(String key) throws IOException {
-        byte[] content = null;
+        byte[] content;
         final S3Object s3Object = s3Client.getObject(bucketName, key);
         final S3ObjectInputStream stream = s3Object.getObjectContent();
         try {

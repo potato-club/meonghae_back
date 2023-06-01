@@ -4,11 +4,14 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.0'
 	id 'maven-publish'
 	id 'com.diffplug.spotless' version '6.8.0'
+	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
 
 group = 'com.meonghae'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+
+apply plugin: "com.ewerk.gradle.plugins.querydsl"
 
 configurations {
 	compileOnly {
@@ -59,9 +62,35 @@ dependencyManagement {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	library = "com.querydsl:querydsl-apt"
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/java', querydslDir]
+		}
+	}
+}
+
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+
 springBoot {
 	buildInfo()
 }
+
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
@@ -69,6 +98,7 @@ publishing {
 		}
 	}
 }
+
 spotless {
 
 	format 'misc', {

@@ -17,7 +17,7 @@ public interface FileService {
 
     List<FileResponseDto> viewFileList(FileRequestDto requestDto);
 
-    FileUserResponseDto viewUserFile(String email);
+    FileUserResponseDto viewUserProfile(String email);
 
     byte[] downloadImage(String key) throws IOException;
 }

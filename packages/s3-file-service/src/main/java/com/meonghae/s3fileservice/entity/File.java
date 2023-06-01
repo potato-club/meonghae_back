@@ -3,14 +3,11 @@ package com.meonghae.s3fileservice.entity;
 import com.meonghae.s3fileservice.dto.FileRequestDto;
 import com.meonghae.s3fileservice.dto.FileUpdateDto;
 import com.meonghae.s3fileservice.enums.EntityType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Data
+@Getter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -41,7 +38,6 @@ public class File extends BaseTimeEntity {
     public void setEntityData(FileRequestDto requestDto) {
         this.entityType = requestDto.getEntityType();
         this.typeId = requestDto.getEntityId();
-        this.email = requestDto.getEmail();
     }
 
     public void update(FileUpdateDto updateDto) {

@@ -52,7 +52,7 @@ public class FileController {
     @Operation(summary = "View File about User Entity API")
     @GetMapping("/users")
     public FileUserResponseDto viewUserFile(String email) {
-        return fileService.viewUserFile(email);
+        return fileService.viewUserProfile(email);
     }
 
     @Operation(summary = "File Download API")

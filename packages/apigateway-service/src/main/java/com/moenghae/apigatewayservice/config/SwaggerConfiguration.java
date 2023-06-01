@@ -83,6 +83,12 @@ public class SwaggerConfiguration {
         resource.setSwaggerVersion("2.0");
         resources.add(resource);
 
+        resource = new SwaggerResource();
+        resource.setName("S3 File Service");
+        resource.setLocation("/s3-file-service/v2/api-docs");
+        resource.setSwaggerVersion("2.0");
+        resources.add(resource);
+
         return () -> resources;
     }
 
@@ -101,6 +107,10 @@ public class SwaggerConfiguration {
                         .filters(f -> f.rewritePath("/profile-service/(?<segment>.*)", "/${segment}")
                                 .setPath("/v2/api-docs"))
                         .uri("lb://PROFILE-SERVICE"))
+                .route("s3-file-service", r -> r.path("/s3-file-service/v2/api-docs")
+                        .filters(f -> f.rewritePath("/s3-file-service/(?<segment>.*)", "/${segment}")
+                                .setPath("/v2/api-docs"))
+                        .uri("lb://S3-FILE-SERVICE"))
                 .build();
     }
 }
