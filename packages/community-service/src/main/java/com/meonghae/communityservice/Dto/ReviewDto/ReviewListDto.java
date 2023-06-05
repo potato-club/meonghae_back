@@ -25,6 +25,10 @@ public class ReviewListDto {
     private List<ImageListDto> images;
     @ApiModelProperty("리뷰 별점")
     private int rating;
+    @ApiModelProperty("리뷰 추천 수")
+    private int likes;
+    @ApiModelProperty("리뷰 비추천 수")
+    private int dislikes;
 
     public ReviewListDto(Review review, String nickname) {
         this.id = review.getId();
@@ -32,6 +36,8 @@ public class ReviewListDto {
         this.title = review.getTitle();
         this.content = review.getContent();
         this.rating = review.getRating();
+        this.likes = review.getLikes();
+        this.dislikes = review.getDislikes();
     }
 
     public void setImages(List<S3ResponseDto> imageList) {
