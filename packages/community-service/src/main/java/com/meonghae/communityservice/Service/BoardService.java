@@ -12,7 +12,6 @@ import com.meonghae.communityservice.Entity.Board.Board;
 import com.meonghae.communityservice.Entity.Board.QBoard;
 import com.meonghae.communityservice.Enum.BoardType;
 import com.meonghae.communityservice.Exception.Custom.BoardException;
-import com.meonghae.communityservice.Exception.Error.ErrorCode;
 import com.meonghae.communityservice.Repository.BoardRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +26,9 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.meonghae.communityservice.Exception.Error.ErrorCode.BAD_REQUEST;
+import static com.meonghae.communityservice.Exception.Error.ErrorCode.UNAUTHORIZED;
 
 @Service
 @Slf4j
@@ -55,7 +57,7 @@ public class BoardService {
     @Transactional
     public BoardDetailDto getBoard(Long id) {
         Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
+                .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
         String nickname = redisService.getNickname(board.getEmail());
         BoardDetailDto detailDto = new BoardDetailDto(board, nickname);
         if(board.getHasImage()) {
@@ -94,6 +96,7 @@ public class BoardService {
 
         Board saveBoard = boardRepository.save(board);
         if(images != null) {
+            imageCheck(saveBoard, images);
             S3RequestDto s3Dto = new S3RequestDto(saveBoard.getId(), "BOARD");
             s3Service.uploadImage(images, s3Dto);
             saveBoard.setHasImage();
@@ -104,10 +107,10 @@ public class BoardService {
     @Transactional
     public void modifyBoard(Long id, BoardRequestDto requestDto, String token) {
         Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new BoardException(ErrorCode.BAD_REQUEST, "board is not exist"));
+                .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
         String email = userService.getUserEmail(token);
         if(!board.getEmail().equals(email)) {
-            throw new BoardException(ErrorCode.UNAUTHORIZED, "글 작성자만 수정 가능합니다.");
+            throw new BoardException(UNAUTHORIZED, "글 작성자만 수정 가능합니다.");
         }
         board.updateBoard(requestDto.getTitle(), requestDto.getContent());
     }
@@ -118,8 +121,16 @@ public class BoardService {
                 .orElseThrow(() -> new RuntimeException("board is not exist"));
         String email = userService.getUserEmail(token);
         if(!board.getEmail().equals(email)) {
-            throw new BoardException(ErrorCode.UNAUTHORIZED, "글 작성자만 삭제 가능합니다.");
+            throw new BoardException(UNAUTHORIZED, "글 작성자만 삭제 가능합니다.");
         }
         boardRepository.delete(board);
+    }
+
+    private void imageCheck(Board saveBoard, List<MultipartFile> images) {
+        if(saveBoard.getType() == BoardType.MISSING && images.size() > 5) {
+            throw new BoardException(BAD_REQUEST, "실종 게시글 사진은 최대 5개까지 업로드 가능합니다.");
+        } else if(images.size() > 3) {
+            throw new BoardException(BAD_REQUEST, "게시글 사진은 최대 3개까지 업로드 가능합니다.");
+        }
     }
 }
