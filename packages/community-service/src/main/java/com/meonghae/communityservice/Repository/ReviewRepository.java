@@ -11,13 +11,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r WHERE r.catalog = :catalog AND " +
             "(:keyword is null OR r.title LIKE %:keyword%) ")
-    Slice<Review> findByCatalogAndKeywordAndRating(Pageable pageable, ReviewCatalog catalog, String keyword);
+    Slice<Review> findByCatalogAndKeywordAndSortType(Pageable pageable, ReviewCatalog catalog, String keyword);
 
     @Query("SELECT r FROM Review r WHERE r.catalog = :catalog AND " +
-            "(:keyword is null OR r.title LIKE %:keyword%) " +
-            "ORDER BY " +
-            "CASE :sort " +
-            "WHEN 'latest' THEN r.createdDate " +
-            "ELSE r.createdDate END DESC")
-    Slice<Review> findByCatalogAndKeywordAndSort(Pageable pageable, ReviewCatalog catalog, String keyword, String sort);
+            "r.hasImage = true AND (:keyword is null OR r.title LIKE %:keyword%) ")
+    Slice<Review> findByCatalogAndHasImageAndKeywordAndSortType(Pageable pageable, ReviewCatalog catalog, String keyword);
 }
