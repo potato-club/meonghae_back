@@ -51,7 +51,7 @@ public class BoardController {
     @Operation(summary = "게시글 생성 API")
     @PostMapping("/{type}")
     public ResponseEntity<String> createBoard(@PathVariable(name = "type") int type,
-                                              @RequestPart List<MultipartFile> images,
+                                              @RequestPart(required = false) List<MultipartFile> images,
                                               @RequestPart BoardRequestDto requestDto,
                                               @RequestHeader("Authorization") String token) {
         boardService.createBoard(type, images, requestDto, token);
