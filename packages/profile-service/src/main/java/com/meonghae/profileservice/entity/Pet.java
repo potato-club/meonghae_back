@@ -1,5 +1,6 @@
 package com.meonghae.profileservice.entity;
 
+import com.meonghae.profileservice.dto.pet.PetInfoRequestDto;
 import com.meonghae.profileservice.enumCustom.PetGender;
 import com.meonghae.profileservice.enumCustom.PetType;
 
@@ -44,5 +45,20 @@ public class Pet extends BaseTimeEntity {
 
   @Column(nullable = false)
   private String petSpecies;
+
+  @Column
+  private boolean hasImage = false;
+  public void setHasImage() {
+    this.hasImage = true;
+  }
+
+  public Pet (PetInfoRequestDto petInfoRequestDto, String userEmail){
+    this.userEmail = userEmail;
+    petType = petInfoRequestDto.getPetType();
+    petName = petInfoRequestDto.getPetName();
+    petGender = petInfoRequestDto.getPetGender();
+    petBirth = petInfoRequestDto.getPetBirth();
+    petSpecies = petInfoRequestDto.getPetSpecies();
+  }
 
 }
