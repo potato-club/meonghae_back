@@ -3,12 +3,14 @@ package com.meonghae.profileservice.controller;
 import com.meonghae.profileservice.dto.pet.PetInfoRequestDto;
 import com.meonghae.profileservice.dto.pet.PetInfoResponseDTO;
 import com.meonghae.profileservice.service.PetService;
+
 import java.util.List;
 
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -25,13 +27,25 @@ public class PetController {
   @Operation(summary = "한 마리의 반려동물 정보")
   @GetMapping("/{id}") // 하나의 반려동물
   public PetInfoResponseDTO getUserPet(@PathVariable Long id) {
-    return petService.getUserPet(id);
+    return petService.getOneOfPet(id);
   }
   @Operation(summary = "반려동물 추가")
   @PostMapping
-  public String add(@RequestBody PetInfoRequestDto petDTO, @RequestHeader("Authorization") String token) {
-    return petService.save(petDTO, token);
+  public String add(
+          @RequestPart List<MultipartFile> images,
+          @RequestPart PetInfoRequestDto petDTO,
+          @RequestHeader("Authorization") String token) {
+
+    return petService.savePet(images, petDTO, token);
   }
+  @PostMapping("/test")
+  public String addPetList(@RequestPart List<MultipartFile> images,
+                           @RequestPart List<PetInfoRequestDto> petListDto,
+                           @RequestHeader("Authorization") String token){
+
+    return petService.savePetList(images, petListDto, token);
+  }
+
   @Operation(summary = "반려동물 수정")
   @PutMapping("/{id}")
   public String update(
@@ -43,4 +57,6 @@ public class PetController {
   public String deleteById(@PathVariable Long id) {
     return petService.deleteById(id);
   }
+
+
 }
