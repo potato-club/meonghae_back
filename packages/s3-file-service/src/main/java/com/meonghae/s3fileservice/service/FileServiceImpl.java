@@ -113,6 +113,24 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public FileUserResponseDto viewPetProfile(FileRequestDto requestDto) {
+        return jpaQueryFactory
+                .select(
+                        Projections.constructor(
+                                FileUserResponseDto.class,
+                                QFile.file.fileName,
+                                QFile.file.fileUrl,
+                                QFile.file.entityType,
+                                QFile.file.email
+                        )
+                )
+                .from(QFile.file)
+                .where(QFile.file.entityType.eq(requestDto.getEntityType())
+                        .and(QFile.file.typeId.eq(requestDto.getEntityId())))
+                .fetchOne();
+    }
+
+    @Override
     public byte[] downloadImage(String key) throws IOException {
         byte[] content;
         final S3Object s3Object = s3Client.getObject(bucketName, key);
