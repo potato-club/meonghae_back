@@ -55,6 +55,12 @@ public class FileController {
         return fileService.viewUserProfile(email);
     }
 
+    @Operation(summary = "View File about Pet Entity Api")
+    @GetMapping ("/pets")
+    public FileUserResponseDto viewPetFile(FileRequestDto requestDto){
+        return fileService.viewPetProfile(requestDto);
+    }
+
     @Operation(summary = "File Download API")
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> s3Download(@RequestParam String key) {
