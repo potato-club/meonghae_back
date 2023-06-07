@@ -49,8 +49,11 @@ public class PetController {
   @Operation(summary = "반려동물 수정")
   @PutMapping("/{id}")
   public String update(
-      @PathVariable Long id, @RequestBody PetInfoRequestDto petDTO) {
-    return petService.update(id, petDTO);
+      @PathVariable Long id,
+      @RequestPart MultipartFile image,
+      @RequestPart PetInfoRequestDto petDto) {
+
+    return petService.update(id, image, petDto);
   }
   @Operation(summary = "반려동물 삭제")
   @DeleteMapping("/{id}")
