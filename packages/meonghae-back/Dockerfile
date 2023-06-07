@@ -1,7 +1,7 @@
 FROM openjdk:11-jdk AS build
 WORKDIR /tmp
 COPY . /tmp
-RUN chmod +x ./gradlew && ./gradlew build
+RUN chmod +x ./gradlew && ./gradlew bootJar
 
 FROM openjdk:11-jdk
 WORKDIR /tmp
