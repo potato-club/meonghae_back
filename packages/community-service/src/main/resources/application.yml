@@ -1,0 +1,92 @@
+server:
+  port: 40004
+
+spring:
+  application:
+    name: community-service
+
+  cache:
+    type: redis
+
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 6000
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  #  zipkin:
+  #    base-url: http://127.0.0.1:9411
+  #    compression:
+  #      enabled: true
+  #
+  #  sleuth:
+  #    sampler:
+  #      probability: 1.0
+  #
+  #  rabbitmq:
+  #    host: 127.0.0.1
+  #    port: 5672
+  #    username: guest
+  #    password: guest
+
+#  h2:
+#    console:
+#      enabled: true
+##      settings:
+##        web-allow-others: true
+##      path: /h2-console
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        show_sql: true
+        format_sql: true
+
+#  datasource:
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:tcp://localhost/~/localDB/meonghae-community
+#    username: sa
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ENC(IXDR7mZ/YjVTR5u6n6v5DA8N6d/WxIRDyomfzBvqFGCHr8NNqC8jMKznfAF7pZ9xfiT7k2vrXJQl8QDrjX3GkMI0evhfYc99uC8ROq7QVWLD7/8x5OiXwin3t5hYSDec)
+    username: ENC(UFnvA2ILke7FK/vPGEmlPg==)
+    password: ENC(9o+/ql8o/OPL7LwqjMsENqxDQRBs3Uxf)
+
+#config:
+#  import: bootstrap.yml
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+logging:
+  level:
+    com.meonghae.communityservice: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, beans, refresh, busrefresh, info, metrics, prometheus
+
+cacheName:
+  getByEmail: cacheByEmail
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
