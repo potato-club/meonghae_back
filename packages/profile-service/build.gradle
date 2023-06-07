@@ -43,16 +43,17 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 //	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
 //	implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
-//	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'com.h2database:h2:1.4.200'
+	implementation 'mysql:mysql-connector-java:8.0.32'
 	//밑에 두줄 dsl설정
 	implementation 'com.querydsl:querydsl-jpa'
 	implementation 'com.querydsl:querydsl-apt'
 
 //	implementation group: 'org.springframework.data', name: 'spring-data-redis', version: '2.7.3'
 	implementation 'io.lettuce:lettuce-core:6.1.3.RELEASE'
-//
+
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
 	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
@@ -62,6 +63,8 @@ dependencies {
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 }
 
 dependencyManagement {
@@ -72,6 +75,7 @@ dependencyManagement {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	systemProperty "jasypt.encryptor.password", project.getProperties().get("jasypt.encryptor.password")
 }
 
 //dsl설정 -----

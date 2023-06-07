@@ -1,0 +1,85 @@
+server:
+  port: 40003
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  application:
+    name: profile-service
+
+#  zipkin:
+#    base-url: http://127.0.0.1:9411
+#    compression:
+#      enabled: true
+#
+#  sleuth:
+#    sampler:
+#      probability: 1.0
+#
+#  rabbitmq:
+#    host: 127.0.0.1
+#    port: 5672
+#    username: guest
+#    password: guest
+
+#  redis:
+#    host: localhost
+#    port: 6379
+#    timeout: 30
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        show_sql: true
+        format_sql: true
+  datasource:
+    url: ENC(sJ/gqsMjQbAMh2bUiubUhoZ7fYilC+Q1I0nQkREt8UNsaEEi1ty8irzxmwKGovVojJ3bedhdubSDh8E+TcmTqeDbNEkBGxe+lOUKmq8BlpA3KkjD1i64CCRZ+zJ2jtOh)
+    username: ENC(akrFtN4LCfZKuIq9ICQUqw==)
+    password: ENC(oKvUEiPXVPQ5Fqx2PKQ1pixQ39vCCN1i)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+#  h2:
+#    console:
+#      enabled: true
+#      settings:
+#        web-allow-others: true
+#      path: /h2-console
+#
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:h2:mem:testdb
+#    username: sa
+#    password:
+
+#config:
+#  import: bootstrap.yml
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    hostname: profile
+
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+logging:
+  level:
+    com.meonghae.userservice: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, beans, refresh, busrefresh, info, metrics, prometheus
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
