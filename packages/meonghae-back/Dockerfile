@@ -5,5 +5,5 @@ RUN chmod +x ./gradlew && ./gradlew bootJar
 
 FROM openjdk:11-jdk
 WORKDIR /tmp
-COPY --from=build /tmp/meonghae-0.0.1-SNAPSHOT.jar Eureka.jar
-ENTRYPOINT ["java","-jar","Eureka.jar"]
+COPY --from=build /tmp/build/libs/meonghae-0.0.1-SNAPSHOT.jar /tmp/Eureka.jar
+ENTRYPOINT ["java","-jar","/tmp/Eureka.jar"]
