@@ -32,7 +32,7 @@ public class Review extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ReviewCatalog catalog;
 
-    @Column(nullable = false)
+    @Column(name = "likes", nullable = false, columnDefinition = "int")
     private int likes;
 
     @Column(nullable = false)

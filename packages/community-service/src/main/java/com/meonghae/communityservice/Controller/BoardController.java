@@ -4,6 +4,7 @@ import com.meonghae.communityservice.Dto.BoardDto.BoardDetailDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardListDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardMainDto;
 import com.meonghae.communityservice.Dto.BoardDto.BoardRequestDto;
+import com.meonghae.communityservice.Dto.S3Dto.S3UpdateDto;
 import com.meonghae.communityservice.Service.BoardLikeService;
 import com.meonghae.communityservice.Service.BoardService;
 import io.swagger.annotations.Api;
@@ -47,11 +48,10 @@ public class BoardController {
         return ResponseEntity.ok(mainDto);
     }
 
-    // 추후에 pathVariable userId 추가하기
     @Operation(summary = "게시글 생성 API")
     @PostMapping("/{type}")
     public ResponseEntity<String> createBoard(@PathVariable(name = "type") int type,
-                                              @RequestPart List<MultipartFile> images,
+                                              @RequestPart(required = false) List<MultipartFile> images,
                                               @RequestPart BoardRequestDto requestDto,
                                               @RequestHeader("Authorization") String token) {
         boardService.createBoard(type, images, requestDto, token);
@@ -69,9 +69,11 @@ public class BoardController {
     @Operation(summary = "게시글 수정 API")
     @PutMapping("/{id}")
     public ResponseEntity<String> modifyBoard(@PathVariable(name = "id") Long id,
-                                              @RequestBody BoardRequestDto requestDto,
+                                              @RequestPart(required = false) List<MultipartFile> images,
+                                              @RequestPart(required = false) List<S3UpdateDto> updateDto,
+                                              @RequestPart BoardRequestDto requestDto,
                                               @RequestHeader("Authorization") String token) {
-        boardService.modifyBoard(id, requestDto, token);
+        boardService.modifyBoard(id, images, updateDto, requestDto, token);
         return ResponseEntity.ok("수정 완료");
     }
 

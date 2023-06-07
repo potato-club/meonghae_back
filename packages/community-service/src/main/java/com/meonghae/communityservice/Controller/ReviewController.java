@@ -3,6 +3,7 @@ package com.meonghae.communityservice.Controller;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewListDto;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewReactionTypeDto;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewRequestDto;
+import com.meonghae.communityservice.Enum.ReviewSortType;
 import com.meonghae.communityservice.Service.ReviewReactionService;
 import com.meonghae.communityservice.Service.ReviewService;
 import io.swagger.annotations.Api;
@@ -35,17 +36,20 @@ public class ReviewController {
                                                               @RequestParam(value = "keyword",
                                                               required = false) String keyword,
                                                               @RequestParam(value = "sort",
-                                                                      defaultValue = "latest",
-                                                                      required = false) String sort
+                                                                      defaultValue = "LATEST",
+                                                                      required = false) ReviewSortType sort,
+                                                              @RequestParam(value = "photo",
+                                                              defaultValue = "false",
+                                                              required = false) boolean photoOnly
                                                               ) {
-        Slice<ReviewListDto> listDto = reviewService.getReviewByType(type, page, keyword, sort);
+        Slice<ReviewListDto> listDto = reviewService.getReviewByType(type, page, keyword, sort, photoOnly);
         return ResponseEntity.ok(listDto);
     }
 
     @Operation(summary = "리뷰 생성 API")
     @PostMapping("")
     public ResponseEntity<String> addReview(@RequestParam(value = "type") int type,
-                                            @RequestPart List<MultipartFile> images,
+                                            @RequestPart(required = false) List<MultipartFile> images,
                                             @Valid @RequestPart ReviewRequestDto requestDto,
                                             @RequestHeader("Authorization") String token) {
         reviewService.createReview(type, images, requestDto, token);
