@@ -1,4 +1,9 @@
+FROM openjdk:11-jdk AS build
+WORKDIR /tmp
+COPY . /tmp
+RUN ./gradlew build
+
 FROM openjdk:11-jdk
-VOLUME /tmp
-COPY build/libs/meonghae-0.0.1-SNAPSHOT.jar Eureka.jar
+WORKDIR /tmp
+COPY --from=build /tmp/build/libs/meonghae-0.0.1-SNAPSHOT.jar Eureka.jar
 ENTRYPOINT ["java","-jar","Eureka.jar"]
