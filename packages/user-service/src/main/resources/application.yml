@@ -1,0 +1,79 @@
+server:
+  port: 40002
+
+spring:
+  application:
+    name: user-service
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  redis:
+    host: localhost
+    port: 6379
+  datasource:
+    url: ENC(xRjaoGael9TCrmzHlxtxlU366Ze/kbIkPhrUznYdumAaM4fYQZ4oRYlFR03Mz1B4)
+    username: ENC(fenD5hfzAh5KSlobLEG+zg==)
+    password: ENC(KsxHc7FpJz1Czw5KwyoC5DEcp0GtK9pj)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        show_sql: true
+        format_sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ENC(QO9kOOM21oZkEV6GrRYcBlGhGbb5JVEtXzJDgxXO30dNnk9cCteTbTwRAWqnwAsE)
+            redirect-uri: ENC(wQ+NXXvjC6rEQ9RvBXwpB3QWCCUbLWQD9IPuat60jfahm32rK9hIxg==)
+            authorization-grant-type: authorization_code
+            client-authentication-method: POST
+            client-name: Kakao
+            scope:
+              - account_email
+        provider:
+          kakao:
+            authorization-uri: ENC(hCJ/tacpdyoDOH9kI4dtNqw4D7QQ5B8vYVHbRTNSXRq0+WZaQjB5On3QCv0p1Bbf)
+            token-uri: ENC(CZ44lHfsdSVQD+wDNQ5xzo5cWhB86CvYJJ68CtdLmcAKmXMy5+yoaPcDLd4UgKCs)
+            user-info-uri: ENC(ca4uVBTi7gy5bWdcOViX7vKdEWmRcOafB+MabSd//p6IHyvhRaAO95ABjSFqU3HO)
+            user-name-attribute: ENC(xwSpaztEoYhD+BXAAywbGg==)
+
+#config:
+#  import: bootstrap.yml
+
+jwt:
+  secret: ENC(j8sywLK8XrevBeAEriBL4luyhTxP/mLqrRWIWx/nODY0JFWpPNHffp3YgPx9B13XbLxPqCdWpO7UR5Kzm/Amp7vCJ+UiJ3inDtORX4+jRQ7bFeNV6NtuxwtxIeF73q91y4pzmcAXP4hX6WpSU0IDWmCoZaS6xCFhqWSGbCboKrNXMf8BFT9fMmpPx2NbCeJDzofmg8h4SbHJw/iy2isMQs14Awkc1ZPw)
+  accessTokenExpiration: ENC(vAdZgGfRj7C+uiyRZ+kISg==)
+  refreshTokenExpiration: ENC(uPhaFjWIZsHwnSRe9gpDcHInKKHi/Z//)
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+logging:
+  level:
+    com.meonghae.userservice: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, beans, refresh, busrefresh, info, metrics, prometheus
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+
+
+

@@ -1,0 +1,64 @@
+server:
+  port: 40005
+
+spring:
+  application:
+    name: s3-file-service
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+
+  datasource:
+    url: ENC(pKzzd14egRix/F0e4KDD+CqqdtkEuPEAG+Zuhb2jYKpyb4U3IQSZK2MvyJWRhQDC)
+    username: ENC(mXlifgEoIgjqJgfUdgBhEw==)
+    password: ENC(wkdcZk2pDjAwBckFMazBzQi8ss+YD+0K)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        show_sql: true
+        format_sql: true
+
+#config:
+#  import: bootstrap.yml
+
+cloud:
+  aws:
+    s3:
+      bucket: ENC(QbwSj0N4/47TWdnHJedJ92YjyAb59dRI)
+    region:
+      auto: false
+      static: ap-northeast-2
+    credentials:
+      accessKey: ENC(LDQBa+D0vpRR+cyiGK945ZsTRbQaLRr0P1W7ajjVEOo=)
+      secretKey: ENC(+VP8xACCmTG+wKmM5YskoFQPmYAPOF1mT5CgV3Hd/R8QY4whkI1n1m01sq759HYPB5iy1fZs5Ek=)
+    stack:
+      auto: false
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+logging:
+  level:
+    com.meonghae.s3-file-service: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, beans, refresh, busrefresh, info, metrics, prometheus
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
