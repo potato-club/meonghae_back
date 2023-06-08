@@ -48,8 +48,8 @@ public class UserController {
 
     @Operation(summary = "카카오 로그인 API")
     @GetMapping("/login")
-    public UserResponseDto login(@RequestParam String code, HttpServletResponse response) {
-        return userService.login(code, response);
+    public UserResponseDto login(@RequestParam String email, HttpServletResponse response) {
+        return userService.login(email, response);
     }
 
     @Operation(summary = "테스트용 로그인 API")
