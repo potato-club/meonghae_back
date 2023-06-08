@@ -22,14 +22,11 @@ import javax.servlet.http.HttpServletResponse;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final KakaoApi kakaoApi;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
 
     @Override
-    public UserResponseDto login(String code, HttpServletResponse response) {
-        String access_token = kakaoApi.getAccessToken(code);
-        String email = kakaoApi.getUserInfo(access_token);
+    public UserResponseDto login(String email, HttpServletResponse response) {
 
         if (userRepository.existsByEmail(email)) {
             UserRole userRole = userRepository.findByEmail(email).get().getUserRole();
