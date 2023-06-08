@@ -3,7 +3,7 @@ server:
 
 eureka:
   instance:
-    hostname: host.docker.internal
+    hostname: gateway-service
   client:
     register-with-eureka: true
     fetch-registry: true
