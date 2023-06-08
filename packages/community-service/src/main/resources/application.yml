@@ -2,6 +2,10 @@ server:
   port: 40004
 
 spring:
+# local 실행 시
+#  profiles:
+#    include: local
+
   application:
     name: community-service
 
@@ -72,7 +76,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://172.17.0.4:8761/eureka
 
 logging:
   level:
