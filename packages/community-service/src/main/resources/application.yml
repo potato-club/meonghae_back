@@ -76,7 +76,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://Eureka.jar/eureka
+      defaultZone: http://meonghae/eureka
 
 logging:
   level:
