@@ -26,6 +26,11 @@ public class BoardController {
     private final BoardService boardService;
     private final BoardLikeService likeService;
 
+    @GetMapping("/health")
+    public String check() {
+        return "hi~";
+    }
+
     @Operation(summary = "게시글 리스트 호출 API")
     @GetMapping("")
     public ResponseEntity<Slice<BoardListDto>> getBoardList(
