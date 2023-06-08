@@ -76,7 +76,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: ENC(qQHdADNQF+H3Ul3+6+gHU10V1lc1ce3fmL9nGjlNoiu9hyht9OCqhA==)
+      defaultZone: http://host.docker.internal/eureka
 
 logging:
   level:
