@@ -53,6 +53,22 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/v2/api-docs/(?<path>.*), /${path}
+        - id: community-service
+          uri: lb://COMMUNITY-SERVICE
+          predicates:
+            - Path=/community-service/v2/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/community-service/v2/api-docs/(?<path>.*), /${path}
+        - id: profile-service
+          uri: lb://PROFILE-SERVICE
+          predicates:
+            - Path=/profile-service/v2/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/profile-service/v2/api-docs/(?<path>.*), /${path}
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
