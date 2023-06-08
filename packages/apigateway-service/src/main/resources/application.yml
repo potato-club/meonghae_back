@@ -103,6 +103,24 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
+        - id: community-service
+          uri: lb://COMMUNITY-SERVICE
+          predicates:
+            - Path=/community-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/community-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+        - id: profile-service
+          uri: lb://PROFILE-SERVICE
+          predicates:
+            - Path=/profile-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/profile-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
         - id: s3-file-service
           uri: lb://S3-FILE-SERVICE
           predicates:
