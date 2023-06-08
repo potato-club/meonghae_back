@@ -3,6 +3,7 @@ package com.meonghae.profileservice.service;
 import com.meonghae.profileservice.client.S3ServiceClient;
 import com.meonghae.profileservice.dto.S3.S3RequestDto;
 import com.meonghae.profileservice.dto.S3.S3ResponseDto;
+import com.meonghae.profileservice.dto.S3.S3UpdateDto;
 import com.meonghae.profileservice.dto.pet.PetInfoRequestDto;
 import com.meonghae.profileservice.dto.pet.PetInfoResponseDTO;
 import com.meonghae.profileservice.entity.Pet;
@@ -37,8 +38,8 @@ public class PetService {
 
     for (Pet pet : petList){
       if ( pet.isHasImage() ){
-        List<S3ResponseDto> image = s3ServiceClient.getImages(new S3RequestDto(pet.getId(),"PET"));
-        resultList.add(new PetInfoResponseDTO(pet,image.get(0)));
+        S3ResponseDto image = s3ServiceClient.viewPetFile(new S3RequestDto(pet.getId(),"PET"));
+        resultList.add(new PetInfoResponseDTO(pet,image));
       }
     }
     return resultList;
@@ -51,8 +52,8 @@ public class PetService {
                   throw new NotFoundException(ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
     PetInfoResponseDTO petInfoResponseDTO = new PetInfoResponseDTO(pet);
     if (pet.isHasImage()){
-      List<S3ResponseDto> images = s3ServiceClient.getImages(new S3RequestDto(pet.getId(),"PET"));
-      petInfoResponseDTO.setImage(images.get(0));
+      S3ResponseDto images = s3ServiceClient.viewPetFile(new S3RequestDto(pet.getId(),"PET"));
+      petInfoResponseDTO.setImage(images);
     }
     return  petInfoResponseDTO;
   }
@@ -70,11 +71,10 @@ public class PetService {
         if (imageList.get(i) != null) {
           S3RequestDto s3RequestDto = new S3RequestDto(savedPet.getId(),"PET");
 
-          //현호형 list 말고 이미지 하나 받는거 만들어줘...
           List<MultipartFile> image = new ArrayList<>();
           image.add(imageList.get(i));
 
-          s3ServiceClient.uploadImage(image, s3RequestDto);
+          s3ServiceClient.uploadImages(image, s3RequestDto);
           savedPet.setHasImage();
         }
       }
@@ -92,7 +92,7 @@ public class PetService {
     Pet savedPet = petRepository.save(pet);
     if (images != null){
       S3RequestDto s3RequestDto = new S3RequestDto(savedPet.getId(),"PET");
-      s3ServiceClient.uploadImage(images, s3RequestDto);
+      s3ServiceClient.uploadImages(images, s3RequestDto);
       savedPet.setHasImage();
     }
     return "저장 완료";
@@ -100,29 +100,43 @@ public class PetService {
 
   //===================
   @Transactional
-  public String update(Long id, PetInfoRequestDto petDTO) {
-    Pet pet =
-        petRepository
-            .findById(id)
-            .orElseThrow(
-                () -> {
-                  throw new NotFoundException(
-                      ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());
-                });
+  public String update(Long id, MultipartFile image,PetInfoRequestDto petDTO) {
+    Pet updatedPet = petRepository.findById(id).orElseThrow(() -> {throw new NotFoundException(
+            ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
+    //기존 엔티티랑 비교해서 업데이트 시키고
+    updatedPet.update(petDTO);
 
-    pet
-        .builder()
-        .petSpecies(petDTO.getPetSpecies())
-        .petGender(petDTO.getPetGender())
-        .petBirth(petDTO.getPetBirth())
-        .petName(petDTO.getPetName())
-        .build();
-    petRepository.save(pet);
+    //pet이 이미지를 가지고 있지 않고, 들어온 이미지가 null이 아닐때
+    if ( !(updatedPet.isHasImage()) && image != null ){
+
+      S3RequestDto s3RequestDto = new S3RequestDto(updatedPet.getId(),"PET");
+      List<MultipartFile> images = new ArrayList<>();
+      images.add(image);
+
+      s3ServiceClient.uploadImages(images, s3RequestDto);
+      updatedPet.setHasImage();
+
+    }else if (updatedPet.isHasImage() && image != null){//이미지가 true면 위에 image와 기존 이미지를 바꾸고
+      //사진 받아오기
+      S3ResponseDto s3ResponseDto = s3ServiceClient.viewPetFile(new S3RequestDto(updatedPet.getId(),"PET"));
+
+      S3UpdateDto s3UpdateDto = new S3UpdateDto(s3ResponseDto);
+
+      List<MultipartFile> images = new ArrayList<>();
+      images.add(image);
+      List<S3UpdateDto> s3UpdateDtoList = new ArrayList<>();
+      s3UpdateDtoList.add(s3UpdateDto);
+
+      s3ServiceClient.updateFiles(images,s3UpdateDtoList);
+    }
+
+    // images == null 일때 서비스 코드 미구현
+
     return "수정 완료";
   }
+
   @Transactional
   public String deleteById(Long id) {
-    // 인증 로직
 
     petRepository.deleteById(id);
     return "삭제 완료";

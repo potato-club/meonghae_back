@@ -61,4 +61,12 @@ public class Pet extends BaseTimeEntity {
     petSpecies = petInfoRequestDto.getPetSpecies();
   }
 
+  public void update(PetInfoRequestDto petInfoRequestDto){
+    petType = petInfoRequestDto.getPetType();
+    petName = petInfoRequestDto.getPetName();
+    petGender = petInfoRequestDto.getPetGender();
+    petBirth = petInfoRequestDto.getPetBirth();
+    petSpecies = petInfoRequestDto.getPetSpecies();
+  }
+
 }

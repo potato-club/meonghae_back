@@ -15,4 +15,6 @@ public class S3ResponseDto {
 
     private Long typeId;
 
+
+
 }

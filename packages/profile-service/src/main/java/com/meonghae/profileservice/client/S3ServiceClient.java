@@ -3,12 +3,10 @@ package com.meonghae.profileservice.client;
 import com.meonghae.profileservice.config.FeignHeaderConfig;
 import com.meonghae.profileservice.dto.S3.S3RequestDto;
 import com.meonghae.profileservice.dto.S3.S3ResponseDto;
+import com.meonghae.profileservice.dto.S3.S3UpdateDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -19,5 +17,11 @@ public interface S3ServiceClient {
   List<S3ResponseDto> getImages(S3RequestDto requestDto);
 
   @PostMapping("/files")
-  ResponseEntity<String> uploadImage(@RequestPart List<MultipartFile> images, @RequestPart S3RequestDto requestDto);
+  ResponseEntity<String> uploadImages(@RequestPart List<MultipartFile> images, @RequestPart S3RequestDto requestDto);
+
+  @GetMapping("/files/pets")
+  S3ResponseDto viewPetFile(S3RequestDto requestDto);
+
+  @PutMapping("/files")
+  ResponseEntity<String> updateFiles(@RequestPart List<MultipartFile> files, @RequestPart List<S3UpdateDto> requestDto);
 }
