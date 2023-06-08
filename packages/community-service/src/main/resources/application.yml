@@ -71,6 +71,7 @@ spring:
 eureka:
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    hostname: eureka-server
 
   client:
     register-with-eureka: true
