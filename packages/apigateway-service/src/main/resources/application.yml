@@ -3,12 +3,12 @@ server:
 
 eureka:
   instance:
-    hostname: www.meonghae.site
+    hostname: localhost
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: www.meonghae.site/eureka/
+      defaultZone: http://registration:8761/eureka
 
 spring:
   redis:
