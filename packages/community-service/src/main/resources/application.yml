@@ -76,7 +76,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://172.17.0.4:8761/eureka
+      defaultZone: ENC(qQHdADNQF+H3Ul3+6+gHU10V1lc1ce3fmL9nGjlNoiu9hyht9OCqhA==)
 
 logging:
   level:
