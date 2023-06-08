@@ -3,7 +3,7 @@ server:
 
 eureka:
   instance:
-    hostname: eureka-server
+    hostname: meonghae.site
 
   client:
     register-with-eureka: true
