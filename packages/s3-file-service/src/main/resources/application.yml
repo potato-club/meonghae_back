@@ -9,12 +9,11 @@ spring:
       matching-strategy: ANT_PATH_MATCHER
 
   datasource:
-    url: ENC(pKzzd14egRix/F0e4KDD+CqqdtkEuPEAG+Zuhb2jYKpyb4U3IQSZK2MvyJWRhQDC)
-    username: ENC(mXlifgEoIgjqJgfUdgBhEw==)
-    password: ENC(wkdcZk2pDjAwBckFMazBzQi8ss+YD+0K)
+    url: ENC(vToGHoUG23Jp28KHHbVhcLXtp4BVBJipast+nYDaQfbopp/ag9Gf1rAINRDY/LhDMaHH71HwtT87sqSO1RAsOM1oBdcacIV+tmxaeGXVkmI=)
+    username: ENC(Js6H5A5GjdGGSq52tbNBow==)
+    password: ENC(sJbpx0wQnxNw4nj0vWWaWci8EGuGvZV8)
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
     properties:
@@ -22,6 +21,7 @@ spring:
         enable_lazy_load_no_trans: true
         show_sql: true
         format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
 
 #config:
 #  import: bootstrap.yml
