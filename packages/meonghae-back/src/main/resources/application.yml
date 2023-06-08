@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: meonghae
+    name: eureka-server
   cloud:
     config:
       uri: http://localhost:40010
