@@ -77,6 +77,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void signUp(UserRequestDto userDto) {
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
+        }
         userRepository.save(userDto.toEntity());
     }
 
