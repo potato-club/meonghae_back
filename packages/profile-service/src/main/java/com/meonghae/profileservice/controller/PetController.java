@@ -49,8 +49,7 @@ public class PetController {
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public String addPetList(@Parameter(name = "List<MultipartFile> images", description = "첨부파일리스트", required = true)
                              @RequestPart List<MultipartFile> images,
-                           @Schema(name = "List<PetInfoRequestDto>",
-                                   description = "petName : (String) / petGender : (BOY or GIRL) / petBirth : (2022-01-01) / petSpecies[동물 종] : (String) / meetRoute : (String) ",
+                           @Parameter(name = "List<PetInfoRequestDto> \"[ petName : (String) \"petGender : (BOY or GIRL) \"petBirth : (2022-01-01) \"petSpecies[동물 종] : (String) \"meetRoute : (String) ",
                                    required = true)
                             @RequestPart List<PetInfoRequestDto> petListDto,
                            @ApiParam(value = "사용자 토큰", required = true) @RequestHeader("Authorization") String token){
