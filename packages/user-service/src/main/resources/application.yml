@@ -11,9 +11,9 @@ spring:
     host: localhost
     port: 6379
   datasource:
-    url: ENC(vToGHoUG23Jp28KHHbVhcLXtp4BVBJipast+nYDaQfbopp/ag9Gf1rAINRDY/LhDMaHH71HwtT87sqSO1RAsOM1oBdcacIV+tmxaeGXVkmI=)
-    username: ENC(Js6H5A5GjdGGSq52tbNBow==)
-    password: ENC(sJbpx0wQnxNw4nj0vWWaWci8EGuGvZV8)
+    url: ENC(9PfL1V27LDaNPLBD4XBXvkWU0B7+qSxY33AJnDiR7lGX1rek91eV9mhJxGIwruSmITCtvfAtJPtpForipy2wMzAXWET15dirwbyeg3o+1Yqs03Vu8snF4cyKu2g+2FYV)
+    username: ENC(4d7BMWbeTcHgNa4Cmvsikw==)
+    password: ENC(4UgvBUNHRaveoEXRRHL2UDqyZ4kSwG0y)
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
