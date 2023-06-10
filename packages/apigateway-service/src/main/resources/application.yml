@@ -45,6 +45,8 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+        # 스웨거 접근 라우팅
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
@@ -86,6 +88,8 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+        # actuator 접근 라우팅
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
@@ -94,15 +98,32 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
-        - id: user-service
-          uri: lb://USER-SERVICE
+        - id: community-service
+          uri: lb://COMMUNITY-SERVICE
           predicates:
-            - Path=/user-service/**
-            - Method=GET
+            - Path=/community-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/community-service/(?<segment>.*), /$\{segment}
+        - id: s3-file-service
+          uri: lb://S3-FILE-SERVICE
+          predicates:
+            - Path=/s3-file-service/actuator/**
+            - Method=GET,POST
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
-            - AuthorizationHeaderFilter
+        - id: profile-service
+          uri: lb://PROFILE-SERVICE
+          predicates:
+            - Path=/profile-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/profile-service/(?<segment>.*), /$\{segment}
+
+        # 커뮤니티 api 접근 라우팅
         - id: community-service
           uri: lb://COMMUNITY-SERVICE
           predicates:
@@ -112,6 +133,8 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/community-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
+
+        # 프로필 api 접근 라우팅
         - id: profile-service
           uri: lb://PROFILE-SERVICE
           predicates:
@@ -121,6 +144,8 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/profile-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
+
+        # s3 api 접근 라우팅
         - id: s3-file-service
           uri: lb://S3-FILE-SERVICE
           predicates:
