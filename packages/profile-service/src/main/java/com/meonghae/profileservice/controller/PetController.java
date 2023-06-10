@@ -35,23 +35,11 @@ public class PetController {
   public PetDetaileResponseDTO getUserPet(@ApiParam(value = "반려동물 id", required = true) @PathVariable Long id) {
     return petService.getOneOfPet(id);
   }
-//  @ApiIgnore
-//  @PostMapping
-//  public String add(
-//          @RequestPart List<MultipartFile> images,
-//          @RequestPart PetInfoRequestDto petDTO,
-//          @RequestHeader("Authorization") String token) {
-//
-//    return petService.savePet(images, petDTO, token);
-//  }
 
   @Operation(summary = "반려동물 리스트 추가 [ 3마리까지만 테스트 부탁 ]")
-  @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public String addPetList(@Parameter(name = "List<MultipartFile> images", description = "첨부파일리스트", required = true)
-                             @RequestPart List<MultipartFile> images,
-                           @Parameter(name = "List<PetInfoRequestDto> \"[ petName : (String) \"petGender : (BOY or GIRL) \"petBirth : (2022-01-01) \"petSpecies[동물 종] : (String) \"meetRoute : (String) ",
-                                   required = true)
-                            @RequestPart List<PetInfoRequestDto> petListDto,
+  @PostMapping("")
+  public String addPetList(@ApiParam(value = "이미지 List", required = true)@RequestPart List<MultipartFile> images,
+                           @RequestPart List<PetInfoRequestDto> petListDto,
                            @ApiParam(value = "사용자 토큰", required = true) @RequestHeader("Authorization") String token){
 
     return petService.savePetList(images, petListDto, token);

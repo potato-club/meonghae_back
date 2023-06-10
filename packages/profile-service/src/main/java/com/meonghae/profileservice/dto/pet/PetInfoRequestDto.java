@@ -20,11 +20,12 @@ public class PetInfoRequestDto {
   private PetGender petGender;
   @ApiModelProperty(notes = "반려동물 생일", example = "2022-01-01", required = true)
   private LocalDate petBirth;
-//  @ApiModelProperty(notes = "반려동물 종", example = "DOG or CAT", required = true)
-//  private PetType petType;
   @ApiModelProperty(notes = "반려동물 종", example = "시츄", required = true)
   private String petSpecies;
   @ApiModelProperty(notes = "입양 경로", example = "간택", required = true)
   private String meetRoute;
+
+  //  @ApiModelProperty(notes = "반려동물 종", example = "DOG or CAT", required = true)
+//  private PetType petType;
 
 }
