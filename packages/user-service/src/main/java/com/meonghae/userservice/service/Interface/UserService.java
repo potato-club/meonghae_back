@@ -3,6 +3,7 @@ package com.meonghae.userservice.service.Interface;
 import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
+import com.meonghae.userservice.dto.UserUpdateDto;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +20,7 @@ public interface UserService {
 
     void signUp(UserRequestDto userDto);
 
-    void update(UserRequestDto userDto, HttpServletRequest request);
+    void update(UserUpdateDto userDto, HttpServletRequest request);
 
     void logout(HttpServletRequest request);
 

@@ -3,6 +3,7 @@ package com.meonghae.userservice.service.impl;
 import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
+import com.meonghae.userservice.dto.UserUpdateDto;
 import com.meonghae.userservice.entity.User;
 import com.meonghae.userservice.enums.UserRole;
 import com.meonghae.userservice.error.exception.UnAuthorizedException;
@@ -17,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static com.meonghae.userservice.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
@@ -84,11 +88,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(UserRequestDto userDto, HttpServletRequest request) {
+    public void update(UserUpdateDto userDto, HttpServletRequest request) {
         String email = this.findByEmailFromAccessToken(request);
         User user = userRepository.findByEmail(email).orElseThrow();
 
-        user.update(userDto);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDate birth = LocalDate.parse(userDto.getBirth(), formatter);
+
+        user.update(userDto, birth);
     }
 
     @Override

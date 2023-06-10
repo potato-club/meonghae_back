@@ -16,7 +16,6 @@ import java.util.UUID;
 @Builder
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class UserRequestDto {
 
     @ApiModelProperty(value = "카카오 Email")

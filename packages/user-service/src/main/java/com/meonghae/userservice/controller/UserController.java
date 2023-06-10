@@ -3,6 +3,7 @@ package com.meonghae.userservice.controller;
 import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
+import com.meonghae.userservice.dto.UserUpdateDto;
 import com.meonghae.userservice.repository.UserRepository;
 import com.meonghae.userservice.service.Interface.UserService;
 import io.swagger.annotations.Api;
@@ -68,9 +69,9 @@ public class UserController {
 
     @Operation(summary = "회원정보 수정 API")
     @PutMapping("/")
-    public ResponseEntity<String> updateNickname(@RequestBody UserRequestDto userDto, HttpServletRequest request) {
+    public ResponseEntity<String> updateNickname(@RequestBody UserUpdateDto userDto, HttpServletRequest request) {
         userService.update(userDto, request);
-        return ResponseEntity.ok("닉네임이 변경되었습니다.");
+        return ResponseEntity.ok("내 정보가 변경되었습니다.");
     }
 
     @Operation(summary = "회원탈퇴 API")

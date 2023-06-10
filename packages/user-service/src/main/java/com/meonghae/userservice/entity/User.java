@@ -1,6 +1,7 @@
 package com.meonghae.userservice.entity;
 
 import com.meonghae.userservice.dto.UserRequestDto;
+import com.meonghae.userservice.dto.UserUpdateDto;
 import com.meonghae.userservice.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,8 +52,10 @@ public class User {
     @Column
     private boolean deleted;
 
-    public void update(UserRequestDto userDto) {
+    public void update(UserUpdateDto userDto, LocalDate birth) {
         this.nickname = userDto.getNickname();
+        this.age = userDto.getAge();
+        this.birth = birth;
     }
 
     public void setDeleted(boolean deleted) {
