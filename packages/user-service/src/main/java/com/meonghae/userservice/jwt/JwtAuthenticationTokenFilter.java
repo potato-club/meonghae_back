@@ -24,7 +24,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        if (path.contains("/swagger") || path.contains("/v2/api-docs")) {
+        if (path.contains("/swagger") || path.contains("/v2/api-docs") || path.endsWith("/prometheus")) {
             filterChain.doFilter(request, response);
             return;
         }
