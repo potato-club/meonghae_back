@@ -13,7 +13,7 @@ spring:
     type: redis
 
   redis:
-    host: localhost
+    host: Redis-server
     port: 6379
     timeout: 6000
 

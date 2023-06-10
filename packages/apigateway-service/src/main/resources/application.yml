@@ -13,7 +13,7 @@ eureka:
 
 spring:
   redis:
-    host: localhost
+    host: Redis-server
     port: 6379
   application:
     name: apigateway-service
