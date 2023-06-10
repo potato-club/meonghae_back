@@ -20,7 +20,7 @@ public class UserMyPageDto {
     private int age;
 
     @ApiModelProperty(value = "생년월일")
-    private LocalDateTime birth;
+    private LocalDate birth;
 
     public UserMyPageDto(User user) {
         this.email = user.getEmail();
