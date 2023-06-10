@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Builder
@@ -17,11 +18,20 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UserRequestDto {
 
+    @ApiModelProperty(value = "Date formatter", hidden = true)
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     @ApiModelProperty(value = "카카오 Email")
     private String email;
 
     @ApiModelProperty(value = "닉네임")
     private String nickname;
+
+    @ApiModelProperty(value = "나이")
+    private int age;
+
+    @ApiModelProperty(value = "생년월일")
+    private String birth;
 
     public User toEntity() {
         User user = User.builder()
@@ -29,6 +39,8 @@ public class UserRequestDto {
                 .email(email)
                 .nickname(nickname)
                 .userRole(UserRole.USER)
+                .age(age)
+                .birth(LocalDateTime.parse(birth, formatter))
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
                 .deleted(false)

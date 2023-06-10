@@ -34,6 +34,12 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column
+    private int age;
+
+    @Column
+    private LocalDateTime birth;
+
     @Column(nullable = false)
     private String nickname;
 

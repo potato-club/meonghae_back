@@ -1,5 +1,6 @@
 package com.meonghae.userservice.service.Interface;
 
+import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
 
@@ -10,11 +11,11 @@ public interface UserService {
 
     UserResponseDto login(String code, HttpServletResponse response);
 
-    void loginTest(HttpServletResponse response);
-
     String sendEmail(String token);
 
     String sendNickname(String email);
+
+    UserMyPageDto viewMyPage(HttpServletRequest request);
 
     void signUp(UserRequestDto userDto);
 

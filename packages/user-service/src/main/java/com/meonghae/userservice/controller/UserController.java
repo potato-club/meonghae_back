@@ -1,5 +1,6 @@
 package com.meonghae.userservice.controller;
 
+import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
 import com.meonghae.userservice.repository.UserRepository;
@@ -40,23 +41,22 @@ public class UserController {
     }
 
     @Operation(summary = "회원가입 API")
-    @GetMapping("/signup")
+    @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto) {
         userService.signUp(userDto);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
+    }
+
+    @Operation(summary = "내 정보 확인 API")
+    @GetMapping("/mypage")
+    public UserMyPageDto viewMyPage(HttpServletRequest request) {
+        return userService.viewMyPage(request);
     }
 
     @Operation(summary = "카카오 로그인 API")
     @GetMapping("/login")
     public UserResponseDto login(@RequestParam String email, HttpServletResponse response) {
         return userService.login(email, response);
-    }
-
-    @Operation(summary = "테스트용 로그인 API")
-    @GetMapping("/login/test")
-    public ResponseEntity<String> loginTest(HttpServletResponse response) {
-        userService.loginTest(response);
-        return ResponseEntity.ok("테스트 로그인 성공");
     }
 
     @Operation(summary = "로그아웃 API")
@@ -73,6 +73,7 @@ public class UserController {
         return ResponseEntity.ok("닉네임이 변경되었습니다.");
     }
 
+    @Operation(summary = "회원탈퇴 API")
     @PutMapping("/withdrawal")
     public ResponseEntity<String> withdrawalMembership(HttpServletRequest request) {
         userService.withdrawalMembership(request);
