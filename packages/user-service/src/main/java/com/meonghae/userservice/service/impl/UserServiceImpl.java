@@ -1,9 +1,11 @@
 package com.meonghae.userservice.service.impl;
 
+import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
 import com.meonghae.userservice.entity.User;
 import com.meonghae.userservice.enums.UserRole;
+import com.meonghae.userservice.error.exception.UnAuthorizedException;
 import com.meonghae.userservice.jwt.JwtTokenProvider;
 import com.meonghae.userservice.repository.UserRepository;
 import com.meonghae.userservice.service.Jwt.RedisService;
@@ -15,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static com.meonghae.userservice.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
 @RequiredArgsConstructor
 @Transactional
@@ -51,20 +55,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void loginTest(HttpServletResponse response) {
-        String email = "test1234@test.com";
-        UserRole userRole = UserRole.USER;
-
-        String accessToken = jwtTokenProvider.createAccessToken(email, userRole);
-        String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole);
-
-        jwtTokenProvider.setHeaderAccessToken(response, accessToken);
-        jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
-
-        redisService.setValues(refreshToken, email);
-    }
-
-    @Override
     public String sendEmail(String token) {
         return jwtTokenProvider.getUserEmail(token);
     }
@@ -72,6 +62,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public String sendNickname(String email) {
         return userRepository.findByEmail(email).get().getNickname();
+    }
+
+    @Override
+    public UserMyPageDto viewMyPage(HttpServletRequest request) {
+        String email = this.findByEmailFromAccessToken(request);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
+        });
+
+        UserMyPageDto userMyPageDto = new UserMyPageDto(user);
+        return userMyPageDto;
     }
 
     @Override
@@ -85,7 +86,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email).orElseThrow();
 
         user.update(userDto);
-        userRepository.save(user);
     }
 
     @Override
