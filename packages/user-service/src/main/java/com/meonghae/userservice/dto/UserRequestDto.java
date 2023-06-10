@@ -18,6 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UserRequestDto {
 
+    @ApiModelProperty(value = "Date formatter", hidden = true)
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @ApiModelProperty(value = "카카오 Email")
