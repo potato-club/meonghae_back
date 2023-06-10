@@ -27,7 +27,4 @@ public class PetInfoRequestDto {
   @ApiModelProperty(notes = "입양 경로", example = "간택", required = true)
   private String meetRoute;
 
-
-
-
 }

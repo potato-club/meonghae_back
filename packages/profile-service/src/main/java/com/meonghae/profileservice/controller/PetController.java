@@ -10,7 +10,10 @@ import java.util.List;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
@@ -43,9 +46,13 @@ public class PetController {
 //  }
 
   @Operation(summary = "반려동물 리스트 추가 [ 3마리까지만 테스트 부탁 ]")
-  @PostMapping("")
-  public String addPetList(@ApiParam(value = "반려동물 사진 리스트", required = true) @RequestPart List<MultipartFile> images,
-                           @ApiParam(value = "반려동물 정보 리스트", required = true) @RequestPart List<PetInfoRequestDto> petListDto,
+  @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public String addPetList(@Parameter(name = "List<MultipartFile> images", description = "첨부파일리스트", required = true)
+                             @RequestPart List<MultipartFile> images,
+                           @Schema(name = "List<PetInfoRequestDto>",
+                                   description = "petName : (String) / petGender : (BOY or GIRL) / petBirth : (2022-01-01) / petSpecies[동물 종] : (String) / meetRoute : (String) ",
+                                   required = true)
+                            @RequestPart List<PetInfoRequestDto> petListDto,
                            @ApiParam(value = "사용자 토큰", required = true) @RequestHeader("Authorization") String token){
 
     return petService.savePetList(images, petListDto, token);
