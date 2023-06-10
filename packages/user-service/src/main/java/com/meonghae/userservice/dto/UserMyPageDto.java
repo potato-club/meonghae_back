@@ -19,7 +19,7 @@ public class UserMyPageDto {
     @ApiModelProperty(value = "나이")
     private int age;
 
-    @ApiModelProperty(value = "생년월일")
+    @ApiModelProperty(value = "생년월일", example = "20010101")
     private LocalDate birth;
 
     public UserMyPageDto(User user) {
