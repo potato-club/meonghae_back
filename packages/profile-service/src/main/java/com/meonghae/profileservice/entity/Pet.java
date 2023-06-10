@@ -2,7 +2,7 @@ package com.meonghae.profileservice.entity;
 
 import com.meonghae.profileservice.dto.pet.PetInfoRequestDto;
 import com.meonghae.profileservice.enumCustom.PetGender;
-import com.meonghae.profileservice.enumCustom.PetType;
+
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,9 +32,6 @@ public class Pet extends BaseTimeEntity {
   private String userEmail;
 
   @Column(nullable = false)
-  private PetType petType;
-
-  @Column(nullable = false)
   private String petName;
 
   @Column(nullable = false)
@@ -45,6 +42,8 @@ public class Pet extends BaseTimeEntity {
 
   @Column(nullable = false)
   private String petSpecies;
+  @Column
+  private String meetRoute;
 
   @Column
   private boolean hasImage = false;
@@ -54,7 +53,7 @@ public class Pet extends BaseTimeEntity {
 
   public Pet (PetInfoRequestDto petInfoRequestDto, String userEmail){
     this.userEmail = userEmail;
-    petType = petInfoRequestDto.getPetType();
+    meetRoute = petInfoRequestDto.getMeetRoute();
     petName = petInfoRequestDto.getPetName();
     petGender = petInfoRequestDto.getPetGender();
     petBirth = petInfoRequestDto.getPetBirth();
@@ -62,7 +61,7 @@ public class Pet extends BaseTimeEntity {
   }
 
   public void update(PetInfoRequestDto petInfoRequestDto){
-    petType = petInfoRequestDto.getPetType();
+    meetRoute = petInfoRequestDto.getMeetRoute();
     petName = petInfoRequestDto.getPetName();
     petGender = petInfoRequestDto.getPetGender();
     petBirth = petInfoRequestDto.getPetBirth();

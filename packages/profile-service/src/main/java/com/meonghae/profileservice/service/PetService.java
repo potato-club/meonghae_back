@@ -4,6 +4,7 @@ import com.meonghae.profileservice.client.S3ServiceClient;
 import com.meonghae.profileservice.dto.S3.S3RequestDto;
 import com.meonghae.profileservice.dto.S3.S3ResponseDto;
 import com.meonghae.profileservice.dto.S3.S3UpdateDto;
+import com.meonghae.profileservice.dto.pet.PetDetaileResponseDTO;
 import com.meonghae.profileservice.dto.pet.PetInfoRequestDto;
 import com.meonghae.profileservice.dto.pet.PetInfoResponseDTO;
 import com.meonghae.profileservice.entity.Pet;
@@ -47,15 +48,15 @@ public class PetService {
 
   // 한 마리의 정보 가져오기
   @Transactional
-  public PetInfoResponseDTO getOneOfPet(Long id) {
+  public PetDetaileResponseDTO getOneOfPet(Long id) {
     Pet pet = petRepository.findById(id).orElseThrow(() -> {
                   throw new NotFoundException(ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
-    PetInfoResponseDTO petInfoResponseDTO = new PetInfoResponseDTO(pet);
+    PetDetaileResponseDTO petDetaileResponseDTO = new PetDetaileResponseDTO(pet);
     if (pet.isHasImage()){
       S3ResponseDto images = s3ServiceClient.viewPetFile(new S3RequestDto(pet.getId(),"PET"));
-      petInfoResponseDTO.setImage(images);
+      petDetaileResponseDTO.setImage(images);
     }
-    return  petInfoResponseDTO;
+    return petDetaileResponseDTO;
   }
 
 //======================================================================
@@ -84,19 +85,19 @@ public class PetService {
     return "저장완료";
   }
 
-  @Transactional//한 마리 저장
-  public String savePet(List<MultipartFile> images, PetInfoRequestDto petInfoRequestDto, String token) {
-    String userEmail = feignService.getUserEmail(token);
-    Pet pet = new Pet(petInfoRequestDto,userEmail);
-
-    Pet savedPet = petRepository.save(pet);
-    if (images != null){
-      S3RequestDto s3RequestDto = new S3RequestDto(savedPet.getId(),"PET");
-      s3ServiceClient.uploadImages(images, s3RequestDto);
-      savedPet.setHasImage();
-    }
-    return "저장 완료";
-  }
+//  @Transactional//한 마리 저장
+//  public String savePet(List<MultipartFile> images, PetInfoRequestDto petInfoRequestDto, String token) {
+//    String userEmail = feignService.getUserEmail(token);
+//    Pet pet = new Pet(petInfoRequestDto,userEmail);
+//
+//    Pet savedPet = petRepository.save(pet);
+//    if (images != null){
+//      S3RequestDto s3RequestDto = new S3RequestDto(savedPet.getId(),"PET");
+//      s3ServiceClient.uploadImages(images, s3RequestDto);
+//      savedPet.setHasImage();
+//    }
+//    return "저장 완료";
+//  }
 
   //===================
   @Transactional

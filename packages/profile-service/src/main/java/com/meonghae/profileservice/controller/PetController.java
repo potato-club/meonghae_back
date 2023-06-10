@@ -1,5 +1,6 @@
 package com.meonghae.profileservice.controller;
 
+import com.meonghae.profileservice.dto.pet.PetDetaileResponseDTO;
 import com.meonghae.profileservice.dto.pet.PetInfoRequestDto;
 import com.meonghae.profileservice.dto.pet.PetInfoResponseDTO;
 import com.meonghae.profileservice.service.PetService;
@@ -7,10 +8,12 @@ import com.meonghae.profileservice.service.PetService;
 import java.util.List;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 @RestController
@@ -20,28 +23,30 @@ import org.springframework.web.multipart.MultipartFile;
 public class PetController {
   private final PetService petService;
   @Operation(summary = "유저의 반려동물 리스트")
-  @GetMapping // uset의 반려동물 리스트
-  public List<PetInfoResponseDTO> getUserPetList(@RequestHeader("Authorization") String token) {
+  @GetMapping // user의 반려동물 리스트
+  public List<PetInfoResponseDTO> getUserPetList(@ApiParam(value = "사용자 토큰", required = true) @RequestHeader("Authorization") String token) {
     return petService.getUserPetList(token);
   }
   @Operation(summary = "한 마리의 반려동물 정보")
   @GetMapping("/{id}") // 하나의 반려동물
-  public PetInfoResponseDTO getUserPet(@PathVariable Long id) {
+  public PetDetaileResponseDTO getUserPet(@ApiParam(value = "반려동물 id", required = true) @PathVariable Long id) {
     return petService.getOneOfPet(id);
   }
-  @Operation(summary = "반려동물 추가")
-  @PostMapping
-  public String add(
-          @RequestPart List<MultipartFile> images,
-          @RequestPart PetInfoRequestDto petDTO,
-          @RequestHeader("Authorization") String token) {
+//  @ApiIgnore
+//  @PostMapping
+//  public String add(
+//          @RequestPart List<MultipartFile> images,
+//          @RequestPart PetInfoRequestDto petDTO,
+//          @RequestHeader("Authorization") String token) {
+//
+//    return petService.savePet(images, petDTO, token);
+//  }
 
-    return petService.savePet(images, petDTO, token);
-  }
-  @PostMapping("/test")
-  public String addPetList(@RequestPart List<MultipartFile> images,
-                           @RequestPart List<PetInfoRequestDto> petListDto,
-                           @RequestHeader("Authorization") String token){
+  @Operation(summary = "반려동물 리스트 추가 [ 3마리까지만 테스트 부탁 ]")
+  @PostMapping("")
+  public String addPetList(@ApiParam(value = "반려동물 사진 리스트", required = true) @RequestPart List<MultipartFile> images,
+                           @ApiParam(value = "반려동물 정보 리스트", required = true) @RequestPart List<PetInfoRequestDto> petListDto,
+                           @ApiParam(value = "사용자 토큰", required = true) @RequestHeader("Authorization") String token){
 
     return petService.savePetList(images, petListDto, token);
   }
@@ -49,9 +54,9 @@ public class PetController {
   @Operation(summary = "반려동물 수정")
   @PutMapping("/{id}")
   public String update(
-      @PathVariable Long id,
-      @RequestPart MultipartFile image,
-      @RequestPart PetInfoRequestDto petDto) {
+          @ApiParam(value = "반려동물 id", required = true)@PathVariable Long id,
+          @ApiParam(value = "반려동물 사진", required = true)@RequestPart MultipartFile image,
+          @ApiParam(value = "반려동물 정보", required = true) @RequestPart PetInfoRequestDto petDto) {
 
     return petService.update(id, image, petDto);
   }
