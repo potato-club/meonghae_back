@@ -18,7 +18,7 @@ public interface UserService {
 
     UserMyPageDto viewMyPage(HttpServletRequest request);
 
-    void signUp(UserRequestDto userDto);
+    void signUp(UserRequestDto userDto, HttpServletResponse response);
 
     void update(UserUpdateDto userDto, HttpServletRequest request);
 

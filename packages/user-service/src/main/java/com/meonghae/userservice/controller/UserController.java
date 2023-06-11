@@ -43,8 +43,8 @@ public class UserController {
 
     @Operation(summary = "회원가입 API")
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto) {
-        userService.signUp(userDto);
+    public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto, HttpServletResponse response) {
+        userService.signUp(userDto, response);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 

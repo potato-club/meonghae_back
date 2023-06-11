@@ -38,14 +38,7 @@ public class UserServiceImpl implements UserService {
 
         if (userRepository.existsByEmail(email)) {
             UserRole userRole = userRepository.findByEmail(email).get().getUserRole();
-
-            String accessToken = jwtTokenProvider.createAccessToken(email, userRole);
-            String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole);
-
-            jwtTokenProvider.setHeaderAccessToken(response, accessToken);
-            jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
-
-            redisService.setValues(refreshToken, email);
+            this.createToken(userRole, email, response);
 
             return UserResponseDto.builder()
                     .responseCode("200_OK")
@@ -80,11 +73,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void signUp(UserRequestDto userDto) {
+    public void signUp(UserRequestDto userDto, HttpServletResponse response) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         }
         userRepository.save(userDto.toEntity());
+
+        UserRole userRole = userRepository.findByEmail(userDto.getEmail()).get().getUserRole();
+        this.createToken(userRole, userDto.getEmail(), response);
     }
 
     @Override
@@ -113,7 +109,17 @@ public class UserServiceImpl implements UserService {
         this.logout(request);
     }
 
-    public String findByEmailFromAccessToken(HttpServletRequest request) {
+    private String findByEmailFromAccessToken(HttpServletRequest request) {
         return jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
+    }
+
+    private void createToken(UserRole userRole, String email, HttpServletResponse response) {
+        String accessToken = jwtTokenProvider.createAccessToken(email, userRole);
+        String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole);
+
+        jwtTokenProvider.setHeaderAccessToken(response, accessToken);
+        jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
+
+        redisService.setValues(refreshToken, email);
     }
 }
