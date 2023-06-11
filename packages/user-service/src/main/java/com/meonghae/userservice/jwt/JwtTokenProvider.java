@@ -127,11 +127,11 @@ public class JwtTokenProvider {
 
     // 어세스 토큰 헤더 설정
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
-        response.setHeader("Authorization", "bearer "+ accessToken);
+        response.setHeader("Authorization", "Bearer "+ accessToken);
     }
 
     // 리프레시 토큰 헤더 설정
     public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
-        response.setHeader("refreshToken", "bearer "+ refreshToken);
+        response.setHeader("refreshToken", "Bearer "+ refreshToken);
     }
 }

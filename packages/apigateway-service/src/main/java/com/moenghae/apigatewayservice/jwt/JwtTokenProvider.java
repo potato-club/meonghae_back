@@ -67,7 +67,7 @@ public class JwtTokenProvider {
             throw new ForbiddenClassException(Exception.class);
         }
 
-        String url = "http://localhost:8000/user-service/users/" + email;
+        String url = "https://api.meonghae.site/user-service/users/" + email;
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 
         String accessToken = createAccessToken(email, responseEntity.getBody());
@@ -115,6 +115,6 @@ public class JwtTokenProvider {
     // 어세스 토큰 헤더 설정
     public void setHeaderAccessToken(ServerHttpResponse response, String accessToken) {
         response.getHeaders().remove(HttpHeaders.AUTHORIZATION);
-        response.getHeaders().add(HttpHeaders.AUTHORIZATION, "bearer "+ accessToken);
+        response.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer "+ accessToken);
     }
 }
