@@ -1,24 +1,25 @@
 package com.meonghae.profileservice.config;
 
-import feign.form.spring.SpringFormEncoder;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
-import org.springframework.cloud.openfeign.support.SpringEncoder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.openfeign.support.AbstractFormWriter;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 
-public class FeignUploadConfig {
-    @Bean
-    public SpringFormEncoder multipartFormEncoder() {
-        ObjectFactory<HttpMessageConverters> convertersFactory = new HttpMessageConvertersFactory();
-        return new SpringFormEncoder(new SpringEncoder(convertersFactory));
+import java.io.IOException;
+
+@Component
+@RequiredArgsConstructor
+public class FeignUploadConfig extends AbstractFormWriter {
+    private final ObjectMapper objectMapper;
+
+    @Override
+    protected MediaType getContentType() {
+        return MediaType.APPLICATION_JSON;
     }
 
-    public class HttpMessageConvertersFactory implements ObjectFactory<HttpMessageConverters> {
-        @Override
-        public HttpMessageConverters getObject() throws BeansException {
-            return new HttpMessageConverters(new RestTemplate().getMessageConverters());
-        }
+    @Override
+    protected String writeAsString(Object object) throws IOException {
+        return objectMapper.writeValueAsString(object);
     }
 }
