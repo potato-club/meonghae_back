@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("/profile")
 @Api(value = "Pet Controller", tags = "반려동물 관련 서비스 API")
 @RequiredArgsConstructor
+@Slf4j
 public class PetController {
   private final PetService petService;
   @Operation(summary = "유저의 반려동물 리스트")
@@ -41,7 +43,7 @@ public class PetController {
   public String addPetList(@ApiParam(value = "이미지 List", required = true)@RequestPart List<MultipartFile> images,
                            @RequestPart List<PetInfoRequestDto> petListDto,
                            @ApiParam(value = "사용자 토큰", required = true) @RequestHeader("Authorization") String token){
-
+  log.info(images.get(0).getOriginalFilename() + petListDto.get(0).getPetName());
     return petService.savePetList(images, petListDto, token);
   }
 
