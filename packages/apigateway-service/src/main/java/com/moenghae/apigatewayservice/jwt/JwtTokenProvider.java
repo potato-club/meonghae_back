@@ -80,7 +80,7 @@ public class JwtTokenProvider {
         List<String> authorizationHeaders = request.getHeaders().get(HttpHeaders.AUTHORIZATION);
         if (authorizationHeaders != null && !authorizationHeaders.isEmpty()) {
             String authorizationHeader = authorizationHeaders.get(0);
-            if (authorizationHeader.startsWith("bearer ")) {
+            if (authorizationHeader.startsWith("Bearer ")) {
                 return authorizationHeader.substring(7);
             }
         }
@@ -115,6 +115,6 @@ public class JwtTokenProvider {
     // 어세스 토큰 헤더 설정
     public void setHeaderAccessToken(ServerHttpResponse response, String accessToken) {
         response.getHeaders().remove(HttpHeaders.AUTHORIZATION);
-        response.getHeaders().add(HttpHeaders.AUTHORIZATION, "bearer "+ accessToken);
+        response.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer "+ accessToken);
     }
 }
