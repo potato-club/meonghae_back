@@ -106,7 +106,7 @@ spring:
             - Method=GET,POST
           filters:
             - RemoveRequestHeader=Cookie
-            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+            - RewritePath=/s3-file-service/(?<segment>.*), /$\{segment}
         - id: profile-service
           uri: lb://PROFILE-SERVICE
           predicates:
@@ -146,7 +146,7 @@ spring:
             - Method=GET,POST,PUT,DELETE
           filters:
             - RemoveRequestHeader=Cookie
-            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+            - RewritePath=/s3-file-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
 
 jwt:
