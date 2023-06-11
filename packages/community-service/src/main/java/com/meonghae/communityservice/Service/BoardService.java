@@ -119,8 +119,7 @@ public class BoardService {
 
         if(images != null) {
             imageCheck(board, images, reuseSize);
-            S3RequestDto s3Dto = new S3RequestDto(board.getId(), "BOARD");
-            s3Service.uploadImage(images, s3Dto);
+            s3Service.updateImage(images, updateDto);
             board.setHasImage();
         }
     }
