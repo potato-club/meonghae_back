@@ -61,7 +61,7 @@ public class PetService {
 
 //======================================================================
 
-  @Transactional //다수 펫과 다수 이미지 저장
+  @Transactional //펫과 이미지 저장
   public String savePetList (MultipartFile image, PetInfoRequestDto petDto, String token){
     String userEmail = feignService.getUserEmail(token);
     try {
