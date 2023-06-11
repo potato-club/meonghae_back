@@ -39,8 +39,8 @@ cloud:
       auto: false
       static: ap-northeast-2
     credentials:
-      accessKey: ENC(LDQBa+D0vpRR+cyiGK945ZsTRbQaLRr0P1W7ajjVEOo=)
-      secretKey: ENC(+VP8xACCmTG+wKmM5YskoFQPmYAPOF1mT5CgV3Hd/R8QY4whkI1n1m01sq759HYPB5iy1fZs5Ek=)
+      accessKey: ENC(uQYp4PiTIpGw0FX/FbCkhC8WFTkhOVSue6AP7uJrWOk=)
+      secretKey: ENC(b1YCtsGBBKYGmK+jRevCADl/5q3mIbXDHyNqGH1UlBeRSJadxefSxa+qvdtRmwPxbzbzsNWnBg4=)
     stack:
       auto: false
 
