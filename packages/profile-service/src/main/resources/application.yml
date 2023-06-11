@@ -5,8 +5,14 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+
   application:
     name: profile-service
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
 
 #  zipkin:
 #    base-url: http://127.0.0.1:9411
