@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +29,7 @@ public class FileController {
     private final FileService fileService;
 
     @Operation(summary = "File Upload API")
-    @PostMapping("")
+    @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImages(@RequestPart List<MultipartFile> files,
                                                @RequestPart FileRequestDto requestDto) throws IOException {
         fileService.uploadImages(files, requestDto);
