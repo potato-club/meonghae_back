@@ -22,8 +22,8 @@ public interface S3ServiceClient {
     List<S3ResponseDto> getImages(S3RequestDto requestDto);
 
     @PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<String> uploadImage(@RequestPart(value = "images") List<MultipartFile> images,
-                                       @RequestPart(value = "s3Dto") S3RequestDto s3Dto);
+    ResponseEntity<String> uploadImage(@RequestPart(value = "files") List<MultipartFile> images,
+                                       @RequestPart(value = "data") S3RequestDto s3Dto);
 
     @PutMapping("/files")
     ResponseEntity<String> updateImage(@RequestPart List<MultipartFile> images,

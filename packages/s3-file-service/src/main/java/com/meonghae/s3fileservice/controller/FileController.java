@@ -30,8 +30,8 @@ public class FileController {
 
     @Operation(summary = "File Upload API")
     @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadImages(@RequestPart List<MultipartFile> files,
-                                               @RequestPart FileRequestDto requestDto) throws IOException {
+    public ResponseEntity<String> uploadImages(@RequestPart(value = "files") List<MultipartFile> files,
+                                               @RequestPart(value = "data") FileRequestDto requestDto) throws IOException {
         fileService.uploadImages(files, requestDto);
         return ResponseEntity.ok("Upload Success");
     }
