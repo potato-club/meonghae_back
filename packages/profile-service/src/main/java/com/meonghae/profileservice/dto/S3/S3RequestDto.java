@@ -1,8 +1,10 @@
 package com.meonghae.profileservice.dto.S3;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 
 @Getter
+@JsonSerialize
 public class S3RequestDto {
     private Long entityId;
     private String entityType;

@@ -1,5 +1,6 @@
 package com.meonghae.s3fileservice.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.meonghae.s3fileservice.entity.File;
 import com.meonghae.s3fileservice.enums.EntityType;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,6 +11,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
+@JsonSerialize
 public class FileRequestDto {
 
     @ApiModelProperty(value = "엔티티 종류")
