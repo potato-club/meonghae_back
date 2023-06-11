@@ -29,6 +29,7 @@ spring:
             preLogger: true
             postLogger: true
       routes:
+        # User api 라우팅
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
