@@ -35,7 +35,7 @@ spring:
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
-        show_sql: true
+        show_sql: false
         format_sql: true
   datasource:
     url: ENC(sJ/gqsMjQbAMh2bUiubUhoZ7fYilC+Q1I0nQkREt8UNsaEEi1ty8irzxmwKGovVojJ3bedhdubSDh8E+TcmTqeDbNEkBGxe+lOUKmq8BlpA3KkjD1i64CCRZ+zJ2jtOh)
