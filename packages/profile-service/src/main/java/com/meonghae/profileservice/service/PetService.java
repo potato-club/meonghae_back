@@ -62,23 +62,22 @@ public class PetService {
 //======================================================================
 
   @Transactional //다수 펫과 다수 이미지 저장
-  public String savePetList (List<MultipartFile> imageList, List<PetInfoRequestDto> petDtoList, String token){
+  public String savePetList (MultipartFile image, PetInfoRequestDto petDto, String token){
     String userEmail = feignService.getUserEmail(token);
     try {
-      for (int i = 0; i < petDtoList.size(); i++) {
-        Pet pet = new Pet(petDtoList.get(i), userEmail);
+        Pet pet = new Pet(petDto, userEmail);
         Pet savedPet = petRepository.save(pet);
 
-        if (imageList.get(i) != null) {
+        if (image != null) {
           S3RequestDto s3RequestDto = new S3RequestDto(savedPet.getId(),"PET");
 
-          List<MultipartFile> image = new ArrayList<>();
-          image.add(imageList.get(i));
+          List<MultipartFile> images = new ArrayList<>();
+          images.add(image);
 
-          s3ServiceClient.uploadImages(image, s3RequestDto);
+          s3ServiceClient.uploadImages(images, s3RequestDto);
           savedPet.setHasImage();
         }
-      }
+
     } catch (NullPointerException e){
       throw new NullPointerException("NULL 예외 발생");
     }
