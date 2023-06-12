@@ -41,7 +41,7 @@ public class UserController {
 
     @Operation(summary = "회원가입 API")
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestPart MultipartFile file,
+    public ResponseEntity<String> signUp(@RequestPart(required = false) MultipartFile file,
                                          @RequestPart UserRequestDto userDto,
                                          HttpServletResponse response) {
         userService.signUp(file, userDto, response);
