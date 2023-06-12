@@ -123,6 +123,20 @@ public class UserServiceImpl implements UserService {
         this.logout(request);
     }
 
+    @Override
+    public void cancelWithdrawal(String email, boolean agreement) {
+        if (userRepository.existsByEmailAndDeleted(email, true) && agreement) {
+            User user = userRepository.findByEmail(email).orElseThrow(() -> {
+                throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
+            });
+
+            user.setDeleted(false);
+
+        } else {
+            throw new UnAuthorizedException("401_NOT_ALLOW", NOT_ALLOW_WRITE_EXCEPTION);
+        }
+    }
+
     private String findByEmailFromAccessToken(HttpServletRequest request) {
         return jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
     }

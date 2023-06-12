@@ -1,9 +1,6 @@
 package com.meonghae.userservice.controller;
 
-import com.meonghae.userservice.dto.UserMyPageDto;
-import com.meonghae.userservice.dto.UserRequestDto;
-import com.meonghae.userservice.dto.UserResponseDto;
-import com.meonghae.userservice.dto.UserUpdateDto;
+import com.meonghae.userservice.dto.*;
 import com.meonghae.userservice.repository.UserRepository;
 import com.meonghae.userservice.service.Interface.UserService;
 import io.swagger.annotations.Api;
@@ -82,5 +79,12 @@ public class UserController {
     public ResponseEntity<String> withdrawalMembership(HttpServletRequest request) {
         userService.withdrawalMembership(request);
         return ResponseEntity.ok("회원탈퇴 처리 되었습니다");
+    }
+
+    @Operation(summary = "회원탈퇴 취소 API")
+    @PutMapping("/cancel")
+    public ResponseEntity<String> cancelWithdrawal(@RequestBody UserCancelDto cancelDto) {
+        userService.cancelWithdrawal(cancelDto.getEmail(), cancelDto.isAgreement());
+        return ResponseEntity.ok("회원탈퇴 처리가 취소되었습니다");
     }
 }

@@ -26,4 +26,6 @@ public interface UserService {
     void logout(HttpServletRequest request);
 
     void withdrawalMembership(HttpServletRequest request);
+
+    void cancelWithdrawal(String email, boolean agreement);
 }
