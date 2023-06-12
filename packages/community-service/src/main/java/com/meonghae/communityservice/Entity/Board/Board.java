@@ -30,6 +30,7 @@ public class Board extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private BoardType type;
     private int likes;
+    @Column(columnDefinition = "TINYINT(1)")
     private Boolean hasImage;
     @OneToMany(mappedBy = "board", orphanRemoval = true)
     private List<BoardComment> comments = new ArrayList<>();
