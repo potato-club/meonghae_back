@@ -6,6 +6,7 @@ import com.meonghae.profileservice.dto.S3.S3RequestDto;
 import com.meonghae.profileservice.dto.S3.S3ResponseDto;
 import com.meonghae.profileservice.dto.S3.S3UpdateDto;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +23,8 @@ public interface S3ServiceClient {
   ResponseEntity<String> uploadImages(@RequestPart(value = "files", name = "files") List<MultipartFile> files,
                                       @RequestPart(value = "data", name = "data") S3RequestDto data);
 
-  @PostMapping("/files/pets")
-  S3ResponseDto viewPetFile(@RequestBody S3RequestDto requestDto);
+  @GetMapping("/files/pets")
+  S3ResponseDto viewPetFile(@SpringQueryMap S3RequestDto requestDto);
 
   @PutMapping("/files")
   ResponseEntity<String> updateFiles(@RequestPart List<MultipartFile> files, @RequestPart List<S3UpdateDto> requestDto);
