@@ -32,7 +32,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             String path = request.getURI().getPath();
 
             if (path.endsWith("/health") || path.endsWith("/prometheus") || path.startsWith("/user-service/signup") ||
-                    path.startsWith("/user-service/login") || path.endsWith("/swagger-ui/index.html")) {
+                    path.startsWith("/user-service/login") || path.endsWith("/swagger-ui/index.html") ||
+                    path.startsWith("/s3-file-service/files/users")) {
                 return chain.filter(exchange);
             }
 
