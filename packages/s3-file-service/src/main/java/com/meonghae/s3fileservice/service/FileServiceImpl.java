@@ -1,6 +1,6 @@
 package com.meonghae.s3fileservice.service;
 
-import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import com.meonghae.s3fileservice.dto.FileRequestDto;
@@ -30,7 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
-    private final AmazonS3 s3Client;
+    private final AmazonS3Client s3Client;
     private final FileRepository fileRepository;
     private final JPAQueryFactory jpaQueryFactory;
 

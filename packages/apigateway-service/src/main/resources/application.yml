@@ -142,7 +142,7 @@ spring:
         - id: s3-file-service
           uri: lb://S3-FILE-SERVICE
           predicates:
-            - Path=/s3-file-service/files/**
+            - Path=/s3-file-service/**
             - Method=GET,POST,PUT,DELETE
           filters:
             - RemoveRequestHeader=Cookie
