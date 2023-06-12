@@ -43,7 +43,7 @@ public class PetController {
   public String addPetList(@ApiParam(value = "이미지", required = true)@RequestPart MultipartFile image,
                            @RequestPart PetInfoRequestDto petDto,
                            @ApiParam(value = "사용자 토큰", required = true) @RequestHeader("Authorization") String token){
-  log.info(image.getOriginalFilename() + petDto.getPetName());
+
     return petService.savePetList(image, petDto, token);
   }
 

@@ -62,10 +62,9 @@ public class CalendarService {
   // 달력에서 출력하기 위함 - 날짜 하나 클릭시 그 날짜에 대한 일정들 리턴
   @Transactional
   public List<CalendarResponseDTO> getSchedule(
-      CalendarRequestDTO calendarRequestDTO, String token) {
+          LocalDateTime startOfDate, String token) {
 
-    LocalDateTime startOfDay = calendarRequestDTO.getScheduleTime().toLocalDate().atStartOfDay();
-    LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1); // ex) 13일 23시 59분
+    LocalDateTime endOfDate = startOfDate.plusDays(1).minusNanos(1); // ex) 13일 23시 59분
 
     String userEmail = feignService.getUserEmail(token);
 
@@ -78,7 +77,7 @@ public class CalendarService {
             .from(qCalendar)
             .innerJoin(qCalendar.pet, qPet)
             .where(
-                qCalendar.userEmail.eq(userEmail).and(qCalendar.scheduleTime.between(startOfDay, endOfDay)))
+                qCalendar.userEmail.eq(userEmail).and(qCalendar.scheduleTime.between(startOfDate, endOfDate)))
             .orderBy(qCalendar.scheduleTime.asc())
             .fetch();
 
@@ -87,9 +86,8 @@ public class CalendarService {
 
   // 달력 월단위 일정들 보기 위한 함수 - 같은 해 같은 월 데이터 출력
   @Transactional
-  public List<CalendarResponseDTO> getMonthSechedule(CalendarRequestDTO calendarRequestDTO, String token) {
-    LocalDate startOfDate =
-        LocalDate.of(calendarRequestDTO.getScheduleTime().getYear(), calendarRequestDTO.getScheduleTime().getMonth(), 1);
+  public List<CalendarResponseDTO> getMonthSechedule(LocalDate startOfDate, String token) {
+
     LocalDate endOfDate = startOfDate.plusMonths(1).minusDays(1);
 
     String userEmail = feignService.getUserEmail(token);
