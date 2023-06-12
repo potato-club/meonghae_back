@@ -89,10 +89,8 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userDto.toEntity());
 
         if(file != null) {
-            List<MultipartFile> files = new ArrayList<>();
-            files.add(file);
             S3RequestDto s3Dto = new S3RequestDto(userDto.getEmail(), "USER");
-            s3Service.uploadImage(files, s3Dto);
+            s3Service.uploadFileForUser(file, s3Dto);
         }
 
         UserRole userRole = userRepository.findByEmail(userDto.getEmail()).get().getUserRole();

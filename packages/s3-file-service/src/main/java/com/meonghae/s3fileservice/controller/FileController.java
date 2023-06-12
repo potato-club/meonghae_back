@@ -34,7 +34,7 @@ public class FileController {
     }
 
     @Operation(summary = "File Upload For User API")
-    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImagesForUser(@RequestPart(value = "file") MultipartFile file,
                                                @RequestPart(value = "data") FileUserDto data) throws IOException {
         fileService.uploadFileForUser(file, data);

@@ -17,8 +17,8 @@ public interface S3ServiceClient {
     @GetMapping("/files/users")
     S3ResponseDto viewUserFile(@RequestParam String email);
 
-    @PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // Error 400
-    ResponseEntity<String> uploadImage(@RequestPart(value = "files", name = "files") List<MultipartFile> files,
+    @PostMapping(value = "/files/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<String> uploadFileForUser(@RequestPart(value = "file", name = "file") MultipartFile file,
                                        @RequestPart(value = "data", name = "data") S3RequestDto data);
 
     @PutMapping("/files")
