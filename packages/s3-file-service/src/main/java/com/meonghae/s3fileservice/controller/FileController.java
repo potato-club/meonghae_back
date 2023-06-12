@@ -50,7 +50,7 @@ public class FileController {
         return fileService.viewFileList(requestDto);
     }
 
-    @Operation(summary = "View File about User Entity API") // test
+    @Operation(summary = "View File about User Entity API")
     @GetMapping("/users")
     public FileUserResponseDto viewUserFile(@RequestParam String email) {
         return fileService.viewUserProfile(email);
