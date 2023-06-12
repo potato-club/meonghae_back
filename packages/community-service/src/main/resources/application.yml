@@ -82,10 +82,11 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://eureka-server:8761/eureka
+    region: ap-northeast-2
 
 logging:
   level:
-    com.meonghae.communityservice: DEBUG
+    root: INFO
 
 management:
   endpoints:
