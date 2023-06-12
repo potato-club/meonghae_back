@@ -6,10 +6,7 @@ import com.meonghae.userservice.dto.S3Dto.S3UpdateDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -18,7 +15,7 @@ import java.util.List;
 public interface S3ServiceClient {
 
     @GetMapping("/files/users")
-    S3ResponseDto viewUserFile(String email);
+    S3ResponseDto viewUserFile(@RequestParam String email);
 
     @PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // Error 400
     ResponseEntity<String> uploadImage(@RequestPart(value = "files", name = "files") List<MultipartFile> files,
