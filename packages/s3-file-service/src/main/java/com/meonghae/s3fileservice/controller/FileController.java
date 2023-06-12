@@ -38,14 +38,14 @@ public class FileController {
 
     @Operation(summary = "File Update API")
     @PutMapping("")
-    public ResponseEntity<String> updateFiles(@RequestPart List<MultipartFile> files,
-                                               @RequestPart List<FileUpdateDto> requestDto) throws IOException {
-        fileService.updateFiles(files, requestDto);
+    public ResponseEntity<String> updateFiles(@RequestPart(value = "files") List<MultipartFile> files,
+                                               @RequestPart(value = "dataList") List<FileUpdateDto> dataList) throws IOException {
+        fileService.updateFiles(files, dataList);
         return ResponseEntity.ok("Update Success");
     }
 
     @Operation(summary = "View File List API")
-    @GetMapping(value = "", consumes = MediaType.ALL_VALUE)
+    @GetMapping(value = "")
     public List<FileResponseDto> viewFileList(@ModelAttribute FileRequestDto requestDto) {
         return fileService.viewFileList(requestDto);
     }
