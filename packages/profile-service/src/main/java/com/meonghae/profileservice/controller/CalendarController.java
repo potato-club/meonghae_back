@@ -3,6 +3,9 @@ package com.meonghae.profileservice.controller;
 import com.meonghae.profileservice.dto.calendar.CalendarRequestDTO;
 import com.meonghae.profileservice.dto.calendar.CalendarResponseDTO;
 import com.meonghae.profileservice.service.CalendarService;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,19 +26,31 @@ public class CalendarController {
   public List<CalendarResponseDTO> getProfileSchedule(@RequestHeader("Authorization") String token) {
     return calendarService.getProfileSchedule(token);
   }
-   //param { year , month }
-   @Operation(summary = "년도와 달을 입력시 해당 달의 일정들을 반환")
-  @GetMapping("/month")
-  public List<CalendarResponseDTO> getMonthSechedule(
-      @RequestBody CalendarRequestDTO calendarRequestDTO, @RequestHeader("Authorization") String token) {
-    return calendarService.getMonthSechedule(calendarRequestDTO, token);
-  }
-   @Operation(summary = "해당 일에 대한 일정들을 반환")
-   //param { year , month , day}
-  @GetMapping("/day")
+
+//   @Operation(summary = "년도와 달을 입력시 해당 달의 일정들을 반환")
+//  @GetMapping("")
+//  public List<CalendarResponseDTO> getMonthSechedule(
+//      @RequestParam("year")int year,
+//      @RequestParam("month")int month,
+//      @RequestHeader("Authorization") String token) {
+//     LocalDate startOfDate =
+//             LocalDate.of(year, month, 1);
+//    return calendarService.getMonthSechedule(startOfDate, token);
+//  }
+   @Operation(summary = "년,월 입력 시 달력반환, 년,월,일 입력시 하루 일정반환")
+  @GetMapping("")
   public List<CalendarResponseDTO> getSchedule(
-      @RequestBody CalendarRequestDTO calendarRequestDTO, @RequestHeader("Authorization") String token) {
-    return calendarService.getSchedule(calendarRequestDTO, token);
+           @RequestParam("year")int year,
+           @RequestParam("month")int month,
+           @RequestParam(value = "day", required = false)Integer day,
+           @RequestHeader("Authorization") String token) {
+       if (day != null) {
+           LocalDateTime startOfDate = LocalDateTime.of(year, month, day, 0, 0, 0);
+           return calendarService.getSchedule(startOfDate, token);
+       } else {
+           LocalDate startOfDate = LocalDate.of(year, month, 1);
+           return calendarService.getMonthSechedule(startOfDate, token);
+       }
   }
    @Operation(summary = "일정 추가 API")
   @PostMapping

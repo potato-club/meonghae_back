@@ -12,7 +12,7 @@ public class CalendarRequestDTO {
   private Long petId;
   @ApiModelProperty(notes = "일정 날짜와 시간", example = "2023-01-01 HH:mm:ss.sss", required = true)
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-  private LocalDateTime ScheduleTime;
+  private LocalDateTime scheduleTime;
   @ApiModelProperty(notes = "일정 정보", example = "예방주사 맞는 날", required = true)
   private String text;
 }
