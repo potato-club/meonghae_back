@@ -95,15 +95,12 @@ public class BoardService {
         String email = userService.getUserEmail(token);
         Board board = requestDto.toEntity(type, email);
         Board saveBoard = boardRepository.save(board);
-        log.info(images.size() + " ==========> 이미지 사이즈 개수임");
-        log.info(images.size() + "개의 이미지 파일이 들어옴");
-        log.info("========================== 여기 실행 됨 ==========================");
-        imageCheck(saveBoard, images, 0);
-        S3RequestDto s3Dto = new S3RequestDto(saveBoard.getId(), "BOARD");
-        s3Service.uploadImage(images, s3Dto);
-        log.info("========================== Feign 요청 완료 ==========================");
-        saveBoard.setHasImage();
-        log.info("========================== board 의 image 상태 변경 완료 ==========================");
+        if(images != null) {
+            imageCheck(saveBoard, images, 0);
+            S3RequestDto s3Dto = new S3RequestDto(saveBoard.getId(), "BOARD");
+            s3Service.uploadImage(images, s3Dto);
+            saveBoard.setHasImage();
+        }
     }
 
     @Transactional
