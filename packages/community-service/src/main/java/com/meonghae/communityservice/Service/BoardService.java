@@ -97,10 +97,14 @@ public class BoardService {
 
         Board saveBoard = boardRepository.save(board);
         if(images != null) {
+            System.out.println(images.size() + "개의 이미지 파일이 들어옴");
+            System.out.println("========================== 여기 실행 됨 ==========================");
             imageCheck(saveBoard, images, 0);
             S3RequestDto s3Dto = new S3RequestDto(saveBoard.getId(), "BOARD");
             s3Service.uploadImage(images, s3Dto);
+            System.out.println("========================== Feign 요청 완료 ==========================");
             saveBoard.setHasImage();
+            System.out.println("========================== board 의 image 상태 변경 완료 ==========================");
         }
     }
 
@@ -136,7 +140,7 @@ public class BoardService {
         boardRepository.delete(board);
     }
 
-    private void imageCheck(Board saveBoard, List<MultipartFile> images, int reuseSize) {
+    public void imageCheck(Board saveBoard, List<MultipartFile> images, int reuseSize) {
         if(saveBoard.getType() == BoardType.MISSING && images.size() - reuseSize > 5) {
             throw new BoardException(BAD_REQUEST, "실종 게시글 사진은 최대 5개까지 업로드 가능합니다.");
         } else if(images.size() - reuseSize > 3) {
