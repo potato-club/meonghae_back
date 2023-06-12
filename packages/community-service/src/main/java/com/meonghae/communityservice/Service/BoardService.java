@@ -94,7 +94,7 @@ public class BoardService {
         BoardType type = BoardType.findWithKey(typeKey);
         String email = userService.getUserEmail(token);
         Board board = requestDto.toEntity(type, email);
-
+        log.info("이건 되냐?");
         Board saveBoard = boardRepository.save(board);
         if(images != null) {
             log.info(images.size() + "개의 이미지 파일이 들어옴");
