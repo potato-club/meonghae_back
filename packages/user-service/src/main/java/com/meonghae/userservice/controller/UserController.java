@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,8 +44,10 @@ public class UserController {
 
     @Operation(summary = "회원가입 API")
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto, HttpServletResponse response) {
-        userService.signUp(userDto, response);
+    public ResponseEntity<String> signUp(@RequestPart MultipartFile file,
+                                         @RequestPart UserRequestDto userDto,
+                                         HttpServletResponse response) {
+        userService.signUp(file, userDto, response);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 
