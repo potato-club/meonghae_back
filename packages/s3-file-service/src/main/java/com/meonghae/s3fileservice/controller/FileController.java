@@ -29,7 +29,7 @@ public class FileController {
     private final FileService fileService;
 
     @Operation(summary = "File Upload API")
-    @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImages(@RequestPart(value = "files") List<MultipartFile> files,
                                                @RequestPart(value = "data") FileRequestDto data) throws IOException {
         fileService.uploadImages(files, data);
@@ -46,7 +46,7 @@ public class FileController {
 
     @Operation(summary = "View File List API")
     @GetMapping("")
-    public List<FileResponseDto> viewFileList(FileRequestDto requestDto) {
+    public List<FileResponseDto> viewFileList(@ModelAttribute FileRequestDto requestDto) {
         return fileService.viewFileList(requestDto);
     }
 

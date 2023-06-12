@@ -1,5 +1,7 @@
 package com.meonghae.userservice.service.impl;
 
+import com.meonghae.userservice.client.S3ServiceClient;
+import com.meonghae.userservice.dto.S3Dto.S3RequestDto;
 import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
@@ -15,14 +17,18 @@ import com.meonghae.userservice.service.Interface.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.meonghae.userservice.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
+import static com.meonghae.userservice.error.ErrorCode.NOT_ALLOW_WRITE_EXCEPTION;
 
 @RequiredArgsConstructor
 @Transactional
@@ -32,17 +38,20 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
+    private final S3ServiceClient s3Service;
 
     @Override
     public UserResponseDto login(String email, HttpServletResponse response) {
 
-        if (userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmailAndDeleted(email, false)) {
             UserRole userRole = userRepository.findByEmail(email).get().getUserRole();
             this.createToken(userRole, email, response);
 
             return UserResponseDto.builder()
                     .responseCode("200_OK")
                     .build();
+        } else if (userRepository.existsByEmailAndDeleted(email, true)) {
+            throw new UnAuthorizedException("401_NOT_ALLOW", NOT_ALLOW_WRITE_EXCEPTION);
         }
 
         return UserResponseDto.builder()
@@ -73,11 +82,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void signUp(UserRequestDto userDto, HttpServletResponse response) {
+    public void signUp(MultipartFile file, UserRequestDto userDto, HttpServletResponse response) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         }
         userRepository.save(userDto.toEntity());
+
+        if(file != null) {
+            List<MultipartFile> files = new ArrayList<>();
+            files.add(file);
+            S3RequestDto s3Dto = new S3RequestDto(userDto.getEmail(), "USER");
+            s3Service.uploadImage(files, s3Dto);
+        }
 
         UserRole userRole = userRepository.findByEmail(userDto.getEmail()).get().getUserRole();
         this.createToken(userRole, userDto.getEmail(), response);
