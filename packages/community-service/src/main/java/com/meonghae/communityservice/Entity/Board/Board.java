@@ -26,7 +26,7 @@ public class Board extends BaseTimeEntity {
     private String title;
     @Column(nullable = false)
     private String content;
-    @Column(nullable = false)
+    @Column
     @Enumerated(value = EnumType.STRING)
     private BoardType type;
     private int likes;
