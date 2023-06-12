@@ -136,7 +136,7 @@ public class BoardService {
         boardRepository.delete(board);
     }
 
-    private void imageCheck(Board saveBoard, List<MultipartFile> images, int reuseSize) {
+    public void imageCheck(Board saveBoard, List<MultipartFile> images, int reuseSize) {
         if(saveBoard.getType() == BoardType.MISSING && images.size() - reuseSize > 5) {
             throw new BoardException(BAD_REQUEST, "실종 게시글 사진은 최대 5개까지 업로드 가능합니다.");
         } else if(images.size() - reuseSize > 3) {
