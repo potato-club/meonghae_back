@@ -45,7 +45,7 @@ public class FileController {
     }
 
     @Operation(summary = "View File List API")
-    @GetMapping("")
+    @GetMapping(value = "", consumes = MediaType.ALL_VALUE)
     public List<FileResponseDto> viewFileList(@ModelAttribute FileRequestDto requestDto) {
         return fileService.viewFileList(requestDto);
     }
