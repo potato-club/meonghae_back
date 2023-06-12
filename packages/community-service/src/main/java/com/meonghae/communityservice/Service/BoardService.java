@@ -97,14 +97,14 @@ public class BoardService {
 
         Board saveBoard = boardRepository.save(board);
         if(images != null) {
-            log.info(images.size() + "개의 이미지 파일이 들어옴");
-            log.info("========================== 여기 실행 됨 ==========================");
+            System.out.println(images.size() + "개의 이미지 파일이 들어옴");
+            System.out.println("========================== 여기 실행 됨 ==========================");
             imageCheck(saveBoard, images, 0);
             S3RequestDto s3Dto = new S3RequestDto(saveBoard.getId(), "BOARD");
             s3Service.uploadImage(images, s3Dto);
-            log.info("========================== Feign 요청 완료 ==========================");
+            System.out.println("========================== Feign 요청 완료 ==========================");
             saveBoard.setHasImage();
-            log.info("========================== board 의 image 상태 변경 완료 ==========================");
+            System.out.println("========================== board 의 image 상태 변경 완료 ==========================");
         }
     }
 
