@@ -1,9 +1,6 @@
 package com.meonghae.s3fileservice.controller;
 
-import com.meonghae.s3fileservice.dto.FileRequestDto;
-import com.meonghae.s3fileservice.dto.FileResponseDto;
-import com.meonghae.s3fileservice.dto.FileUpdateDto;
-import com.meonghae.s3fileservice.dto.FileUserResponseDto;
+import com.meonghae.s3fileservice.dto.*;
 import com.meonghae.s3fileservice.service.FileService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +30,14 @@ public class FileController {
     public ResponseEntity<String> uploadImages(@RequestPart(value = "files") List<MultipartFile> files,
                                                @RequestPart(value = "data") FileRequestDto data) throws IOException {
         fileService.uploadImages(files, data);
+        return ResponseEntity.ok("Upload Success");
+    }
+
+    @Operation(summary = "File Upload For User API")
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadImagesForUser(@RequestPart(value = "file") MultipartFile file,
+                                               @RequestPart(value = "data") FileUserDto data) throws IOException {
+        fileService.uploadFileForUser(file, data);
         return ResponseEntity.ok("Upload Success");
     }
 

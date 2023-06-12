@@ -3,10 +3,7 @@ package com.meonghae.s3fileservice.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
-import com.meonghae.s3fileservice.dto.FileRequestDto;
-import com.meonghae.s3fileservice.dto.FileResponseDto;
-import com.meonghae.s3fileservice.dto.FileUpdateDto;
-import com.meonghae.s3fileservice.dto.FileUserResponseDto;
+import com.meonghae.s3fileservice.dto.*;
 import com.meonghae.s3fileservice.entity.File;
 import com.meonghae.s3fileservice.entity.QFile;
 import com.meonghae.s3fileservice.enums.EntityType;
@@ -44,6 +41,18 @@ public class FileServiceImpl implements FileService {
         for (File file : list) {
             file.setEntityData(requestDto);
             fileRepository.save(file);
+        }
+    }
+
+    @Override
+    public void uploadFileForUser(MultipartFile file, FileUserDto userDto) throws IOException {
+        List<MultipartFile> files = new ArrayList<>();
+        files.add(file);
+
+        List<File> list = this.existsFiles(files);
+        for (File image : list) {
+            image.setEntityDataForUser(userDto);
+            fileRepository.save(image);
         }
     }
 
