@@ -57,8 +57,8 @@ public class FileController {
     }
 
     @Operation(summary = "View File about Pet Entity Api")
-    @PostMapping ("/pets")
-    public FileUserResponseDto viewPetFile(@RequestBody FileRequestDto requestDto){
+    @GetMapping ("/pets")
+    public FileUserResponseDto viewPetFile(@ModelAttribute FileRequestDto requestDto){
         return fileService.viewPetProfile(requestDto);
     }
 

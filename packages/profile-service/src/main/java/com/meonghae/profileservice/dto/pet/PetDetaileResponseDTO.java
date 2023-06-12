@@ -21,7 +21,7 @@ public class PetDetaileResponseDTO {
   @ApiModelProperty(notes = "반려동물 이름", example = "시츄")
   private String petName;
   @ApiModelProperty(notes = "반려동물 성별", example = "BOY or GIRL")
-  private PetGender petGender;
+  private String petGender;
   @ApiModelProperty(notes = "반려동물 생일", example = "2018-01-01")
   private LocalDate petBirth;
   @ApiModelProperty(notes = "반려동물 종", example = "문자열")
@@ -34,6 +34,10 @@ public class PetDetaileResponseDTO {
   public PetDetaileResponseDTO(Pet pet) {
     this.id = pet.getId();
     this.petName = pet.getPetName();
+    this.petGender = pet.getPetGender().getKey();
+    this.petBirth = pet.getPetBirth();
+    this.petSpecies = pet.getPetSpecies();
+    this.meetRoute = pet.getMeetRoute();
   }
 
 
