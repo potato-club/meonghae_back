@@ -26,4 +26,8 @@ public class PetInfoResponseDTO {
     this.petName = pet.getPetName();
     this.s3ResponseDto = s3ResponseDto;
   }
+  public PetInfoResponseDTO(Pet pet) {
+    this.id = pet.getId();
+    this.petName = pet.getPetName();
+  }
 }

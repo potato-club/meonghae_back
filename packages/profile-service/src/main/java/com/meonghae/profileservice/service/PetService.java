@@ -41,6 +41,8 @@ public class PetService {
       if ( pet.isHasImage() ){
         S3ResponseDto image = s3ServiceClient.viewPetFile(new S3RequestDto(pet.getId(),"PET"));
         resultList.add(new PetInfoResponseDTO(pet,image));
+      } else{
+        resultList.add(new PetInfoResponseDTO(pet));
       }
     }
     return resultList;
