@@ -2,6 +2,7 @@ package com.meonghae.profileservice.dto.pet;
 
 import com.meonghae.profileservice.enumCustom.PetGender;
 import java.time.LocalDate;
+import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -24,6 +25,8 @@ public class PetInfoRequestDto {
   private String petSpecies;
   @ApiModelProperty(notes = "입양 경로", example = "간택", required = true)
   private String meetRoute;
+  @ApiModelProperty("이미지 파일")
+  private MultipartFile image;
 
   //  @ApiModelProperty(notes = "반려동물 종", example = "DOG or CAT", required = true)
 //  private PetType petType;
