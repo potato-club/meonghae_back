@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import static com.meonghae.userservice.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 import static com.meonghae.userservice.error.ErrorCode.NOT_ALLOW_WRITE_EXCEPTION;
@@ -64,7 +65,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String sendNickname(String email) {
-        return userRepository.findByEmail(email).get().getNickname();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        return userOptional.map(User::getNickname).orElse(null);
     }
 
     @Override
