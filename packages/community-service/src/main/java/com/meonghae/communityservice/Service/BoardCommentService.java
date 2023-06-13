@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -35,8 +36,9 @@ public class BoardCommentService {
         PageRequest request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.DESC, "id"));
         Slice<BoardComment> comments = commentRepository.findByBoardAndParentIsNull(request, board);
         Slice<CommentParentDto> dtoPage = comments.map(comment -> {
-            String nickname = redisService.getNickname(comment.getEmail());
-            return new CommentParentDto(comment, nickname);
+            String url = redisService.getProfileImage(comment.getEmail());
+            return Objects.equals(comment.getEmail(), board.getEmail()) ?
+                    new CommentParentDto(comment, url, true) : new CommentParentDto(comment, url, false);
         });
         return dtoPage;
     }
@@ -50,8 +52,9 @@ public class BoardCommentService {
         PageRequest request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.ASC, "id"));
         Slice<BoardComment> childComments = commentRepository.findByParent(request, parent);
         Slice<CommentChildDto> dtoPage = childComments.map(comment -> {
-            String nickname = redisService.getNickname(comment.getEmail());
-            return new CommentChildDto(comment, nickname);
+            String url = redisService.getProfileImage(comment.getEmail());
+            return Objects.equals(comment.getBoard().getEmail(), comment.getEmail()) ?
+                    new CommentChildDto(comment, url, true) : new CommentChildDto(comment, url, false);
         });
         return dtoPage;
     }

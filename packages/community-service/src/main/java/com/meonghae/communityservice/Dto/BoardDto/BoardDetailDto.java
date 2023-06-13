@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 public class BoardDetailDto {
     @ApiModelProperty("게시글 id")
     private Long id;
-    @ApiModelProperty("게시글 작성자 닉네임")
-    private String nickname;
+    @ApiModelProperty("게시글 작성자 프로필 사진")
+    private String profileUrl;
     @ApiModelProperty("게시글 제목")
     private String title;
     @ApiModelProperty("게시글 내용")
@@ -28,9 +28,9 @@ public class BoardDetailDto {
     @ApiModelProperty("게시글 좋아요 개수")
     private int likes;
 
-    public BoardDetailDto(Board board, String nickname) {
+    public BoardDetailDto(Board board, String url) {
         this.id = board.getId();
-        this.nickname = nickname;
+        this.profileUrl = url;
         this.title = board.getTitle();
         this.content = board.getContent();
         this.commentSize = board.getComments().isEmpty() ? 0 : board.getComments().size();

@@ -46,8 +46,8 @@ public class BoardService {
                 Sort.by(Sort.Direction.DESC, "createdDate"));
         Slice<Board> list = boardRepository.findByType(type, request);
         Slice<BoardListDto> listDto = list.map(board -> {
-            String nickname = redisService.getNickname(board.getEmail());
-            return new BoardListDto(board, nickname);
+            String url = redisService.getProfileImage(board.getEmail());
+            return new BoardListDto(board, url);
         });
         return listDto;
     }
@@ -56,8 +56,8 @@ public class BoardService {
     public BoardDetailDto getBoard(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
-        String nickname = redisService.getNickname(board.getEmail());
-        BoardDetailDto detailDto = new BoardDetailDto(board, nickname);
+        String url = redisService.getProfileImage(board.getEmail());
+        BoardDetailDto detailDto = new BoardDetailDto(board, url);
         if(board.getHasImage()) {
             List<S3ResponseDto> images = s3Service.getImages(new S3RequestDto(board.getId(), "BOARD"));
             detailDto.setImages(images);
@@ -80,10 +80,7 @@ public class BoardService {
                 .limit(1)
                 .fetchOne()).filter(Objects::nonNull).collect(Collectors.toList());
 
-        return mainBoardLists.stream().map(board -> {
-            String nickname = redisService.getNickname(board.getEmail());
-            return new BoardMainDto(board, nickname);
-        }).collect(Collectors.toList());
+        return mainBoardLists.stream().map(BoardMainDto::new).collect(Collectors.toList());
     }
 
     @Transactional

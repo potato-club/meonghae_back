@@ -120,7 +120,8 @@ public class ReviewService {
 
     private ReviewListDto convertTypeAndAddImage(Review review) {
         String nickname = redisService.getNickname(review.getEmail());
-        ReviewListDto reviewDto = new ReviewListDto(review, nickname);
+        String url = redisService.getProfileImage(review.getEmail());
+        ReviewListDto reviewDto = new ReviewListDto(review, nickname, url);
         if (review.getHasImage()) {
             S3RequestDto requestDto = new S3RequestDto(review.getId(), "REVIEW");
             reviewDto.setImages(s3Service.getImages(requestDto));
