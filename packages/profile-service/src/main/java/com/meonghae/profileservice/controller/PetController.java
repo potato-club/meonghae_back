@@ -10,14 +10,9 @@ import java.util.List;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 
 
 @RestController
@@ -60,5 +55,10 @@ public class PetController {
     return petService.deleteById(id);
   }
 
+  @Operation(summary = "Feign용 이메일로 데이터삭제")
+  @DeleteMapping("/users")
+  public void deletedByUserEmail(@RequestPart String userEmail){
+    petService.deleteByUserEmail(userEmail);
 
+  }
 }

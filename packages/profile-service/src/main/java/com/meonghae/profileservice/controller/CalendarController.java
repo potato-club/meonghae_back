@@ -27,16 +27,6 @@ public class CalendarController {
     return calendarService.getProfileSchedule(token);
   }
 
-//   @Operation(summary = "년도와 달을 입력시 해당 달의 일정들을 반환")
-//  @GetMapping("")
-//  public List<CalendarResponseDTO> getMonthSechedule(
-//      @RequestParam("year")int year,
-//      @RequestParam("month")int month,
-//      @RequestHeader("Authorization") String token) {
-//     LocalDate startOfDate =
-//             LocalDate.of(year, month, 1);
-//    return calendarService.getMonthSechedule(startOfDate, token);
-//  }
    @Operation(summary = "년,월 입력 시 달력반환, 년,월,일 입력시 하루 일정반환")
   @GetMapping("")
   public List<CalendarResponseDTO> getSchedule(
@@ -49,10 +39,17 @@ public class CalendarController {
            return calendarService.getSchedule(startOfDate, token);
        } else {
            LocalDate startOfDate = LocalDate.of(year, month, 1);
-           return calendarService.getMonthSechedule(startOfDate, token);
+           return calendarService.getMonthSchedule(startOfDate, token);
        }
   }
-   @Operation(summary = "일정 추가 API")
+
+  @Operation(summary = "일정 검색 API")
+  @GetMapping("/find")
+  public List<CalendarResponseDTO> getScheduleOfFindByText(@RequestParam("key") String key){
+    return calendarService.getScheduleOfFindByText(key);
+  }
+
+  @Operation(summary = "일정 추가 API")
   @PostMapping
   public String addSchedule(
       @RequestBody CalendarRequestDTO calendarRequestDTO, @RequestHeader("Authorization") String token) {
