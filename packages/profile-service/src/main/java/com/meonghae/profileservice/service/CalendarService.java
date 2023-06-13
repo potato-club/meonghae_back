@@ -11,6 +11,7 @@ import com.meonghae.profileservice.error.exception.BadRequestException;
 import com.meonghae.profileservice.error.exception.NotFoundException;
 import com.meonghae.profileservice.repository.CalendarRepository;
 import com.meonghae.profileservice.repository.PetRepository;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.time.DateTimeException;
@@ -124,7 +125,12 @@ public class CalendarService {
                     .selectFrom(qCalendar)
                     .join(qCalendar.pet, qPet)
                     .where(qCalendar.userEmail.eq(userEmail))
-                    .where(qCalendar.text.like("%"+key+"%").or(qPet.petName.like("%"+key+"%")))
+                    .where(qCalendar.text.like("%"+key+"%").or(
+                            JPAExpressions
+                                    .selectFrom(qPet)
+                                    .where(qPet.petName.like("%"+key+"%"))
+                                    .exists()
+                    ))
                     .orderBy(qCalendar.scheduleTime.asc())
                     .fetch();
 
