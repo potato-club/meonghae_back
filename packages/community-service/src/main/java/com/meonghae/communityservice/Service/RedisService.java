@@ -28,7 +28,7 @@ public class RedisService {
             log.info("=========== Feign 호출 ===========");
             nickname = userService.getNickname(email);
             if(nickname == null) {
-                throw new BoardException(ErrorCode.BAD_REQUEST, "User is not exist");
+                return "탈퇴한 회원";
             }
             cacheManager.getCache(byEmail).put(email, nickname);
         }

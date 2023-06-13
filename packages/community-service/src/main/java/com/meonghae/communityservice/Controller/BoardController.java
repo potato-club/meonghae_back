@@ -67,6 +67,7 @@ public class BoardController {
         return ResponseEntity.ok(result);
     }
 
+    // 수정 로직 미완성 -> 이미지 수정 문제 List<S3UpdateDto> 어떻게 받을지 고민
     @Operation(summary = "게시글 수정 API")
     @PutMapping("/{id}")
     public ResponseEntity<String> modifyBoard(@PathVariable(name = "id") Long id,
