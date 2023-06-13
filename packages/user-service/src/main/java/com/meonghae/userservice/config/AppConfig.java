@@ -1,5 +1,8 @@
 package com.meonghae.userservice.config;
 
+import com.meonghae.userservice.client.PetServiceClient;
+import com.meonghae.userservice.client.S3ServiceClient;
+import com.meonghae.userservice.dto.S3Dto.S3RequestDto;
 import com.meonghae.userservice.entity.User;
 import com.meonghae.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class AppConfig implements SchedulingConfigurer {
 
     private final UserRepository userRepository;
+    private final S3ServiceClient s3Service;
+    private final PetServiceClient petService;
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -32,6 +37,12 @@ public class AppConfig implements SchedulingConfigurer {
                     LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
                     List<User> usersToDelete = userRepository.findByDeletedIsTrueAndModifiedDateBefore(oneWeekAgo);
                     userRepository.deleteAll(usersToDelete);
+
+                    for (User user : usersToDelete) {
+                        S3RequestDto requestDto = new S3RequestDto(user.getEmail(), "USER");
+                        s3Service.deleteFileForUser(requestDto);
+                        petService.deletedByUserEmail(user.getEmail());
+                    }
                 },
                 triggerContext -> new CronTrigger("0 0 0 * * *").nextExecutionTime(triggerContext) // 매일 자정에 실행
         );

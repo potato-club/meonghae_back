@@ -140,6 +140,24 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public void deleteFiles(FileRequestDto requestDto) {
+        List<File> files = fileRepository.findByEntityTypeAndTypeId(requestDto.getEntityType(), requestDto.getEntityId());
+        for (File file : files) {
+            s3Client.deleteObject(new DeleteObjectRequest(bucketName, file.getFileName()));
+            fileRepository.delete(file);
+        }
+    }
+
+    @Override
+    public void deleteFileForUser(FileUserDto userDto) {
+        List<File> files = fileRepository.findByEntityTypeAndEmail(userDto.getEntityType(), userDto.getEmail());
+        for (File file : files) {
+            s3Client.deleteObject(new DeleteObjectRequest(bucketName, file.getFileName()));
+            fileRepository.delete(file);
+        }
+    }
+
+    @Override
     public byte[] downloadImage(String key) throws IOException {
         byte[] content;
         final S3Object s3Object = s3Client.getObject(bucketName, key);
