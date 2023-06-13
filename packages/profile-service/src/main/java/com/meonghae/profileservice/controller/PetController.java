@@ -50,10 +50,9 @@ public class PetController {
   @PutMapping("/{id}")
   public String update(
           @ApiParam(value = "반려동물 id", required = true)@PathVariable Long id,
-          @ApiParam(value = "반려동물 사진", required = true)@RequestPart MultipartFile image,
-          @ApiParam(value = "반려동물 정보", required = true) @RequestPart PetInfoRequestDto petDto) {
+          PetInfoRequestDto petDto) {
 
-    return petService.update(id, image, petDto);
+    return petService.update(id, petDto);
   }
   @Operation(summary = "반려동물 삭제")
   @DeleteMapping("/{id}")

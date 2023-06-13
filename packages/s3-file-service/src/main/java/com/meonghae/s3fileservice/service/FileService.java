@@ -20,5 +20,9 @@ public interface FileService {
 
     FileUserResponseDto viewPetProfile(FileRequestDto requestDto);
 
+    void deleteFiles(FileRequestDto requestDto);
+
+    void deleteFileForUser(FileUserDto userDto);
+
     byte[] downloadImage(String key) throws IOException;
 }

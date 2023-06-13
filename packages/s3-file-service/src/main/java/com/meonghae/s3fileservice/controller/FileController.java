@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -42,7 +43,7 @@ public class FileController {
     }
 
     @Operation(summary = "File Update API")
-    @PutMapping("")
+    @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateFiles(@RequestPart(value = "files") List<MultipartFile> files,
                                                @RequestPart(value = "dataList") List<FileUpdateDto> dataList) throws IOException {
         fileService.updateFiles(files, dataList);
@@ -55,7 +56,7 @@ public class FileController {
         return fileService.viewFileList(requestDto);
     }
 
-    @Operation(summary = "View File about User Entity API") // test
+    @Operation(summary = "View File about User Entity API")
     @GetMapping("/users")
     public FileUserResponseDto viewUserFile(@RequestParam String email) {
         return fileService.viewUserProfile(email);
@@ -65,6 +66,20 @@ public class FileController {
     @GetMapping ("/pets")
     public FileUserResponseDto viewPetFile(@ModelAttribute FileRequestDto requestDto){
         return fileService.viewPetProfile(requestDto);
+    }
+
+    @Operation(summary = "파일 삭제 API")
+    @DeleteMapping ("")
+    public ResponseEntity<String> deleteFiles(@RequestBody FileRequestDto requestDto){
+        fileService.deleteFiles(requestDto);
+        return ResponseEntity.ok("File Delete Success");
+    }
+
+    @Operation(summary = "유저 서비스 전용 파일 삭제 API")
+    @DeleteMapping ("/users")
+    public ResponseEntity<String> deleteFileForUser(@RequestBody FileUserDto userDto){
+        fileService.deleteFileForUser(userDto);
+        return ResponseEntity.ok("File Delete Success");
     }
 
     @Operation(summary = "File Download API")
@@ -78,7 +93,7 @@ public class FileController {
                     .contentLength(data.length)
                     .header("Content-type", "application/octet-stream")
                     .header("Content-Disposition", "attachment; filename=" +
-                            URLEncoder.encode(key, "UTF-8"))
+                            URLEncoder.encode(key, StandardCharsets.UTF_8))
                     .body(resource);
         } catch (IOException ex) {
             return ResponseEntity.badRequest().contentLength(0).body(null);
