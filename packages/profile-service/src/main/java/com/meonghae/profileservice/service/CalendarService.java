@@ -122,7 +122,7 @@ public class CalendarService {
                     .selectFrom(qCalendar)
                     .join(qCalendar.pet, qPet)
                     .where(qCalendar.text.like("%"+key+"%")
-                            .or(qPet.petName.like("%"+key+"%")))
+                            .or(qCalendar.pet.petName.like("%"+key+"%")))
                     .fetch();
 
     return calendarList.stream().map(CalendarResponseDTO::new).collect(Collectors.toList());
