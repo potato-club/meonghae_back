@@ -36,8 +36,7 @@ public class CalendarService {
   // dsl
   private final JPAQueryFactory jpaQueryFactory;
   private final FeignService feignService;
-  @PersistenceContext
-  private EntityManager entityManager;
+
 
   // 프로필 화면에서 가까운 일정 순서대로 표시하기위함.
   @Transactional
@@ -119,20 +118,18 @@ public class CalendarService {
   @Transactional
   public List<CalendarResponseDTO> getScheduleOfFindByText(String key, String token){
     String userEmail = feignService.getUserEmail(token);
-    //영속성 컨택스트를 비웁니다
-    entityManager.clear();
 
     QCalendar qCalendar = QCalendar.calendar;
     QPet qPet = QPet.pet;
 
     List<Calendar> calendarList = jpaQueryFactory
-                    .selectFrom(qCalendar)
-                    .innerJoin(qCalendar.pet, qPet)
-                    .where(qCalendar.userEmail.eq(userEmail)
-                            .and((qCalendar.text.like("%"+key+"%")
-                                    .or(qPet.petName.like("%"+key+"%")))))
-                    .orderBy(qCalendar.scheduleTime.asc())
-                    .fetch();
+            .selectFrom(qCalendar)
+            .innerJoin(qCalendar.pet, qPet)
+            .where(qCalendar.userEmail.eq(userEmail)
+                    .and(qCalendar.text.like("%"+key+"%"))
+                    .or(qPet.petName.like("%"+key+"%")))
+            .orderBy(qCalendar.scheduleTime.asc())
+            .fetch();
 
     return calendarList.stream().map(CalendarResponseDTO::new).collect(Collectors.toList());
   }
