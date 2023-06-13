@@ -6,6 +6,7 @@ import com.meonghae.userservice.service.Interface.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @Operation(summary = "회원가입 API")
-    @PostMapping("/signup")
+    @PostMapping(value = "/signup", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> signUp(@RequestPart(required = false) MultipartFile file,
                                          @RequestPart UserRequestDto userDto,
                                          HttpServletResponse response) {
