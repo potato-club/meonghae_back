@@ -40,11 +40,10 @@ public class PetController {
 
   @Operation(summary = "반려동물 리스트 추가 [ 3마리까지만 테스트 부탁 ]")
   @PostMapping("")
-  public String addPetList(@ApiParam(value = "이미지", required = true)@RequestPart MultipartFile image,
-                           @RequestPart PetInfoRequestDto petDto,
+  public String addPetList( PetInfoRequestDto petDto,
                            @ApiParam(value = "사용자 토큰", required = true) @RequestHeader("Authorization") String token){
 
-    return petService.savePetList(image, petDto, token);
+    return petService.savePetList(petDto, token);
   }
 
   @Operation(summary = "반려동물 수정")

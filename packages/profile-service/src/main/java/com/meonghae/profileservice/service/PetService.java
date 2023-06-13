@@ -62,19 +62,19 @@ public class PetService {
 //======================================================================
 
   @Transactional //펫과 이미지 저장
-  public String savePetList (MultipartFile image, PetInfoRequestDto petDto, String token){
+  public String savePetList (PetInfoRequestDto petDto, String token){
     String userEmail = feignService.getUserEmail(token);
     try {
         Pet pet = new Pet(petDto, userEmail);
         Pet savedPet = petRepository.save(pet);
 
-        if (image != null) {
+        if (petDto.getImage() != null) {
           S3RequestDto s3RequestDto = new S3RequestDto(savedPet.getId(),"PET");
 
-          List<MultipartFile> images = new ArrayList<>();
-          images.add(image);
+          List<MultipartFile> imageList = new ArrayList<>();
+          imageList.add(petDto.getImage());
 
-          s3ServiceClient.uploadImages(images, s3RequestDto);
+          s3ServiceClient.uploadImages(imageList, s3RequestDto);
           savedPet.setHasImage();
         }
 

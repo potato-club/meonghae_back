@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 public class CalendarResponseDTO {
   private Long id;
   private String petName;
-  private LocalDateTime scheduleTime;
+  private String scheduleTime;
   private String text;
 
   public CalendarResponseDTO(Calendar calendar) {
     this.id = calendar.getId();
     this.petName = calendar.getPet().getPetName();
-    this.scheduleTime = calendar.getScheduleTime();
+    this.scheduleTime = calendar.getScheduleTime().toString();
     this.text = calendar.getText();
   }
 }
