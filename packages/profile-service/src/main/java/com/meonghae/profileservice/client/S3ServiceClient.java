@@ -26,6 +26,7 @@ public interface S3ServiceClient {
   @GetMapping("/files/pets")
   S3ResponseDto viewPetFile(@SpringQueryMap S3RequestDto requestDto);
 
-  @PutMapping("/files")
-  ResponseEntity<String> updateFiles(@RequestPart List<MultipartFile> files, @RequestPart List<S3UpdateDto> requestDto);
+  @PutMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  ResponseEntity<String> updateFiles(@RequestPart(value = "files", name = "files") List<MultipartFile> files,
+                                     @RequestPart(value = "dataList", name = "dataList") List<S3UpdateDto> dataList);
 }

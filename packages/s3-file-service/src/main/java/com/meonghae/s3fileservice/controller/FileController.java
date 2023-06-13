@@ -42,7 +42,7 @@ public class FileController {
     }
 
     @Operation(summary = "File Update API")
-    @PutMapping("")
+    @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateFiles(@RequestPart(value = "files") List<MultipartFile> files,
                                                @RequestPart(value = "dataList") List<FileUpdateDto> dataList) throws IOException {
         fileService.updateFiles(files, dataList);
