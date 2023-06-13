@@ -2,6 +2,7 @@ package com.meonghae.userservice.service.impl;
 
 import com.meonghae.userservice.client.S3ServiceClient;
 import com.meonghae.userservice.dto.S3Dto.S3RequestDto;
+import com.meonghae.userservice.dto.S3Dto.S3ResponseDto;
 import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
@@ -76,8 +77,8 @@ public class UserServiceImpl implements UserService {
             throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         });
 
-        UserMyPageDto userMyPageDto = new UserMyPageDto(user);
-        return userMyPageDto;
+        S3ResponseDto responseDto = s3Service.viewUserFile(user.getEmail());
+        return new UserMyPageDto(user, responseDto);
     }
 
     @Override
