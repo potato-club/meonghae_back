@@ -121,7 +121,7 @@ public class CalendarService {
 
     List<Calendar> calendarList = jpaQueryFactory
                     .selectFrom(qCalendar)
-                    .leftJoin(qCalendar.pet, qPet)
+                    .innerJoin(qCalendar.pet, qPet)
                     .where(qCalendar.userEmail.eq(userEmail)
                             .and((qCalendar.text.like("%"+key+"%")
                                     .or(qPet.petName.like("%"+key+"%")))))
