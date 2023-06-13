@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +29,9 @@ public class UserRequestDto {
 
     @ApiModelProperty(value = "생년월일")
     private String birth;
+
+    @ApiModelProperty(value = "프로필 사진")
+    private MultipartFile file;
 
     public User toEntity() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");

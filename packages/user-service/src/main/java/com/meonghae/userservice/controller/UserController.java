@@ -41,11 +41,9 @@ public class UserController {
     }
 
     @Operation(summary = "회원가입 API")
-    @PostMapping(value = "/signup", consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> signUp(@RequestPart(required = false) MultipartFile file,
-                                         @RequestPart UserRequestDto userDto,
-                                         HttpServletResponse response) {
-        userService.signUp(file, userDto, response);
+    @PostMapping(value = "/signup")
+    public ResponseEntity<String> signUp(UserRequestDto userDto, HttpServletResponse response) {
+        userService.signUp(userDto, response);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 

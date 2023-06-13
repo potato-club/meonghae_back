@@ -82,12 +82,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void signUp(MultipartFile file, UserRequestDto userDto, HttpServletResponse response) {
+    public void signUp(UserRequestDto userDto, HttpServletResponse response) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         }
         userRepository.save(userDto.toEntity());
-
+        MultipartFile file = userDto.getFile();
         if(file != null) {
             S3RequestDto s3Dto = new S3RequestDto(userDto.getEmail(), "USER");
             s3Service.uploadFileForUser(file, s3Dto);
