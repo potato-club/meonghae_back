@@ -5,14 +5,12 @@ import com.meonghae.communityservice.Config.FeignUploadConfig;
 import com.meonghae.communityservice.Dto.S3Dto.S3RequestDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3ResponseDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3UpdateDto;
+import com.meonghae.communityservice.Dto.S3Dto.UserImageDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -21,6 +19,9 @@ import java.util.List;
 public interface S3ServiceClient {
     @GetMapping("/files")
     List<S3ResponseDto> getImages(@SpringQueryMap S3RequestDto requestDto);
+
+    @GetMapping("/files/users")
+    UserImageDto getUserImage(@RequestParam String email);
 
     @PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<String> uploadImage(@RequestPart(value = "files", name = "files") List<MultipartFile> files,

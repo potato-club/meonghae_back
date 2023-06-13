@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 public class BoardListDto {
     @ApiModelProperty("게시글 id")
     private Long id;
-    @ApiModelProperty("게시글 작성자 닉네임")
-    private String nickname;
+    @ApiModelProperty("게시글 작성자 프로필 사진")
+    private String profileUrl;
     @ApiModelProperty("게시글 제목")
     private String title;
     @ApiModelProperty("게시글 내용")
@@ -23,9 +23,9 @@ public class BoardListDto {
     @ApiModelProperty("게시글 내 이미지 여부")
     private boolean hasImage;
 
-    public BoardListDto(Board board, String nickname) {
+    public BoardListDto(Board board, String profileUrl) {
         this.id = board.getId();
-        this.nickname = nickname;
+        this.profileUrl = profileUrl;
         this.title = board.getTitle();
         this.content = board.getContent();
         this.likes = board.getLikes();
