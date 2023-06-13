@@ -56,10 +56,9 @@ public class BoardController {
     @Operation(summary = "게시글 생성 API")
     @PostMapping("/{type}")
     public ResponseEntity<String> createBoard(@PathVariable(name = "type") int type,
-                                              @RequestPart(required = false) List<MultipartFile> images,
-                                              @RequestPart BoardRequestDto requestDto,
-                                              @RequestHeader("Authorization") String token) {
-        boardService.createBoard(type, images, requestDto, token);
+                                              @RequestHeader("Authorization") String token,
+                                              BoardRequestDto requestDto) {
+        boardService.createBoard(type, requestDto, token);
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글 생성 완료");
     }
 

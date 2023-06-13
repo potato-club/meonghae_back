@@ -90,11 +90,12 @@ public class BoardService {
     }
 
     @Transactional
-    public void createBoard(int typeKey, List<MultipartFile> images, BoardRequestDto requestDto, String token) {
+    public void createBoard(int typeKey, BoardRequestDto requestDto, String token) {
         BoardType type = BoardType.findWithKey(typeKey);
         String email = userService.getUserEmail(token);
         Board board = requestDto.toEntity(type, email);
         Board saveBoard = boardRepository.save(board);
+        List<MultipartFile> images = requestDto.getImages();
         if(images != null) {
             imageCheck(saveBoard, images, 0);
             S3RequestDto s3Dto = new S3RequestDto(saveBoard.getId(), "BOARD");
