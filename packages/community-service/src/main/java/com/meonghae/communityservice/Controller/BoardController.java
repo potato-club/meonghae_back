@@ -1,9 +1,6 @@
 package com.meonghae.communityservice.Controller;
 
-import com.meonghae.communityservice.Dto.BoardDto.BoardDetailDto;
-import com.meonghae.communityservice.Dto.BoardDto.BoardListDto;
-import com.meonghae.communityservice.Dto.BoardDto.BoardMainDto;
-import com.meonghae.communityservice.Dto.BoardDto.BoardRequestDto;
+import com.meonghae.communityservice.Dto.BoardDto.*;
 import com.meonghae.communityservice.Dto.S3Dto.S3UpdateDto;
 import com.meonghae.communityservice.Service.BoardLikeService;
 import com.meonghae.communityservice.Service.BoardService;
@@ -73,11 +70,9 @@ public class BoardController {
     @Operation(summary = "게시글 수정 API")
     @PutMapping("/{id}")
     public ResponseEntity<String> modifyBoard(@PathVariable(name = "id") Long id,
-                                              @RequestPart(required = false) List<MultipartFile> images,
-                                              @RequestPart(required = false) List<S3UpdateDto> updateDto,
-                                              @RequestPart BoardRequestDto requestDto,
-                                              @RequestHeader("Authorization") String token) {
-        boardService.modifyBoard(id, images, updateDto, requestDto, token);
+                                              @RequestHeader("Authorization") String token,
+                                              BoardUpdateDto updateDto) {
+        boardService.modifyBoard(id, updateDto, token);
         return ResponseEntity.ok("수정 완료");
     }
 
