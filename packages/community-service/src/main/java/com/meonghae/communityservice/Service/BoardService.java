@@ -2,10 +2,7 @@ package com.meonghae.communityservice.Service;
 
 import com.meonghae.communityservice.Client.S3ServiceClient;
 import com.meonghae.communityservice.Client.UserServiceClient;
-import com.meonghae.communityservice.Dto.BoardDto.BoardDetailDto;
-import com.meonghae.communityservice.Dto.BoardDto.BoardListDto;
-import com.meonghae.communityservice.Dto.BoardDto.BoardMainDto;
-import com.meonghae.communityservice.Dto.BoardDto.BoardRequestDto;
+import com.meonghae.communityservice.Dto.BoardDto.*;
 import com.meonghae.communityservice.Dto.S3Dto.S3RequestDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3ResponseDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3UpdateDto;
@@ -105,21 +102,22 @@ public class BoardService {
     }
 
     @Transactional
-    public void modifyBoard(Long id, List<MultipartFile> images, List<S3UpdateDto> updateDto,
-                            BoardRequestDto requestDto, String token) {
+    public void modifyBoard(Long id, BoardUpdateDto updateDto, String token) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
         String email = userService.getUserEmail(token);
         if(!board.getEmail().equals(email)) {
             throw new BoardException(UNAUTHORIZED, "글 작성자만 수정 가능합니다.");
         }
-        board.updateBoard(requestDto.getTitle(), requestDto.getContent());
-        List<S3UpdateDto> reuseDto = updateDto.stream().filter(dto -> !dto.isDeleted()).collect(Collectors.toList());
+        board.updateBoard(updateDto.getTitle(), updateDto.getContent());
+        List<S3UpdateDto> reuseDto = updateDto.getUpdateDto()
+                .stream().filter(dto -> !dto.isDeleted()).collect(Collectors.toList());
         int reuseSize = reuseDto.size();
 
+        List<MultipartFile> images = updateDto.getImages();
         if(images != null) {
             imageCheck(board, images, reuseSize);
-            s3Service.updateImage(images, updateDto);
+            s3Service.updateImage(images, updateDto.getUpdateDto());
             board.setHasImage();
         }
     }

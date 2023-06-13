@@ -2,8 +2,10 @@ package com.meonghae.communityservice.Dto.ReviewDto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
+import java.util.List;
 
 @Data
 public class ReviewRequestDto {
@@ -19,4 +21,7 @@ public class ReviewRequestDto {
     @DecimalMin(value = "0")
     @DecimalMax(value = "10")
     private int rating;
+
+    @ApiModelProperty("리뷰 이미지")
+    private List<MultipartFile> images;
 }

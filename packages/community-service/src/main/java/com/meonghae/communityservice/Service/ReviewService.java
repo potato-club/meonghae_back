@@ -95,7 +95,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void createReview(int key, List<MultipartFile> images, ReviewRequestDto requestDto, String token) {
+    public void createReview(int key, ReviewRequestDto requestDto, String token) {
         ReviewCatalog catalog = ReviewCatalog.findWithKey(key);
         String email = userService.getUserEmail(token);
         if(catalog == null) throw new ReviewException(BAD_REQUEST, "잘못된 Catalog Type 입니다.");
@@ -109,6 +109,7 @@ public class ReviewService {
                 .dislikes(0)
                 .hasImage(false).build();
         Review saveReview = reviewRepository.save(review);
+        List<MultipartFile> images = requestDto.getImages();
         if(images != null) {
             if(images.size() > 3) throw new ReviewException(BAD_REQUEST, "리뷰 사진은 3개까지 업로드 가능합니다.");
             S3RequestDto s3Dto = new S3RequestDto(saveReview.getId(), "REVIEW");
