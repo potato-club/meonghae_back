@@ -2,12 +2,12 @@ package com.meonghae.profileservice.dto.pet;
 
 import com.meonghae.profileservice.enumCustom.PetGender;
 import java.time.LocalDate;
-import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
@@ -20,6 +20,7 @@ public class PetInfoRequestDto {
   @ApiModelProperty(notes = "반려동물 성별", example = "BOY or GIRL", required = true)
   private PetGender petGender;
   @ApiModelProperty(notes = "반려동물 생일", example = "2022-01-01", required = true)
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate petBirth;
   @ApiModelProperty(notes = "반려동물 종", example = "시츄", required = true)
   private String petSpecies;
