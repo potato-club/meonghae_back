@@ -140,8 +140,11 @@ public class PetService {
 
   @Transactional
   public String deleteById(Long id) {
-
     petRepository.deleteById(id);
     return "삭제 완료";
+  }
+  @Transactional
+  public void deleteByUserEmail(String userEmail){
+    petRepository.deleteByUserEmail(userEmail);
   }
 }
