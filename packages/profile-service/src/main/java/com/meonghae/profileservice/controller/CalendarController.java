@@ -45,8 +45,8 @@ public class CalendarController {
 
   @Operation(summary = "일정 검색 API")
   @GetMapping("/find")
-  public List<CalendarResponseDTO> getScheduleOfFindByText(@RequestParam("key") String key){
-    return calendarService.getScheduleOfFindByText(key);
+  public List<CalendarResponseDTO> getScheduleOfFindByText(@RequestParam("key") String key, @RequestHeader("Authorization") String token){
+    return calendarService.getScheduleOfFindByText(key, token);
   }
 
   @Operation(summary = "일정 추가 API")

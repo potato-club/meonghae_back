@@ -113,7 +113,9 @@ public class CalendarService {
   }
 
   @Transactional
-  public List<CalendarResponseDTO> getScheduleOfFindByText(String key){
+  public List<CalendarResponseDTO> getScheduleOfFindByText(String key, String token){
+    String userEmail = feignService.getUserEmail(token);
+
     QCalendar qCalendar = QCalendar.calendar;
     QPet qPet = QPet.pet;
 
@@ -121,8 +123,12 @@ public class CalendarService {
             jpaQueryFactory
                     .selectFrom(qCalendar)
                     .join(qCalendar.pet, qPet)
-                    .where(qCalendar.text.like("%"+key+"%")
-                            .or(qCalendar.pet.petName.like("%"+key+"%")))
+                    .where(qCalendar
+                            .userEmail
+                            .eq(userEmail)
+                            .and((qCalendar.text.like("%"+key+"%")
+                                    .or(qPet.pet.petName.like("%"+key+"%")))))
+                    .orderBy(qCalendar.scheduleTime.asc())
                     .fetch();
 
     return calendarList.stream().map(CalendarResponseDTO::new).collect(Collectors.toList());
