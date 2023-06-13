@@ -123,11 +123,8 @@ public class CalendarService {
             jpaQueryFactory
                     .selectFrom(qCalendar)
                     .join(qCalendar.pet, qPet)
-                    .where(qCalendar
-                            .userEmail
-                            .eq(userEmail)
-                            .and((qCalendar.text.like("%"+key+"%")
-                                    .or(qPet.pet.petName.like("%"+key+"%")))))
+                    .where(qCalendar.userEmail.eq(userEmail))
+                    .where(qCalendar.text.like("%"+key+"%").or(qPet.petName.like("%"+key+"%")))
                     .orderBy(qCalendar.scheduleTime.asc())
                     .fetch();
 
