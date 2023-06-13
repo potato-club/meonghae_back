@@ -24,4 +24,7 @@ public interface S3ServiceClient {
     @PutMapping("/files")
     ResponseEntity<String> updateImage(@RequestPart List<MultipartFile> images,
                                        @RequestPart List<S3UpdateDto> requestDto);
+
+    @DeleteMapping("/files/users")
+    ResponseEntity<String> deleteFileForUser(@RequestBody S3RequestDto requestDto);
 }

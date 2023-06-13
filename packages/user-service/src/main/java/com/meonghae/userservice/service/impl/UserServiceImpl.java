@@ -2,6 +2,7 @@ package com.meonghae.userservice.service.impl;
 
 import com.meonghae.userservice.client.S3ServiceClient;
 import com.meonghae.userservice.dto.S3Dto.S3RequestDto;
+import com.meonghae.userservice.dto.S3Dto.S3ResponseDto;
 import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
@@ -12,7 +13,6 @@ import com.meonghae.userservice.error.exception.UnAuthorizedException;
 import com.meonghae.userservice.jwt.JwtTokenProvider;
 import com.meonghae.userservice.repository.UserRepository;
 import com.meonghae.userservice.service.Jwt.RedisService;
-import com.meonghae.userservice.service.KakaoApi;
 import com.meonghae.userservice.service.Interface.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,8 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 import static com.meonghae.userservice.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 import static com.meonghae.userservice.error.ErrorCode.NOT_ALLOW_WRITE_EXCEPTION;
@@ -67,7 +66,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String sendNickname(String email) {
-        return userRepository.findByEmail(email).get().getNickname();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        return userOptional.map(User::getNickname).orElse(null);
     }
 
     @Override
@@ -77,8 +77,8 @@ public class UserServiceImpl implements UserService {
             throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         });
 
-        UserMyPageDto userMyPageDto = new UserMyPageDto(user);
-        return userMyPageDto;
+        S3ResponseDto responseDto = s3Service.viewUserFile(user.getEmail());
+        return new UserMyPageDto(user, responseDto);
     }
 
     @Override
