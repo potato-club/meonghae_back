@@ -100,34 +100,35 @@ public class PetService {
 
   //===================
   @Transactional
-  public String update(Long id, MultipartFile image,PetInfoRequestDto petDTO) {
+  public String update(Long id, PetInfoRequestDto petDto) {
     Pet updatedPet = petRepository.findById(id).orElseThrow(() -> {throw new NotFoundException(
             ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
     //기존 엔티티랑 비교해서 업데이트 시키고
-    updatedPet.update(petDTO);
+    updatedPet.update(petDto);
 
     //pet이 이미지를 가지고 있지 않고, 들어온 이미지가 null이 아닐때
-    if ( !(updatedPet.isHasImage()) && image != null ){
+    if ( !(updatedPet.isHasImage()) && petDto.getImage() != null ){
 
       S3RequestDto s3RequestDto = new S3RequestDto(updatedPet.getId(),"PET");
       List<MultipartFile> images = new ArrayList<>();
-      images.add(image);
+      images.add(petDto.getImage());
 
       s3ServiceClient.uploadImages(images, s3RequestDto);
       updatedPet.setHasImage();
 
-    }else if (updatedPet.isHasImage() && image != null){//이미지가 true면 위에 image와 기존 이미지를 바꾸고
+    }else if (updatedPet.isHasImage() && petDto.getImage() != null){
+      //사진을 이미 가지고있고, 바뀔 image가 들릴때 기존 이미지를 삭제하고 새로 업로드
       //사진 받아오기
       S3ResponseDto s3ResponseDto = s3ServiceClient.viewPetFile(new S3RequestDto(updatedPet.getId(),"PET"));
-
+      // 기존 사진 삭제처리
       S3UpdateDto s3UpdateDto = new S3UpdateDto(s3ResponseDto);
 
-      List<MultipartFile> images = new ArrayList<>();
-      images.add(image);
+      List<MultipartFile> imageList = new ArrayList<>();
+      imageList.add(petDto.getImage());
       List<S3UpdateDto> s3UpdateDtoList = new ArrayList<>();
       s3UpdateDtoList.add(s3UpdateDto);
 
-      s3ServiceClient.updateFiles(images,s3UpdateDtoList);
+      s3ServiceClient.updateFiles(imageList, s3UpdateDtoList);
     }
 
     // images == null 일때 서비스 코드 미구현
