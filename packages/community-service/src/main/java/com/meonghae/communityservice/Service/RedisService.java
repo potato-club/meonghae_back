@@ -46,11 +46,10 @@ public class RedisService {
         if(url == null) {
             log.info("=========== S3 Feign 호출 ===========");
             UserImageDto dto = s3Service.getUserImage(email);
-            url = dto.getFileUrl();
-            if(url == null) {
+            if(dto == null) {
                 return null;
             }
-            cacheManager.getCache(getProfile).put(email, url);
+            cacheManager.getCache(getProfile).put(email, dto.getFileUrl());
         }
         return url;
     }
