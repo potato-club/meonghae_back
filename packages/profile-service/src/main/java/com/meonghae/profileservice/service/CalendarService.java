@@ -86,7 +86,7 @@ public class CalendarService {
 
   // 달력 월단위 일정들 보기 위한 함수 - 같은 해 같은 월 데이터 출력
   @Transactional
-  public List<CalendarResponseDTO> getMonthSechedule(LocalDate startOfDate, String token) {
+  public List<CalendarResponseDTO> getMonthSchedule(LocalDate startOfDate, String token) {
 
     LocalDate endOfDate = startOfDate.plusMonths(1).minusDays(1);
 
@@ -110,6 +110,22 @@ public class CalendarService {
             .orderBy(qCalendar.scheduleTime.asc())
             .fetch();
     return result.stream().map(CalendarResponseDTO::new).collect(Collectors.toList());
+  }
+
+  @Transactional
+  public List<CalendarResponseDTO> getScheduleOfFindByText(String key){
+    QCalendar qCalendar = QCalendar.calendar;
+    QPet qPet = QPet.pet;
+
+    List<Calendar> calendarList =
+            jpaQueryFactory
+                    .selectFrom(qCalendar)
+                    .join(qCalendar.pet, qPet)
+                    .where(qCalendar.text.like("%"+key+"%")
+                            .or(qPet.petName.like("%"+key+"%")))
+                    .fetch();
+
+    return calendarList.stream().map(CalendarResponseDTO::new).collect(Collectors.toList());
   }
 
   @Transactional
