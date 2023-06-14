@@ -63,4 +63,12 @@ public class ReviewController {
         String result = reactionService.toggleRecommendedReview(reviewId, token, typeDto);
         return ResponseEntity.ok(result);
     }
+
+    @Operation(summary = "리뷰 삭제 API")
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<String> deleteReview(@PathVariable(name = "reviewId") Long reviewId,
+                                               @RequestHeader("Authorization") String token) {
+        reviewService.deleteReview(reviewId, token);
+        return ResponseEntity.ok("삭제 완료");
+    }
 }
