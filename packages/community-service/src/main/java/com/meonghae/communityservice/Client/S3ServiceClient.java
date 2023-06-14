@@ -30,4 +30,7 @@ public interface S3ServiceClient {
     @PutMapping("/files")
     ResponseEntity<String> updateImage(@RequestPart(value = "files", name = "files") List<MultipartFile> files,
                                        @RequestPart(value = "dataList", name = "dataList") List<S3UpdateDto> dataList);
+
+    @DeleteMapping("/files")
+    ResponseEntity<String> deleteImage(@SpringQueryMap S3RequestDto requestDto);
 }

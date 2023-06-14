@@ -8,6 +8,7 @@ import com.meonghae.communityservice.Dto.S3Dto.S3RequestDto;
 import com.meonghae.communityservice.Entity.Review.Review;
 import com.meonghae.communityservice.Enum.ReviewCatalog;
 import com.meonghae.communityservice.Enum.ReviewSortType;
+import com.meonghae.communityservice.Exception.Custom.BoardException;
 import com.meonghae.communityservice.Exception.Custom.ReviewException;
 import com.meonghae.communityservice.Repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.util.List;
 
-import static com.meonghae.communityservice.Exception.Error.ErrorCode.BAD_REQUEST;
+import static com.meonghae.communityservice.Exception.Error.ErrorCode.*;
 
 @Service
 @Slf4j
@@ -116,6 +117,19 @@ public class ReviewService {
             s3Service.uploadImage(images, s3Dto);
             saveReview.setHasImage();
         }
+    }
+
+    @Transactional
+    public void deleteReview(Long reviewId, String token) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewException(NOT_FOUND, "review is not exist"));
+        String email = userService.getUserEmail(token);
+        if(!review.getEmail().equals(email)) {
+            throw new BoardException(UNAUTHORIZED, "리뷰 작성자만 삭제 가능합니다.");
+        }
+        S3RequestDto requestDto = new S3RequestDto(review.getId(), "REVIEW");
+        s3Service.deleteImage(requestDto);
+        reviewRepository.delete(review);
     }
 
     private ReviewListDto convertTypeAndAddImage(Review review) {

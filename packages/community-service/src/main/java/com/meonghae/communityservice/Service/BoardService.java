@@ -25,8 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.meonghae.communityservice.Exception.Error.ErrorCode.BAD_REQUEST;
-import static com.meonghae.communityservice.Exception.Error.ErrorCode.UNAUTHORIZED;
+import static com.meonghae.communityservice.Exception.Error.ErrorCode.*;
 
 @Service
 @Slf4j
@@ -119,15 +118,16 @@ public class BoardService {
         }
     }
 
-    // S3 이미지 삭제 로직 생기면 추가
     @Transactional
     public void deleteBoard(Long id, String token) {
         Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("board is not exist"));
+                .orElseThrow(() -> new BoardException(NOT_FOUND, "board is not exist"));
         String email = userService.getUserEmail(token);
         if(!board.getEmail().equals(email)) {
             throw new BoardException(UNAUTHORIZED, "글 작성자만 삭제 가능합니다.");
         }
+        S3RequestDto requestDto = new S3RequestDto(board.getId(), "BOARD");
+        s3Service.deleteImage(requestDto);
         boardRepository.delete(board);
     }
 
