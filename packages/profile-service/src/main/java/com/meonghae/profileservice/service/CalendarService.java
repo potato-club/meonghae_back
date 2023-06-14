@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ public class CalendarService {
   // dsl
   private final JPAQueryFactory jpaQueryFactory;
   private final FeignService feignService;
+
 
   // 프로필 화면에서 가까운 일정 순서대로 표시하기위함.
   @Transactional
@@ -112,19 +115,27 @@ public class CalendarService {
     return result.stream().map(CalendarResponseDTO::new).collect(Collectors.toList());
   }
 
+  @PersistenceContext
+  private EntityManager em;
+
   @Transactional
-  public List<CalendarResponseDTO> getScheduleOfFindByText(String key){
+  public List<CalendarResponseDTO> getScheduleOfFindByText(String key, String token){
+    String userEmail = feignService.getUserEmail(token);
+
+
     QCalendar qCalendar = QCalendar.calendar;
     QPet qPet = QPet.pet;
 
-    List<Calendar> calendarList =
-            jpaQueryFactory
+    List<Calendar> calendarList = jpaQueryFactory
                     .selectFrom(qCalendar)
-                    .join(qCalendar.pet, qPet)
-                    .where(qCalendar.text.like("%"+key+"%")
-                            .or(qPet.petName.like("%"+key+"%")))
+                    .innerJoin(qCalendar.pet, qPet)
+                    .where(qCalendar.userEmail.eq(userEmail)
+                            .and((qCalendar.text.like("%"+key+"%")
+                                    .or(qPet.petName.like("%"+key+"%")))))
+                    .orderBy(qCalendar.scheduleTime.asc())
                     .fetch();
-
+    em.flush();
+    em.clear();
     return calendarList.stream().map(CalendarResponseDTO::new).collect(Collectors.toList());
   }
 
