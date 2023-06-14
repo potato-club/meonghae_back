@@ -43,8 +43,6 @@ public class UserRequestDto {
                 .userRole(UserRole.USER)
                 .age(age)
                 .birth(LocalDate.parse(birth, formatter))
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
                 .deleted(false)
                 .build();
 
