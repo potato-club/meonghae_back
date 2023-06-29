@@ -29,7 +29,4 @@ public class PetInfoRequestDto {
   @ApiModelProperty("이미지 파일")
   private MultipartFile image;
 
-  //  @ApiModelProperty(notes = "반려동물 종", example = "DOG or CAT", required = true)
-//  private PetType petType;
-
 }
