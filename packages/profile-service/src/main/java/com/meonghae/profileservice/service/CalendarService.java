@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class CalendarService {
   private final PetRepository petRepository;
 
@@ -115,27 +116,23 @@ public class CalendarService {
     return result.stream().map(CalendarResponseDTO::new).collect(Collectors.toList());
   }
 
-  @PersistenceContext
-  private EntityManager em;
 
   @Transactional
   public List<CalendarResponseDTO> getScheduleOfFindByText(String key, String token){
     String userEmail = feignService.getUserEmail(token);
-
 
     QCalendar qCalendar = QCalendar.calendar;
     QPet qPet = QPet.pet;
 
     List<Calendar> calendarList = jpaQueryFactory
                     .selectFrom(qCalendar)
-                    .innerJoin(qCalendar.pet, qPet)
+                    .innerJoin(qCalendar.pet, qPet).fetchJoin()
                     .where(qCalendar.userEmail.eq(userEmail)
                             .and((qCalendar.text.like("%"+key+"%")
                                     .or(qPet.petName.like("%"+key+"%")))))
                     .orderBy(qCalendar.scheduleTime.asc())
                     .fetch();
-    em.flush();
-    em.clear();
+
     return calendarList.stream().map(CalendarResponseDTO::new).collect(Collectors.toList());
   }
 
