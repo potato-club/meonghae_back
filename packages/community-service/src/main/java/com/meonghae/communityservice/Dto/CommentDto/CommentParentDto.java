@@ -11,8 +11,10 @@ import org.springframework.util.CollectionUtils;
 public class CommentParentDto {
     @ApiModelProperty("부모댓글 id")
     private Long id;
-    @ApiModelProperty("댓글 작성자 닉네임")
-    private String nickname;
+    @ApiModelProperty("댓글 작성자 프로필 사진")
+    private String profileUrl;
+    @ApiModelProperty("댓글 작성자가 원글 작성자인지 여부")
+    private Boolean isWriter;
     @ApiModelProperty("댓글 내용")
     private String comment;
     @ApiModelProperty("댓글 수정 여부")
@@ -20,11 +22,12 @@ public class CommentParentDto {
     @ApiModelProperty("대댓글 개수")
     private int replies;
 
-    public CommentParentDto(BoardComment comment, String nickname) {
+    public CommentParentDto(BoardComment comment, String url, boolean isWriter) {
         this.id = comment.getId();
-        this.nickname = nickname;
+        this.profileUrl = url;
         this.comment = comment.getComment();
         this.update = comment.getUpdated();
+        this.isWriter = isWriter;
         this.replies = CollectionUtils.isEmpty(comment.getReplies()) ? 0 : comment.getReplies().size();
     }
 }

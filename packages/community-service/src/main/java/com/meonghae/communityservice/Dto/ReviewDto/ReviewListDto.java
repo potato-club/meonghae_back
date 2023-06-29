@@ -17,6 +17,8 @@ public class ReviewListDto {
     private Long id;
     @ApiModelProperty("리뷰 작성자 닉네임")
     private String nickname;
+    @ApiModelProperty("게시글 작성자 프로필 사진")
+    private String profileUrl;
     @ApiModelProperty("리뷰 제목")
     private String title;
     @ApiModelProperty("리뷰 내용")
@@ -30,9 +32,10 @@ public class ReviewListDto {
     @ApiModelProperty("리뷰 비추천 수")
     private int dislikes;
 
-    public ReviewListDto(Review review, String nickname) {
+    public ReviewListDto(Review review, String nickname, String url) {
         this.id = review.getId();
         this.nickname = nickname;
+        this.profileUrl = url;
         this.title = review.getTitle();
         this.content = review.getContent();
         this.rating = review.getRating();

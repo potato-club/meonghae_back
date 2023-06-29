@@ -96,6 +96,7 @@ management:
 
 cacheName:
   getByEmail: cacheByEmail
+  getProfile: cacheProfile
 
 jasypt:
   encryptor:
