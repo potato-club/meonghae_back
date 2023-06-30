@@ -11,6 +11,7 @@ import com.meonghae.s3fileservice.repository.FileRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class FileServiceImpl implements FileService {
 
     private final AmazonS3Client s3Client;
@@ -62,6 +64,7 @@ public class FileServiceImpl implements FileService {
 
         for (FileUpdateDto dto : updateDto) {
             List<File> dtoList;
+            log.info("fileName : ", dto.getFileName());
             if (dto.getEntityType().equals(EntityType.USER)) {
                 dtoList = fileRepository.findByEntityTypeAndEmail(dto.getEntityType(), dto.getEmail());
             } else {
