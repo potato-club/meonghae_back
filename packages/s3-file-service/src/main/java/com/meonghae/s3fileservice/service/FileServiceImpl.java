@@ -58,14 +58,17 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void updateFiles(List<MultipartFile> files, List<FileUpdateDto> updateDto) throws IOException {
-        List<File> fileList = null;
+        List<File> fileList = new ArrayList<>();
 
         for (FileUpdateDto dto : updateDto) {
+            List<File> dtoList;
             if (dto.getEntityType().equals(EntityType.USER)) {
-                fileList = fileRepository.findByEntityTypeAndEmail(dto.getEntityType(), dto.getEmail());
+                dtoList = fileRepository.findByEntityTypeAndEmail(dto.getEntityType(), dto.getEmail());
             } else {
-                fileList = fileRepository.findByEntityTypeAndTypeId(dto.getEntityType(), dto.getEntityId());
+                dtoList = fileRepository.findByEntityTypeAndTypeId(dto.getEntityType(), dto.getEntityId());
             }
+
+            fileList.addAll(dtoList);
         }
 
         // 기존 파일 리스트와 새로 업로드한 파일 리스트를 비교하여
