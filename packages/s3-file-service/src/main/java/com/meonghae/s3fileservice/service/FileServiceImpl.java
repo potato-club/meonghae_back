@@ -84,8 +84,6 @@ public class FileServiceImpl implements FileService {
             }
         }
 
-        log.info("file 수 : ", list.size());
-
         for (File file : list) {
             file.update(updateDto.get(0));  // 새로 추가된 파일에 엔티티 정보 추가
             fileRepository.save(file);  // 새 파일 DB 저장
