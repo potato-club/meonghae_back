@@ -64,7 +64,6 @@ public class FileServiceImpl implements FileService {
 
         for (FileUpdateDto dto : updateDto) {
             List<File> dtoList;
-            log.info("fileName : ", dto.getFileName());
             if (dto.getEntityType().equals(EntityType.USER)) {
                 dtoList = fileRepository.findByEntityTypeAndEmail(dto.getEntityType(), dto.getEmail());
             } else {
@@ -84,6 +83,8 @@ public class FileServiceImpl implements FileService {
                 fileRepository.delete(fileList.get(i)); // DB에서도 해당 파일 엔티티 삭제
             }
         }
+
+        log.info("file 수 : ", list.size());
 
         for (File file : list) {
             file.update(updateDto.get(0));  // 새로 추가된 파일에 엔티티 정보 추가
