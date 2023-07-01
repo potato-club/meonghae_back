@@ -33,7 +33,7 @@ public class PetController {
     return petService.getOneOfPet(id);
   }
 
-  @Operation(summary = "반려동물 리스트 추가 [ 3마리까지만 테스트 부탁 ]")
+  @Operation(summary = "반려동물 단일 추가")
   @PostMapping("")
   public String addPetList( PetInfoRequestDto petDto,
                            @ApiParam(value = "사용자 토큰", required = true) @RequestHeader("Authorization") String token){
