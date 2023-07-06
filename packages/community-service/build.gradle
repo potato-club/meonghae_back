@@ -43,6 +43,8 @@ dependencies {
 //	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-zipkin', version: '2.2.3.RELEASE'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-sleuth', version: '2.2.3.RELEASE'
 	implementation 'com.querydsl:querydsl-jpa'
 	implementation 'com.querydsl:querydsl-apt'
 	implementation 'com.h2database:h2:1.4.200'

@@ -17,6 +17,11 @@ spring:
     port: 6379
   application:
     name: apigateway-service
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: http://zipkin-server:9411/
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher

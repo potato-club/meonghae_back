@@ -11,6 +11,7 @@ import com.meonghae.s3fileservice.repository.FileRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class FileServiceImpl implements FileService {
 
     private final AmazonS3Client s3Client;
@@ -58,14 +60,17 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void updateFiles(List<MultipartFile> files, List<FileUpdateDto> updateDto) throws IOException {
-        List<File> fileList = null;
+        List<File> fileList = new ArrayList<>();
 
         for (FileUpdateDto dto : updateDto) {
+            List<File> dtoList;
             if (dto.getEntityType().equals(EntityType.USER)) {
-                fileList = fileRepository.findByEntityTypeAndEmail(dto.getEntityType(), dto.getEmail());
+                dtoList = fileRepository.findByEntityTypeAndEmail(dto.getEntityType(), dto.getEmail());
             } else {
-                fileList = fileRepository.findByEntityTypeAndTypeId(dto.getEntityType(), dto.getEntityId());
+                dtoList = fileRepository.findByEntityTypeAndTypeId(dto.getEntityType(), dto.getEntityId());
             }
+
+            fileList.addAll(dtoList);
         }
 
         // 기존 파일 리스트와 새로 업로드한 파일 리스트를 비교하여
