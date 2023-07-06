@@ -54,8 +54,8 @@ dependencies {
 	implementation 'io.lettuce:lettuce-core:6.2.3.RELEASE'
 
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
-	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-zipkin', version: '2.2.3.RELEASE'
-	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-sleuth', version: '2.2.3.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
+	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
 	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
 	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 	compileOnly 'org.projectlombok:lombok'
