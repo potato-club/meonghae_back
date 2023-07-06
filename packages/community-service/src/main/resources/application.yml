@@ -9,6 +9,13 @@ spring:
   application:
     name: community-service
 
+  sleuth:
+    sampler:
+      probability: 1.0
+
+  zipkin:
+    base-url: http://zipkin-server:9411/
+
   cache:
     type: redis
 
