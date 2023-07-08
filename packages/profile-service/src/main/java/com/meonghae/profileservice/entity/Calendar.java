@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import javax.persistence.*;
+
+import com.meonghae.profileservice.enumCustom.VaccinationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,12 +28,14 @@ public class Calendar extends BaseTimeEntity{
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "pet_id",nullable = false)
   private Pet pet;
-
-  @Column(nullable = false)
-  private String text;
-
+  @Column
+  private VaccinationType vaccinationType;
   @Column(nullable = false)
   private LocalDateTime scheduleTime;
+  @Column
+  private LocalDateTime alarmTime;
+  @Column(nullable = false)
+  private String text;
 
 
   public void update(CalendarRequestDTO calendarRequestDTO, Pet pet) {

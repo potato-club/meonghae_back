@@ -13,12 +13,14 @@ public class CalendarResponseDTO {
   private Long id;
   private String petName;
   private String scheduleTime;
+  private String alarmTime;
   private String text;
 
   public CalendarResponseDTO(Calendar calendar) {
     this.id = calendar.getId();
     this.petName = calendar.getPet().getPetName();
     this.scheduleTime = calendar.getScheduleTime().toString();
+    this.alarmTime = calendar.getAlarmTime().toString();
     this.text = calendar.getText();
   }
 }

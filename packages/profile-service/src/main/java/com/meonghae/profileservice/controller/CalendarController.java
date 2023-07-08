@@ -2,6 +2,8 @@ package com.meonghae.profileservice.controller;
 
 import com.meonghae.profileservice.dto.calendar.CalendarRequestDTO;
 import com.meonghae.profileservice.dto.calendar.CalendarResponseDTO;
+import com.meonghae.profileservice.error.ErrorCode;
+import com.meonghae.profileservice.error.exception.BadRequestException;
 import com.meonghae.profileservice.service.CalendarService;
 
 import java.time.LocalDate;
@@ -46,6 +48,9 @@ public class CalendarController {
   @Operation(summary = "일정 검색 API")
   @GetMapping("/find")
   public List<CalendarResponseDTO> getScheduleOfFindByText(@RequestParam("key") String key, @RequestHeader("Authorization") String token){
+      if (key == null){
+          throw new BadRequestException(ErrorCode.RUNTIME_EXCEPTION,ErrorCode.RUNTIME_EXCEPTION.getMessage());
+      }
     return calendarService.getScheduleOfFindByText(key, token);
   }
 

@@ -21,25 +21,12 @@ spring:
       max-file-size: 10MB
       max-request-size: 30MB
 
-#  zipkin:
-#    base-url: http://127.0.0.1:9411
-#    compression:
-#      enabled: true
-#
-#  sleuth:
-#    sampler:
-#      probability: 1.0
-#
-#  rabbitmq:
-#    host: 127.0.0.1
-#    port: 5672
-#    username: guest
-#    password: guest
+  rabbitmq:
+    host: meonghae.site
+    port: 5672
+    username: guest
+    password: guest
 
-#  redis:
-#    host: localhost
-#    port: 6379
-#    timeout: 30
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
@@ -56,18 +43,6 @@ spring:
     password: ENC(oKvUEiPXVPQ5Fqx2PKQ1pixQ39vCCN1i)
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-#  h2:
-#    console:
-#      enabled: true
-#      settings:
-#        web-allow-others: true
-#      path: /h2-console
-#
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:h2:mem:testdb
-#    username: sa
-#    password:
 
 #config:
 #  import: bootstrap.yml
