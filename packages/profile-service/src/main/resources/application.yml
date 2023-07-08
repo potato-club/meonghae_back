@@ -22,10 +22,10 @@ spring:
       max-request-size: 30MB
 
   rabbitmq:
-    host: meonghae.site
+    host: rabbitmq
     port: 5672
-    username: guest
-    password: guest
+    username: ENC(3ScsqIY17k94LPHscMoQmw==)
+    password: ENC(8wd6uRVvx434DIRHIHiRLf9505m8UwEl)
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
