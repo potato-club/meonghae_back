@@ -31,7 +31,7 @@ public class Calendar extends BaseTimeEntity{
   @Column
   private VaccinationType vaccinationType;
   @Column(nullable = false)
-  private LocalDateTime scheduleTime;
+  private LocalDate scheduleTime;
   @Column
   private LocalDateTime alarmTime;
   @Column(nullable = false)
