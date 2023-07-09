@@ -1,22 +1,21 @@
 package com.meonghae.profileservice.dto.calendar;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.meonghae.profileservice.entity.Calendar;
-import com.meonghae.profileservice.enumCustom.VaccinationType;
+import com.meonghae.profileservice.enumCustom.ScheduleType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Getter
 public class CalendarRequestDTO {
   @ApiModelProperty(notes = "반려동물 id", example = "LONG", required = true)
   private Long petId;
+  @ApiModelProperty(notes = "사용자 지정 일정", example = "지정된 타입이 있으면 null처리")
+  private String title;
   @ApiModelProperty(notes = "백신 지정할 타입", example = "DHPPL, Coronavirus 등 string값")
-  private VaccinationType vaccinationType;
+  private ScheduleType scheduleType;
   @ApiModelProperty(notes = "일정 날짜와 시간", example = "2023-01-01", required = true)
   private LocalDate scheduleTime;
   @ApiModelProperty(notes = "알림 지정 시간 ", example = "2023-01-01THH:mm")

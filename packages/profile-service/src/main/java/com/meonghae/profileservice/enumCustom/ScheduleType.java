@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum VaccinationType {
+public enum ScheduleType {
 
     DHPPL(1,"혼합백신"),
     Coronavirus(2,"코로나장염"),
