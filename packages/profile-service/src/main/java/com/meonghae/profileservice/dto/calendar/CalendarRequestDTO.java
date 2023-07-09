@@ -17,7 +17,7 @@ public class CalendarRequestDTO {
   private VaccinationType vaccinationType;
   @ApiModelProperty(notes = "일정 날짜와 시간", example = "2023-01-01", required = true)
   @DateTimeFormat(pattern = "yyyy-MM-dd")
-  private LocalDate scheduleTime;
+  private LocalDateTime scheduleTime;
   @ApiModelProperty(notes = "알림 지정 시간 ", example = "2023-01-01THH:mm")
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
   private LocalDateTime alarmTime;
