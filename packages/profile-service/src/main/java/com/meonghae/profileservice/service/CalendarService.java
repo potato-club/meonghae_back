@@ -148,7 +148,7 @@ public class CalendarService {
                     .builder()
                     .userEmail(userEmail)
                     .pet(pet)
-                    .scheduleTime(calendarRequestDTO.getScheduleTime())
+                    .scheduleTime(LocalDateTime.of(calendarRequestDTO.getScheduleTime(), LocalTime.MIDNIGHT))
                     .alarmTime(calendarRequestDTO.getAlarmTime())
                     .text(calendarRequestDTO.getText())
                     .build();

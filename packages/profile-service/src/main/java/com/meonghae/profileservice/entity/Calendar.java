@@ -41,6 +41,6 @@ public class Calendar extends BaseTimeEntity{
   public void update(CalendarRequestDTO calendarRequestDTO, Pet pet) {
     this.pet = pet;
     this.text = calendarRequestDTO.getText();
-    this.scheduleTime = calendarRequestDTO.getScheduleTime();
+    this.scheduleTime = LocalDateTime.of(calendarRequestDTO.getScheduleTime(), LocalTime.MIDNIGHT);
   }
 }
