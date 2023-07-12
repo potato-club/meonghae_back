@@ -138,22 +138,20 @@ public class CalendarService {
 
   @Transactional
   public String addSchedule(CalendarRequestDTO calendarRequestDTO, String token) {
-    // 프론트에서 FM 이면 hour에 +12해서 주겠징
-    LocalDateTime scheduleDateTime = calendarRequestDTO.getScheduleTime();
-
     Pet pet = petRepository.findById(calendarRequestDTO.getPetId())
             .orElseThrow(() -> {throw new NotFoundException(ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
 
     String userEmail = feignService.getUserEmail(token);
 
     Calendar calendar =
-        new Calendar()
-            .builder()
-            .userEmail(userEmail)
-            .pet(pet)
-            .scheduleTime(scheduleDateTime)
-            .text(calendarRequestDTO.getText())
-            .build();
+            new Calendar()
+                    .builder()
+                    .userEmail(userEmail)
+                    .pet(pet)
+                    .scheduleTime(LocalDateTime.of(calendarRequestDTO.getScheduleTime(), LocalTime.MIDNIGHT))
+                    .alarmTime(calendarRequestDTO.getAlarmTime())
+                    .text(calendarRequestDTO.getText())
+                    .build();
     calendarRepository.save(calendar);
     return "일정 추가 완료";
   }

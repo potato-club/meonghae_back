@@ -5,6 +5,7 @@ import com.meonghae.profileservice.entity.Pet;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -12,13 +13,15 @@ import java.time.LocalDateTime;
 public class CalendarResponseDTO {
   private Long id;
   private String petName;
-  private String scheduleTime;
+  private LocalDate scheduleTime;
+  private String alarmTime;
   private String text;
 
   public CalendarResponseDTO(Calendar calendar) {
     this.id = calendar.getId();
     this.petName = calendar.getPet().getPetName();
-    this.scheduleTime = calendar.getScheduleTime().toString();
+    this.scheduleTime = calendar.getScheduleTime().toLocalDate();
+    this.alarmTime = calendar.getAlarmTime().toString();
     this.text = calendar.getText();
   }
 }
