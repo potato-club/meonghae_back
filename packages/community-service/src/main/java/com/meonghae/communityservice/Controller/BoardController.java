@@ -39,8 +39,9 @@ public class BoardController {
 
     @Operation(summary = "특정 게시글 호출 API")
     @GetMapping("/{id}")
-    public BoardDetailDto getBoard(@PathVariable(name = "id") Long id) {
-        return boardService.getBoard(id);
+    public BoardDetailDto getBoard(@PathVariable(name = "id") Long id,
+                                   @RequestHeader("Authorization") String token) {
+        return boardService.getBoard(id, token);
     }
 
     @Operation(summary = "메인 페이지 인기게시글 호출 API")

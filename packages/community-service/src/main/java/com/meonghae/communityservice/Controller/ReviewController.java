@@ -30,6 +30,7 @@ public class ReviewController {
     @Operation(summary = "타입별 리뷰 조회 API")
     @GetMapping("/{type}")
     public ResponseEntity<Slice<ReviewListDto>> getReviewList(@PathVariable(name = "type") int type,
+                                                              @RequestHeader("Authorization") String token,
                                                               @RequestParam(value = "p",
                                                                      defaultValue = "1",
                                                                       required = false) int page,
@@ -42,7 +43,7 @@ public class ReviewController {
                                                               defaultValue = "false",
                                                               required = false) boolean photoOnly
                                                               ) {
-        Slice<ReviewListDto> listDto = reviewService.getReviewByType(type, page, keyword, sort, photoOnly);
+        Slice<ReviewListDto> listDto = reviewService.getReviewByType(type, token, page, keyword, sort, photoOnly);
         return ResponseEntity.ok(listDto);
     }
 

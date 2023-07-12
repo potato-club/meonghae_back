@@ -6,6 +6,7 @@ import com.meonghae.communityservice.Dto.ReviewDto.ReviewListDto;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewRequestDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3RequestDto;
 import com.meonghae.communityservice.Entity.Review.Review;
+import com.meonghae.communityservice.Enum.RecommendStatus;
 import com.meonghae.communityservice.Enum.ReviewCatalog;
 import com.meonghae.communityservice.Enum.ReviewSortType;
 import com.meonghae.communityservice.Exception.Custom.BoardException;
@@ -30,15 +31,14 @@ import static com.meonghae.communityservice.Exception.Error.ErrorCode.*;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
+    private final ReviewReactionService reactionService;
     private final RedisService redisService;
     private final UserServiceClient userService;
     private final S3ServiceClient s3Service;
 
     @Transactional
-    public Slice<ReviewListDto> getReviewByType(int key, int page,
-                                                String keyword,
-                                                ReviewSortType sort,
-                                                boolean photoOnly) {
+    public Slice<ReviewListDto> getReviewByType(int key, String token, int page,
+                                                String keyword, ReviewSortType sort, boolean photoOnly) {
         ReviewCatalog catalog = ReviewCatalog.findWithKey(key);
         if(catalog == null) throw new ReviewException(BAD_REQUEST, "잘못된 Catalog Type 입니다.");
         Slice<Review> reviews;
@@ -46,7 +46,7 @@ public class ReviewService {
         reviews = photoOnly ?
                 getPagingReviewWithPhoto(page, catalog, keyword, sort) : getPagingReview(page, catalog, keyword, sort);
 
-        return reviews.map(this::convertTypeAndAddImage);
+        return reviews.map(r -> convertTypeAndAddImage(r, token));
     }
 
     private Slice<Review> getPagingReview(int page, ReviewCatalog catalog, String keyword, ReviewSortType sort) {
@@ -132,10 +132,11 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
-    private ReviewListDto convertTypeAndAddImage(Review review) {
+    private ReviewListDto convertTypeAndAddImage(Review review, String token) {
         String nickname = redisService.getNickname(review.getEmail());
         String url = redisService.getProfileImage(review.getEmail());
-        ReviewListDto reviewDto = new ReviewListDto(review, nickname, url);
+        RecommendStatus status = reactionService.getReviewReaction(review, token);
+        ReviewListDto reviewDto = new ReviewListDto(review, nickname, url, status);
         if (review.getHasImage()) {
             S3RequestDto requestDto = new S3RequestDto(review.getId(), "REVIEW");
             reviewDto.setImages(s3Service.getImages(requestDto));

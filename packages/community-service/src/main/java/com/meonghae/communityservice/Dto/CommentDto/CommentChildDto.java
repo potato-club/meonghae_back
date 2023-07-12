@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 public class CommentChildDto {
@@ -20,6 +22,8 @@ public class CommentChildDto {
     private Boolean update;
     @ApiModelProperty("댓글의 부모댓글 id")
     private Long parentId;
+    @ApiModelProperty("댓글 작성 시간")
+    private LocalDateTime date;
 
     public CommentChildDto(BoardComment child, String url, boolean isWriter) {
         this.id = child.getId();
@@ -28,5 +32,6 @@ public class CommentChildDto {
         this.profileUrl = url;
         this.update = child.getUpdated();
         this.parentId = child.getParent().getId();
+        this.date = child.getCreatedDate();
     }
 }

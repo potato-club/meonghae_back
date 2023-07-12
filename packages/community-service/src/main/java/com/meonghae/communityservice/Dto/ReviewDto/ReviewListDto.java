@@ -3,10 +3,12 @@ package com.meonghae.communityservice.Dto.ReviewDto;
 import com.meonghae.communityservice.Dto.S3Dto.ImageListDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3ResponseDto;
 import com.meonghae.communityservice.Entity.Review.Review;
+import com.meonghae.communityservice.Enum.RecommendStatus;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,8 +33,12 @@ public class ReviewListDto {
     private int likes;
     @ApiModelProperty("리뷰 비추천 수")
     private int dislikes;
+    @ApiModelProperty("리뷰 추천 상태")
+    private RecommendStatus recommendStatus;
+    @ApiModelProperty("리뷰 등록 날짜")
+    private LocalDateTime date;
 
-    public ReviewListDto(Review review, String nickname, String url) {
+    public ReviewListDto(Review review, String nickname, String url, RecommendStatus status) {
         this.id = review.getId();
         this.nickname = nickname;
         this.profileUrl = url;
@@ -41,6 +47,8 @@ public class ReviewListDto {
         this.rating = review.getRating();
         this.likes = review.getLikes();
         this.dislikes = review.getDislikes();
+        this.recommendStatus = status;
+        this.date = review.getCreatedDate();
     }
 
     public void setImages(List<S3ResponseDto> imageList) {

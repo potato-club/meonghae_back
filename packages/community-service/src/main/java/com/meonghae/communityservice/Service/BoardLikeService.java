@@ -42,4 +42,10 @@ public class BoardLikeService {
         else like.addLike(board);
         return "추천 완료";
     }
+
+    public boolean isLikeBoard(Board board, String token) {
+        String email = userService.getUserEmail(token);
+        BoardLike like = likeRepository.findByEmailAndBoard(email, board);
+        return like != null && like.getStatus();
+    }
 }

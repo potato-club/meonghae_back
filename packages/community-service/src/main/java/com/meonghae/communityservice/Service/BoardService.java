@@ -33,6 +33,7 @@ import static com.meonghae.communityservice.Exception.Error.ErrorCode.*;
 @RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
+    private final BoardLikeService likeService;
     private final JPAQueryFactory jpaQueryFactory;
     private final RedisService redisService;
     private final UserServiceClient userService;
@@ -52,11 +53,12 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardDetailDto getBoard(Long id) {
+    public BoardDetailDto getBoard(Long id, String token) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
+        boolean likeStatus = likeService.isLikeBoard(board, token);
         String url = redisService.getProfileImage(board.getEmail());
-        BoardDetailDto detailDto = new BoardDetailDto(board, url);
+        BoardDetailDto detailDto = new BoardDetailDto(board, url, likeStatus);
         if(board.getHasImage()) {
             List<S3ResponseDto> images = s3Service.getImages(new S3RequestDto(board.getId(), "BOARD"));
             detailDto.setImages(images);

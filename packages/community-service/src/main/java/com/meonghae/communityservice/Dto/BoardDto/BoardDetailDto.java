@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,14 +28,20 @@ public class BoardDetailDto {
     private int commentSize;
     @ApiModelProperty("게시글 좋아요 개수")
     private int likes;
+    @ApiModelProperty("좋아요 여부")
+    private boolean likeStatus;
+    @ApiModelProperty("게시글 작성 시간")
+    private LocalDateTime date;
 
-    public BoardDetailDto(Board board, String url) {
+    public BoardDetailDto(Board board, String url, boolean status) {
         this.id = board.getId();
         this.profileUrl = url;
         this.title = board.getTitle();
         this.content = board.getContent();
         this.commentSize = board.getComments().isEmpty() ? 0 : board.getComments().size();
         this.likes = board.getLikes();
+        this.likeStatus = status;
+        this.date = board.getCreatedDate();
     }
 
     public void setImages(List<S3ResponseDto> imageList) {
