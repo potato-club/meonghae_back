@@ -52,7 +52,7 @@ public class ReviewReactionService {
     public RecommendStatus getReviewReaction(Review review, String token) {
         String email = userService.getUserEmail(token);
         ReviewReaction reaction = reactionRepository.findByEmailAndReview(email, review);
-        if(reaction == null) {
+        if(reaction == null || reaction.getRecommendStatus() == null) {
             return NONE;
         } else if (reaction.getRecommendStatus()) {
             return TRUE;
