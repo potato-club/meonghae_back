@@ -9,6 +9,7 @@ import com.meonghae.communityservice.Service.ReviewService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
+@Slf4j
 @Api(value = "REVIEW_CONTROLLER", tags = "리뷰 서비스 컨트롤러")
 public class ReviewController {
     private final ReviewService reviewService;
@@ -43,6 +45,7 @@ public class ReviewController {
                                                               defaultValue = "false",
                                                               required = false) boolean photoOnly
                                                               ) {
+        log.info("=========================몇번 호출되나 봅시다=========================");
         Slice<ReviewListDto> listDto = reviewService.getReviewByType(type, token, page, keyword, sort, photoOnly);
         return ResponseEntity.ok(listDto);
     }
