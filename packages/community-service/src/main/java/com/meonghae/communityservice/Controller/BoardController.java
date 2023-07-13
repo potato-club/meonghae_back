@@ -7,6 +7,7 @@ import com.meonghae.communityservice.Service.BoardService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/boards")
 @RequiredArgsConstructor
+@Slf4j
 @Api(value = "BOARD_CONTROLLER", tags = "게시판 서비스 컨트롤러")
 public class BoardController {
     private final BoardService boardService;
@@ -64,6 +66,7 @@ public class BoardController {
     @PostMapping("/{id}/like")
     public ResponseEntity<String> addLike(@PathVariable(name = "id") Long id,
                                           @RequestHeader("Authorization") String token) {
+        log.info("=============== 게시글 좋아요 몇번 호출되나 ===============");
         String result = likeService.addLike(id, token);
         return ResponseEntity.ok(result);
     }

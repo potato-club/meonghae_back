@@ -45,7 +45,6 @@ public class ReviewController {
                                                               defaultValue = "false",
                                                               required = false) boolean photoOnly
                                                               ) {
-        log.info("=========================몇번 호출되나 봅시다=========================");
         Slice<ReviewListDto> listDto = reviewService.getReviewByType(type, token, page, keyword, sort, photoOnly);
         return ResponseEntity.ok(listDto);
     }
@@ -64,6 +63,7 @@ public class ReviewController {
     public ResponseEntity<String> likeReview(@PathVariable(name = "reviewId") Long reviewId,
                                              @RequestHeader("Authorization") String token,
                                              @RequestBody ReviewReactionTypeDto typeDto) {
+        log.info("=============== 리뷰 추천 몇번 호출되나 ===============");
         String result = reactionService.toggleRecommendedReview(reviewId, token, typeDto);
         return ResponseEntity.ok(result);
     }
