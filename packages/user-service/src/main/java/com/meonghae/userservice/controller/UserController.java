@@ -42,8 +42,8 @@ public class UserController {
 
     @Operation(summary = "회원가입 API")
     @PostMapping(value = "/signup")
-    public ResponseEntity<String> signUp(UserRequestDto userDto, HttpServletResponse response) {
-        userService.signUp(userDto, response);
+    public ResponseEntity<String> signUp(UserRequestDto userDto, HttpServletRequest request, HttpServletResponse response) {
+        userService.signUp(userDto, request, response);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 
@@ -55,8 +55,8 @@ public class UserController {
 
     @Operation(summary = "카카오 로그인 API")
     @GetMapping("/login")
-    public UserResponseDto login(@RequestParam String email, HttpServletResponse response) {
-        return userService.login(email, response);
+    public UserResponseDto login(@RequestParam String email, HttpServletRequest request, HttpServletResponse response) {
+        return userService.login(email, request, response);
     }
 
     @Operation(summary = "로그아웃 API")
