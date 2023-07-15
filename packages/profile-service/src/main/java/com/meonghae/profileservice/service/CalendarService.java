@@ -7,20 +7,16 @@ import com.meonghae.profileservice.entity.Pet;
 import com.meonghae.profileservice.entity.QCalendar;
 import com.meonghae.profileservice.entity.QPet;
 import com.meonghae.profileservice.error.ErrorCode;
-import com.meonghae.profileservice.error.exception.BadRequestException;
 import com.meonghae.profileservice.error.exception.NotFoundException;
 import com.meonghae.profileservice.repository.CalendarRepository;
 import com.meonghae.profileservice.repository.PetRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -148,7 +144,9 @@ public class CalendarService {
                     .builder()
                     .userEmail(userEmail)
                     .pet(pet)
-                    .scheduleTime(LocalDateTime.of(calendarRequestDTO.getScheduleTime(), LocalTime.MIDNIGHT))
+                    .title(calendarRequestDTO.getTitle())
+                    .scheduleType(calendarRequestDTO.getScheduleType())
+                    .scheduleTime(calendarRequestDTO.getScheduleTime())
                     .alarmTime(calendarRequestDTO.getAlarmTime())
                     .text(calendarRequestDTO.getText())
                     .build();

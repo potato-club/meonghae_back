@@ -1,12 +1,12 @@
 package com.meonghae.profileservice.entity;
 
 import com.meonghae.profileservice.dto.calendar.CalendarRequestDTO;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import javax.persistence.*;
 
-import com.meonghae.profileservice.enumCustom.VaccinationType;
+import com.meonghae.profileservice.enumCustom.ScheduleType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +29,9 @@ public class Calendar extends BaseTimeEntity{
   @JoinColumn(name = "pet_id",nullable = false)
   private Pet pet;
   @Column
-  private VaccinationType vaccinationType;
+  private String title;
+  @Column
+  private ScheduleType scheduleType;
   @Column(nullable = false)
   private LocalDateTime scheduleTime;
   @Column
@@ -40,7 +42,10 @@ public class Calendar extends BaseTimeEntity{
 
   public void update(CalendarRequestDTO calendarRequestDTO, Pet pet) {
     this.pet = pet;
+    this.title = calendarRequestDTO.getTitle();
+    this.scheduleType = calendarRequestDTO.getScheduleType();
     this.text = calendarRequestDTO.getText();
-    this.scheduleTime = LocalDateTime.of(calendarRequestDTO.getScheduleTime(), LocalTime.MIDNIGHT);
+    this.scheduleTime = calendarRequestDTO.getScheduleTime();
+    this.alarmTime = calendarRequestDTO.getAlarmTime();
   }
 }

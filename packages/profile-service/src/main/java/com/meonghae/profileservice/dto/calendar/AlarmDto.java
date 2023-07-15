@@ -1,7 +1,7 @@
 package com.meonghae.profileservice.dto.calendar;
 
 import com.meonghae.profileservice.entity.Calendar;
-import com.meonghae.profileservice.enumCustom.VaccinationType;
+import com.meonghae.profileservice.enumCustom.ScheduleType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,14 +12,18 @@ import java.sql.Timestamp;
 @Getter
 @NoArgsConstructor
 public class AlarmDto {
-    private String userEmail;
-    private VaccinationType vaccinationType;
+    private String userEmail; //식별번호로 바꿔야함
+    private String text;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private Timestamp alarmTime;
 
     public AlarmDto(Calendar calendar){
         this.alarmTime = Timestamp.valueOf(calendar.getAlarmTime());
-        this.vaccinationType = calendar.getVaccinationType();
+        if (calendar.getScheduleType().getKey() < 10){
+            this.text = calendar.getUserEmail()+"님, "+calendar.getScheduleType().getTitle();
+        }else if(calendar.getScheduleType().getKey() > 10){
+            this.text = calendar.getUserEmail()+"님, 오늘은 "+calendar.getTitle()+calendar.getScheduleType().getTitle()+" 일정이 있어요";
+        }
         this.userEmail = calendar.getUserEmail();
     }
 }
