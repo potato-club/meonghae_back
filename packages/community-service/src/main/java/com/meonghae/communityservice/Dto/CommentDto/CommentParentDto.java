@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 public class CommentParentDto {
@@ -21,6 +23,8 @@ public class CommentParentDto {
     private Boolean update;
     @ApiModelProperty("대댓글 개수")
     private int replies;
+    @ApiModelProperty("댓글 작성 시간")
+    private LocalDateTime date;
 
     public CommentParentDto(BoardComment comment, String url, boolean isWriter) {
         this.id = comment.getId();
@@ -29,5 +33,6 @@ public class CommentParentDto {
         this.update = comment.getUpdated();
         this.isWriter = isWriter;
         this.replies = CollectionUtils.isEmpty(comment.getReplies()) ? 0 : comment.getReplies().size();
+        this.date = comment.getCreatedDate();
     }
 }

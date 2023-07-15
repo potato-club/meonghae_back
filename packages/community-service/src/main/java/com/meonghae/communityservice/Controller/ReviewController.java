@@ -9,6 +9,7 @@ import com.meonghae.communityservice.Service.ReviewService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
+@Slf4j
 @Api(value = "REVIEW_CONTROLLER", tags = "리뷰 서비스 컨트롤러")
 public class ReviewController {
     private final ReviewService reviewService;
@@ -30,6 +32,7 @@ public class ReviewController {
     @Operation(summary = "타입별 리뷰 조회 API")
     @GetMapping("/{type}")
     public ResponseEntity<Slice<ReviewListDto>> getReviewList(@PathVariable(name = "type") int type,
+                                                              @RequestHeader("Authorization") String token,
                                                               @RequestParam(value = "p",
                                                                      defaultValue = "1",
                                                                       required = false) int page,
@@ -42,7 +45,7 @@ public class ReviewController {
                                                               defaultValue = "false",
                                                               required = false) boolean photoOnly
                                                               ) {
-        Slice<ReviewListDto> listDto = reviewService.getReviewByType(type, page, keyword, sort, photoOnly);
+        Slice<ReviewListDto> listDto = reviewService.getReviewByType(type, token, page, keyword, sort, photoOnly);
         return ResponseEntity.ok(listDto);
     }
 
@@ -60,6 +63,7 @@ public class ReviewController {
     public ResponseEntity<String> likeReview(@PathVariable(name = "reviewId") Long reviewId,
                                              @RequestHeader("Authorization") String token,
                                              @RequestBody ReviewReactionTypeDto typeDto) {
+        log.info("=============== 리뷰 추천 몇번 호출되나 ===============");
         String result = reactionService.toggleRecommendedReview(reviewId, token, typeDto);
         return ResponseEntity.ok(result);
     }

@@ -4,6 +4,7 @@ import com.meonghae.communityservice.Client.UserServiceClient;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewReactionTypeDto;
 import com.meonghae.communityservice.Entity.Review.Review;
 import com.meonghae.communityservice.Entity.Review.ReviewReaction;
+import com.meonghae.communityservice.Enum.RecommendStatus;
 import com.meonghae.communityservice.Exception.Custom.ReviewException;
 import com.meonghae.communityservice.Repository.ReviewReactionRepository;
 import com.meonghae.communityservice.Repository.ReviewRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import static com.meonghae.communityservice.Enum.RecommendStatus.*;
 import static com.meonghae.communityservice.Exception.Error.ErrorCode.*;
 
 @Service
@@ -44,6 +46,18 @@ public class ReviewReactionService {
         } else {
             String result = reaction.updateStatus(isLikes);
             return result;
+        }
+    }
+
+    public RecommendStatus getReviewReaction(Review review, String token) {
+        String email = userService.getUserEmail(token);
+        ReviewReaction reaction = reactionRepository.findByEmailAndReview(email, review);
+        if(reaction == null || reaction.getRecommendStatus() == null) {
+            return NONE;
+        } else if (reaction.getRecommendStatus()) {
+            return TRUE;
+        } else {
+            return FALSE;
         }
     }
 }

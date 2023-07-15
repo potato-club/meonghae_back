@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 public class BoardListDto {
@@ -22,6 +24,8 @@ public class BoardListDto {
     private int commentSize;
     @ApiModelProperty("게시글 내 이미지 여부")
     private boolean hasImage;
+    @ApiModelProperty("게시글 작성 시간")
+    private LocalDateTime date;
 
     public BoardListDto(Board board, String profileUrl) {
         this.id = board.getId();
@@ -31,5 +35,6 @@ public class BoardListDto {
         this.likes = board.getLikes();
         this.commentSize = board.getComments().isEmpty() ? 0 : board.getComments().size();
         this.hasImage = board.getHasImage();
+        this.date = board.getCreatedDate();
     }
 }
