@@ -40,11 +40,11 @@ public class UserServiceImpl implements UserService {
     private final S3ServiceClient s3Service;
 
     @Override
-    public UserResponseDto login(String email, HttpServletResponse response) {
+    public UserResponseDto login(String email, HttpServletRequest request, HttpServletResponse response) {
 
         if (userRepository.existsByEmailAndDeleted(email, false)) {
             UserRole userRole = userRepository.findByEmail(email).get().getUserRole();
-            this.createToken(userRole, email, response);
+            this.createToken(userRole, email, request, response);
 
             return UserResponseDto.builder()
                     .responseCode("200_OK")
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void signUp(UserRequestDto userDto, HttpServletResponse response) {
+    public void signUp(UserRequestDto userDto, HttpServletRequest request, HttpServletResponse response) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         }
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
         }
 
         UserRole userRole = userRepository.findByEmail(userDto.getEmail()).get().getUserRole();
-        this.createToken(userRole, userDto.getEmail(), response);
+        this.createToken(userRole, userDto.getEmail(), request, response);
     }
 
     @Override
@@ -141,7 +141,9 @@ public class UserServiceImpl implements UserService {
         return jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
     }
 
-    private void createToken(UserRole userRole, String email, HttpServletResponse response) {
+    private void createToken(UserRole userRole, String email, HttpServletRequest request, HttpServletResponse response) {
+        String androidId = request.getHeader("androidId");
+
         String accessToken = jwtTokenProvider.createAccessToken(email, userRole);
         String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole);
 
@@ -149,5 +151,6 @@ public class UserServiceImpl implements UserService {
         jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
 
         redisService.setValues(refreshToken, email);
+        redisService.setAndroidId(email, androidId);
     }
 }

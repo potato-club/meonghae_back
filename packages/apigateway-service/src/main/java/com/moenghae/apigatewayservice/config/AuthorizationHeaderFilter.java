@@ -9,6 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @Component
 public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
@@ -30,19 +32,28 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             ServerHttpRequest request = exchange.getRequest();
 
             String path = request.getURI().getPath();
+            String androidId = request.getHeaders().getFirst("AndroidId");
 
             if (path.endsWith("/health") || path.endsWith("/prometheus") || path.startsWith("/user-service/signup") ||
                     path.startsWith("/user-service/login") || path.endsWith("/swagger-ui/index.html") ||
                     path.startsWith("/s3-file-service/files/users")) {
-                return chain.filter(exchange);
+
+                return chain.filter(exchange.mutate().request(
+                        request.mutate()
+                                .header("androidId", androidId)         // AndroidId 헤더 추가
+                                .build()
+                ).build());
             }
 
             String accessToken = jwtTokenProvider.resolveAccessToken(request);
             String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
             if (accessToken == null) {
-                if (jwtTokenProvider.validateToken(refreshToken) && redisService.isRefreshTokenValid(refreshToken)) {
-                    accessToken = jwtTokenProvider.reissueAccessToken(refreshToken);
+                if (jwtTokenProvider.validateToken(refreshToken) && redisService.isRefreshTokenValid(refreshToken)
+                  && redisService.isAndroidIdValid(refreshToken)) {
+                    List<String> tokenList = jwtTokenProvider.reissueToken(refreshToken, androidId);
+                    accessToken = tokenList.get(0);
+                    refreshToken = tokenList.get(1);
                 }
             } else if (accessToken != null) {
                 if (jwtTokenProvider.validateToken(accessToken) && !redisService.isTokenInBlacklist(accessToken)) {

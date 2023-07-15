@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface UserService {
 
-    UserResponseDto login(String code, HttpServletResponse response);
+    UserResponseDto login(String code, HttpServletRequest request, HttpServletResponse response);
 
     String sendEmail(String token);
 
@@ -19,7 +19,7 @@ public interface UserService {
 
     UserMyPageDto viewMyPage(HttpServletRequest request);
 
-    void signUp(UserRequestDto userDto, HttpServletResponse response);
+    void signUp(UserRequestDto userDto, HttpServletRequest request, HttpServletResponse response);
 
     void update(UserUpdateDto userDto, HttpServletRequest request);
 

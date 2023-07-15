@@ -5,6 +5,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -19,9 +21,35 @@ public class RedisService {
         return values.get(token);
     }
 
+    public void setValues(String token, String email) {
+        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
+        Map<String, String> map = new HashMap<>();
+        map.put("email", email);
+        operations.set(token, map, Duration.ofDays(7)); // 7일 뒤 메모리에서 삭제됨
+    }
+
+    public void setAndroidId(String email, String androidId) {
+        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
+        Map<String, String> map = new HashMap<>();
+        map.put("androidId", androidId);
+        operations.set(email, map, Duration.ofDays(7)); // 7일 뒤 메모리에서 삭제됨
+    }
+
     public boolean isRefreshTokenValid(String token) {
         Map<String, String> values = getValues(token);
         return !values.isEmpty();
+    }
+
+    public boolean isAndroidIdValid(String token) {
+        Map<String, String> tokenValue = getValues(token);
+        String email = tokenValue.get("email");
+
+        if (email != null) {
+            Map<String, String> emailValue = getValues(email);
+            return emailValue.containsKey("androidId");
+        } else {
+            return false;
+        }
     }
 
     public boolean isTokenInBlacklist(String token) {
@@ -29,5 +57,9 @@ public class RedisService {
             throw new InvalidTokenException("Invalid access: token in blacklist");
         }
         return false;
+    }
+
+    public void delValues(String token) {
+        redisTemplate.delete(token);
     }
 }
