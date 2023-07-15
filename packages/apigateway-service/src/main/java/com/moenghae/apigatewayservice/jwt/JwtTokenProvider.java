@@ -30,9 +30,11 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    // 액세스 토큰 유효시간 | 1h
     @Value("${jwt.accessTokenExpiration}")
     private long accessTokenValidTime;
+
+    @Value("${jwt.refreshTokenExpiration}")
+    private long refreshTokenValidTime;
 
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
     @PostConstruct // 의존성 주입 후, 초기화를 수행
@@ -43,6 +45,10 @@ public class JwtTokenProvider {
     // Access Token 생성.
     public String createAccessToken(String email, String roles) {
         return this.createToken(email, roles, accessTokenValidTime);
+    }
+
+    public String createRefreshToken(String email, String roles) {
+        return this.createToken(email, roles, refreshTokenValidTime);
     }
 
     // Create token
@@ -59,7 +65,7 @@ public class JwtTokenProvider {
                 .compact(); // 생성
     }
 
-    public String reissueAccessToken(String refreshToken) {
+    public List<String> reissueToken(String refreshToken, String androidId) {
         Map<String, String> values = redisService.getValues(refreshToken);
         String email = values.get("email");
 
@@ -71,8 +77,21 @@ public class JwtTokenProvider {
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 
         String accessToken = createAccessToken(email, responseEntity.getBody());
+        String newRefreshToken = createRefreshToken(email, responseEntity.getBody());
 
-        return accessToken;
+        // Redis에서 기존 리프레시 토큰과 Android-Id를 삭제한다.
+        redisService.delValues(refreshToken);
+        redisService.delValues(email);
+
+        // Redis에 새로운 리프레시 토큰과 Android-Id를 저장한다.
+        redisService.setValues(newRefreshToken, email);
+        redisService.setAndroidId(email, androidId);
+
+        List<String> tokenList = new ArrayList<>();
+        tokenList.add(accessToken);
+        tokenList.add(newRefreshToken);
+
+        return tokenList;
     }
 
     // Request의 Header에서 AccessToken 값을 가져옵니다. "Authorization" : "token"

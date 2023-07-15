@@ -16,12 +16,20 @@ public class RedisService {
 
     private final RedisTemplate redisTemplate;
 
-    // RefreshToken, email, IP Address 설정
+    // RefreshToken, email 설정
     public void setValues(String token, String email) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         Map<String, String> map = new HashMap<>();
         map.put("email", email);
         operations.set(token, map, Duration.ofDays(7)); // 7일 뒤 메모리에서 삭제됨
+    }
+
+    // RefreshToken, Android-Id 설정
+    public void setAndroidId(String email, String androidId) {
+        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
+        Map<String, String> map = new HashMap<>();
+        map.put("androidId", androidId);
+        operations.set(email, map, Duration.ofDays(7)); // 7일 뒤 메모리에서 삭제됨
     }
 
     // 키값으로 벨류 가져오기
