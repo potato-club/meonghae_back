@@ -45,7 +45,7 @@ public class Calendar extends BaseTimeEntity{
     this.title = calendarRequestDTO.getTitle();
     this.scheduleType = calendarRequestDTO.getScheduleType();
     this.text = calendarRequestDTO.getText();
-    this.scheduleTime = LocalDateTime.of(calendarRequestDTO.getScheduleTime(), LocalTime.MIDNIGHT);
+    this.scheduleTime = calendarRequestDTO.getScheduleTime();
     this.alarmTime = calendarRequestDTO.getAlarmTime();
   }
 }

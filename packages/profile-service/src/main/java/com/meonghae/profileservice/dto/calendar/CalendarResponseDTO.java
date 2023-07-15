@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,7 +15,7 @@ public class CalendarResponseDTO {
   private String petName;
   private String title;
   private ScheduleType scheduleType;
-  private LocalDate scheduleTime;
+  private LocalDateTime scheduleTime;
   private String alarmTime;
   private String text;
 
@@ -23,7 +24,7 @@ public class CalendarResponseDTO {
     this.petName = calendar.getPet().getPetName();
     this.title = calendar.getTitle();
     this.scheduleType = calendar.getScheduleType();
-    this.scheduleTime = calendar.getScheduleTime().toLocalDate();
+    this.scheduleTime = calendar.getScheduleTime();
     this.alarmTime = calendar.getAlarmTime().toString();
     this.text = calendar.getText();
   }

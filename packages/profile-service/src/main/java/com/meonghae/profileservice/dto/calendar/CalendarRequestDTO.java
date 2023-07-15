@@ -16,8 +16,8 @@ public class CalendarRequestDTO {
   private String title;
   @ApiModelProperty(notes = "백신 지정할 타입", example = "DHPPL, Coronavirus 등 string값")
   private ScheduleType scheduleType;
-  @ApiModelProperty(notes = "일정 날짜와 시간", example = "2023-01-01", required = true)
-  private LocalDate scheduleTime;
+  @ApiModelProperty(notes = "일정 날짜와 시간", example = "2023-01-01THH:mm", required = true)
+  private LocalDateTime scheduleTime;
   @ApiModelProperty(notes = "알림 지정 시간 ", example = "2023-01-01THH:mm")
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
   private LocalDateTime alarmTime;
