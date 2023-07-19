@@ -19,8 +19,8 @@ public class WebConfig {
         return new RestTemplate();
     }
 
-    @Bean
-    public ErrorExceptionControllerAdvice customExceptionHandler() {
-        return new ErrorExceptionControllerAdvice();
-    }
+//    @Bean
+//    public ErrorExceptionControllerAdvice customExceptionHandler() {
+//        return new ErrorExceptionControllerAdvice();
+//    }
 }

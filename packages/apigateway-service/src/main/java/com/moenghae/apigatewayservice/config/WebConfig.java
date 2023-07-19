@@ -19,8 +19,8 @@ public class WebConfig {
         return new RestTemplate();
     }
 
-    @Bean
-    public CustomExceptionHandler customExceptionHandler() {
-        return new CustomExceptionHandler();
-    }
+//    @Bean
+//    public CustomExceptionHandler customExceptionHandler() {
+//        return new CustomExceptionHandler();
+//    }
 }
