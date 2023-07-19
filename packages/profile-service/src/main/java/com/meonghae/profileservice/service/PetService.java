@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,6 +60,23 @@ public class PetService {
       petDetaileResponseDTO.setImage(images);
     }
     return petDetaileResponseDTO;
+  }
+  // 전체 반려동물 디테일 리스트
+  @Transactional
+  public List<PetDetaileResponseDTO> getAllPet(String token) {
+    String userEmail = feignService.getUserEmail(token);
+    List<Pet> petList = petRepository.findByUserEmail(userEmail);
+    List<PetDetaileResponseDTO> resultList = new ArrayList<>();
+
+    for (Pet pet : petList){
+      if ( pet.isHasImage() ){
+        S3ResponseDto image = s3ServiceClient.viewPetFile(new S3RequestDto(pet.getId(),"PET"));
+        resultList.add(new PetDetaileResponseDTO(pet,image));
+      } else{
+        resultList.add(new PetDetaileResponseDTO(pet));
+      }
+    }
+    return resultList;
   }
 
 //======================================================================
