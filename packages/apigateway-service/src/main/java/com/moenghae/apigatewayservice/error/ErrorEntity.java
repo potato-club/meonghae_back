@@ -9,14 +9,14 @@ import org.springframework.http.HttpStatus;
 @ToString
 public class ErrorEntity {
 
-    private int status;
-    private String errorCode;
-    private String errorMessage;
+    private int code;
+    private String status;
+    private String message;
 
     @Builder
-    public ErrorEntity(int status, String errorCode, String errorMessage) {
+    public ErrorEntity(int code, String status, String message) {
+        this.code = code;
         this.status = status;
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
+        this.message = message;
     }
 }

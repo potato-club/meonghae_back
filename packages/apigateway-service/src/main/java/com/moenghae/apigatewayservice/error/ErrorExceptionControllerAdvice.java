@@ -19,50 +19,50 @@ public class ErrorExceptionControllerAdvice {
     @ExceptionHandler({InvalidTokenException.class})
     public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final InvalidTokenException e) {
         return ResponseEntity
-                .status(e.getErrorCode().getStatus())
+                .status(e.getErrorCode().getCode())
                 .body(ErrorEntity.builder()
-                        .errorCode(e.getErrorCode().getCode())
-                        .errorMessage(e.getErrorCode().getMessage())
+                        .code(e.getErrorCode().getCode())
+                        .message(e.getErrorCode().getMessage())
                         .build());
     }
 
     @ExceptionHandler({IllegalArgumentException.class})
     public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final IllegalArgumentException e) {
         return ResponseEntity
-                .status(e.getErrorCode().getStatus())
+                .status(e.getErrorCode().getCode())
                 .body(ErrorEntity.builder()
-                        .errorCode(e.getErrorCode().getCode())
-                        .errorMessage(e.getErrorCode().getMessage())
+                        .code(e.getErrorCode().getCode())
+                        .message(e.getErrorCode().getMessage())
                         .build());
     }
 
     @ExceptionHandler({JwtExpiredException.class})
     public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final JwtExpiredException e) {
         return ResponseEntity
-                .status(e.getErrorCode().getStatus())
+                .status(e.getErrorCode().getCode())
                 .body(ErrorEntity.builder()
-                        .errorCode(e.getErrorCode().getCode())
-                        .errorMessage(e.getErrorCode().getMessage())
+                        .code(e.getErrorCode().getCode())
+                        .message(e.getErrorCode().getMessage())
                         .build());
     }
 
     @ExceptionHandler({SignatureException.class})
     public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final SignatureException e) {
         return ResponseEntity
-                .status(e.getErrorCode().getStatus())
+                .status(e.getErrorCode().getCode())
                 .body(ErrorEntity.builder()
-                        .errorCode(e.getErrorCode().getCode())
-                        .errorMessage(e.getErrorCode().getMessage())
+                        .code(e.getErrorCode().getCode())
+                        .message(e.getErrorCode().getMessage())
                         .build());
     }
 
     @ExceptionHandler({UnsupportedJwtException.class})
     public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final UnsupportedJwtException e) {
         return ResponseEntity
-                .status(e.getErrorCode().getStatus())
+                .status(e.getErrorCode().getCode())
                 .body(ErrorEntity.builder()
-                        .errorCode(e.getErrorCode().getCode())
-                        .errorMessage(e.getErrorCode().getMessage())
+                        .code(e.getErrorCode().getCode())
+                        .message(e.getErrorCode().getMessage())
                         .build());
     }
 }

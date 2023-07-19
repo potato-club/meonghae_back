@@ -12,22 +12,22 @@ public enum ErrorCode {
     EMPTY_JWT_CLAIMS(4004, "4004","JWT claims string is empty"),
     JWT_SIGNATURE_MISMATCH(4005, "4005","JWT signature does not match");
 
-    private final int status;
-    private final String code;
+    private final int code;
+    private final String status;
     private final String message;
 
-    ErrorCode(int status, String code, String message) {
-        this.status = status;
+    ErrorCode(int code, String status, String message) {
         this.code = code;
+        this.status = status;
         this.message = message;
     }
 
-    public int getStatus() {
-        return status;
+    public int getCode() {
+        return code;
     }
 
-    public String getCode() {
-        return code;
+    public String getStatus() {
+        return status;
     }
 
     public String getMessage() {
