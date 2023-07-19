@@ -1,5 +1,7 @@
 package com.moenghae.apigatewayservice.jwt;
 
+import com.moenghae.apigatewayservice.error.ErrorCode;
+import com.moenghae.apigatewayservice.error.jwt.InvalidTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -54,7 +56,7 @@ public class RedisService {
 
     public boolean isTokenInBlacklist(String token) {
         if (Boolean.TRUE.equals(redisTemplate.hasKey(token))) {
-            throw new InvalidTokenException("Invalid access: token in blacklist");
+            throw new InvalidTokenException("4001", ErrorCode.INVALID_JWT_TOKEN);
         }
         return false;
     }
