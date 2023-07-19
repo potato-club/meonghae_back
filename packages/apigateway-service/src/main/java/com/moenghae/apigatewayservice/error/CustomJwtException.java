@@ -7,8 +7,4 @@ public class CustomJwtException extends RuntimeException {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
-
-    public int getErrorCode() {
-        return errorCode.getCode();
-    }
 }
