@@ -1,7 +1,10 @@
 package com.moenghae.apigatewayservice.jwt;
 
+import com.moenghae.apigatewayservice.error.CustomJwtException;
+import com.moenghae.apigatewayservice.error.ErrorCode;
 import com.thoughtworks.xstream.security.ForbiddenClassException;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import java.security.Key;
 import java.util.*;
 
 @Slf4j
@@ -56,12 +60,14 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims().setSubject(email); // claims 생성 및 payload 설정
         claims.put("roles", roles); // 권한 설정, key/ value 쌍으로 저장
 
+        Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
         Date date = new Date();
+
         return Jwts.builder()
                 .setClaims(claims) // 발행 유저 정보 저장
                 .setIssuedAt(date) // 발행 시간 저장
                 .setExpiration(new Date(date.getTime() + tokenValid)) // 토큰 유효 시간 저장
-                .signWith(SignatureAlgorithm.HS256, secretKey) // 해싱 알고리즘 및 키 설정
+                .signWith(key, SignatureAlgorithm.HS256) // 해싱 알고리즘 및 키 설정
                 .compact(); // 생성
     }
 
@@ -116,18 +122,23 @@ public class JwtTokenProvider {
     // 토큰의 유효성 + 만료일자 확인
     public boolean validateToken(String jwtToken) {
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
+            Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(jwtToken);
+
             return !claims.getBody().getExpiration().before(new Date());
         } catch (MalformedJwtException e) {
-            throw new MalformedJwtException("Invalid JWT token");
+            throw new CustomJwtException(ErrorCode.INVALID_JWT_TOKEN);
         } catch (ExpiredJwtException e) {
-            throw new JwtExpiredException("JWT token has expired");
+            throw new CustomJwtException(ErrorCode.JWT_TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
-            throw new UnsupportedJwtException("JWT token is unsupported");
+            throw new CustomJwtException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("JWT claims string is empty");
+            throw new CustomJwtException(ErrorCode.EMPTY_JWT_CLAIMS);
         } catch (SignatureException e) {
-            throw new SignatureException("JWT signature does not match");
+            throw new CustomJwtException(ErrorCode.JWT_SIGNATURE_MISMATCH);
         }
     }
 

@@ -53,7 +53,7 @@ public class RedisService {
     }
 
     public boolean isTokenInBlacklist(String token) {
-        if (redisTemplate.hasKey(token)) {
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(token))) {
             throw new InvalidTokenException("Invalid access: token in blacklist");
         }
         return false;
