@@ -1,6 +1,5 @@
 package com.moenghae.apigatewayservice.config;
 
-import com.moenghae.apigatewayservice.error.CustomExceptionHandler;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

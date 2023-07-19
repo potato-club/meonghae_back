@@ -1,13 +1,16 @@
 package com.meonghae.userservice.jwt;
 
 import com.meonghae.userservice.enums.UserRole;
-import com.meonghae.userservice.error.jwt.CustomJwtException;
-import com.meonghae.userservice.error.jwt.ErrorJwtCode;
+import com.meonghae.userservice.error.ErrorCode;
+import com.meonghae.userservice.error.exception.InvalidTokenException;
+import com.meonghae.userservice.error.exception.JwtExpiredException;
+import com.meonghae.userservice.error.exception.IllegalArgumentException;
+import com.meonghae.userservice.error.exception.UnsupportedJwtException;
+import com.meonghae.userservice.error.exception.SignatureException;
 import com.meonghae.userservice.service.Jwt.CustomUserDetailService;
 import com.meonghae.userservice.service.Jwt.RedisService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -133,15 +136,15 @@ public class JwtTokenProvider {
 
             return !claims.getBody().getExpiration().before(new Date());
         } catch (MalformedJwtException e) {
-            throw new CustomJwtException(ErrorJwtCode.INVALID_JWT_TOKEN);
+            throw new InvalidTokenException("4001", ErrorCode.INVALID_TOKEN_EXCEPTION);
         } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(ErrorJwtCode.JWT_TOKEN_EXPIRED);
+            throw new JwtExpiredException("4002", ErrorCode.JWT_TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
-            throw new CustomJwtException(ErrorJwtCode.UNSUPPORTED_JWT_TOKEN);
+            throw new UnsupportedJwtException("4003", ErrorCode.UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException e) {
-            throw new CustomJwtException(ErrorJwtCode.EMPTY_JWT_CLAIMS);
+            throw new IllegalArgumentException("4004", ErrorCode.EMPTY_JWT_CLAIMS);
         } catch (SignatureException e) {
-            throw new CustomJwtException(ErrorJwtCode.JWT_SIGNATURE_MISMATCH);
+            throw new SignatureException("4005", ErrorCode.JWT_SIGNATURE_MISMATCH);
         }
     }
 

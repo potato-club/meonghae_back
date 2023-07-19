@@ -1,11 +1,14 @@
 package com.moenghae.apigatewayservice.jwt;
 
-import com.moenghae.apigatewayservice.error.CustomJwtException;
 import com.moenghae.apigatewayservice.error.ErrorCode;
 import com.thoughtworks.xstream.security.ForbiddenClassException;
+import com.moenghae.apigatewayservice.error.jwt.InvalidTokenException;
+import com.moenghae.apigatewayservice.error.jwt.JwtExpiredException;
+import com.moenghae.apigatewayservice.error.jwt.IllegalArgumentException;
+import com.moenghae.apigatewayservice.error.jwt.UnsupportedJwtException;
+import com.moenghae.apigatewayservice.error.jwt.SignatureException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -130,15 +133,15 @@ public class JwtTokenProvider {
 
             return !claims.getBody().getExpiration().before(new Date());
         } catch (MalformedJwtException e) {
-            throw new CustomJwtException(ErrorCode.INVALID_JWT_TOKEN);
+            throw new InvalidTokenException("4001", ErrorCode.INVALID_JWT_TOKEN);
         } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(ErrorCode.JWT_TOKEN_EXPIRED);
+            throw new JwtExpiredException("4002", ErrorCode.JWT_TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
-            throw new CustomJwtException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
+            throw new UnsupportedJwtException("4003", ErrorCode.UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException e) {
-            throw new CustomJwtException(ErrorCode.EMPTY_JWT_CLAIMS);
+            throw new IllegalArgumentException("4004", ErrorCode.EMPTY_JWT_CLAIMS);
         } catch (SignatureException e) {
-            throw new CustomJwtException(ErrorCode.JWT_SIGNATURE_MISMATCH);
+            throw new SignatureException("4005", ErrorCode.JWT_SIGNATURE_MISMATCH);
         }
     }
 

@@ -5,16 +5,16 @@ import com.moenghae.apigatewayservice.error.jwt.JwtExpiredException;
 import com.moenghae.apigatewayservice.error.jwt.SignatureException;
 import com.moenghae.apigatewayservice.error.jwt.UnsupportedJwtException;
 import com.moenghae.apigatewayservice.error.jwt.IllegalArgumentException;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
 
-
+@RequiredArgsConstructor
 @RestControllerAdvice
-public class CustomExceptionHandler {
+public class ErrorExceptionControllerAdvice {
 
     @ExceptionHandler({InvalidTokenException.class})
     public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final InvalidTokenException e) {

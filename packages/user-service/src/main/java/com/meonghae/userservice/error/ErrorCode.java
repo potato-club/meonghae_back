@@ -8,19 +8,23 @@ import org.springframework.http.HttpStatus;
 @ToString
 public enum ErrorCode {
 
-    RUNTIME_EXCEPTION(HttpStatus.BAD_REQUEST, "400", "400 Bad Request"),
-    ACCESS_DENIED_EXCEPTION(HttpStatus.UNAUTHORIZED, "401", "401 UnAuthorized"),
-    NOT_ALLOW_WRITE_EXCEPTION(HttpStatus.UNAUTHORIZED, "401_NOT_ALLOW", "401 UnAuthorized"),
-    FORBIDDEN_EXCEPTION(HttpStatus.FORBIDDEN, "403", "403 Forbidden"),
-    NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "404", "404 Not Found"),
-    CONFLICT_EXCEPTION(HttpStatus.CONFLICT, "409", "409 Conflict"),
-    INVALID_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "401_Invalid", "Invalid access: token in blacklist");
+    RUNTIME_EXCEPTION(400, "400", "400 Bad Request"),
+    ACCESS_DENIED_EXCEPTION(401, "401", "401 UnAuthorized"),
+    NOT_ALLOW_WRITE_EXCEPTION(401, "401_1", "Not Allow"),
+    FORBIDDEN_EXCEPTION(403, "403", "403 Forbidden"),
+    NOT_FOUND_EXCEPTION(404, "404", "404 Not Found"),
+    CONFLICT_EXCEPTION(409, "409", "409 Conflict"),
+    INVALID_TOKEN_EXCEPTION(4001, "4001", "Invalid JWT token"),
+    JWT_TOKEN_EXPIRED(4002, "4002", "JWT token has expired"),
+    UNSUPPORTED_JWT_TOKEN(4003, "4003", "JWT token is unsupported"),
+    EMPTY_JWT_CLAIMS( 4004, "4004", "JWT claims string is empty"),
+    JWT_SIGNATURE_MISMATCH(4005, "4005", "JWT signature does not match");
 
-    private final HttpStatus status;
+    private final int status;
     private final String code;
     private final String message;
 
-    ErrorCode(HttpStatus status, String code, String message) {
+    ErrorCode(int status, String code, String message) {
         this.status = status;
         this.code = code;
         this.message = message;
