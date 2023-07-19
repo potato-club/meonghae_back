@@ -2,7 +2,6 @@ package com.moenghae.apigatewayservice.error;
 
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @ToString
@@ -21,5 +20,17 @@ public enum ErrorCode {
         this.status = status;
         this.code = code;
         this.message = message;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
