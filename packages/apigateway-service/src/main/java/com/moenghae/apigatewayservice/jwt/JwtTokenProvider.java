@@ -1,12 +1,6 @@
 package com.moenghae.apigatewayservice.jwt;
 
-import com.moenghae.apigatewayservice.error.ErrorCode;
 import com.thoughtworks.xstream.security.ForbiddenClassException;
-import com.moenghae.apigatewayservice.error.jwt.InvalidTokenException;
-import com.moenghae.apigatewayservice.error.jwt.JwtExpiredException;
-import com.moenghae.apigatewayservice.error.jwt.IllegalArgumentException;
-import com.moenghae.apigatewayservice.error.jwt.UnsupportedJwtException;
-import com.moenghae.apigatewayservice.error.jwt.SignatureException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.security.Key;
 import java.util.*;
 
@@ -135,15 +127,15 @@ public class JwtTokenProvider {
 
             return !claims.getBody().getExpiration().before(new Date());
         } catch (MalformedJwtException e) {
-            throw new InvalidTokenException("4001", ErrorCode.INVALID_JWT_TOKEN);
+            throw new MalformedJwtException("Invalid JWT token");
         } catch (ExpiredJwtException e) {
-            throw new JwtExpiredException("4002", ErrorCode.JWT_TOKEN_EXPIRED);
+            throw new JwtExpiredException("JWT token has expired");
         } catch (UnsupportedJwtException e) {
-            throw new UnsupportedJwtException("4003", ErrorCode.UNSUPPORTED_JWT_TOKEN);
+            throw new UnsupportedJwtException("JWT token is unsupported");
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("4004", ErrorCode.EMPTY_JWT_CLAIMS);
+            throw new IllegalArgumentException("JWT claims string is empty");
         } catch (SignatureException e) {
-            throw new SignatureException("4005", ErrorCode.JWT_SIGNATURE_MISMATCH);
+            throw new SignatureException("JWT signature does not match");
         }
     }
 

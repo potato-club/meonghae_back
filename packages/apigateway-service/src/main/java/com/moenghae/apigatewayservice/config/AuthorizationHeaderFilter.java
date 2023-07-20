@@ -1,10 +1,11 @@
 package com.moenghae.apigatewayservice.config;
 
 import com.moenghae.apigatewayservice.error.ErrorCode;
-import com.moenghae.apigatewayservice.error.jwt.*;
-import com.moenghae.apigatewayservice.error.jwt.IllegalArgumentException;
 import com.moenghae.apigatewayservice.jwt.JwtTokenProvider;
 import com.moenghae.apigatewayservice.jwt.RedisService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -92,10 +93,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         HttpStatus status = HttpStatus.UNAUTHORIZED;;
         ErrorCode errorCode = ErrorCode.INVALID_JWT_TOKEN;
 
-        if (e instanceof InvalidTokenException) {
-            status = HttpStatus.UNAUTHORIZED;
-            errorCode = ErrorCode.INVALID_JWT_TOKEN;
-        } else if (e instanceof JwtExpiredException) {
+        if (e instanceof ExpiredJwtException) {
             status = HttpStatus.UNAUTHORIZED;
             errorCode = ErrorCode.JWT_TOKEN_EXPIRED;
         } else if (e instanceof UnsupportedJwtException) {
