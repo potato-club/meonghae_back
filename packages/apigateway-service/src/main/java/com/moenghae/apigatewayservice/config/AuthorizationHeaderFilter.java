@@ -102,6 +102,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         } else if (e instanceof IllegalArgumentException){
             status = HttpStatus.UNAUTHORIZED;
             errorCode = ErrorCode.EMPTY_JWT_CLAIMS;
+            log.info("여기서 에러 발생!!!");
         } else if (e instanceof SignatureException) {
             status = HttpStatus.UNAUTHORIZED;
             errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH;
