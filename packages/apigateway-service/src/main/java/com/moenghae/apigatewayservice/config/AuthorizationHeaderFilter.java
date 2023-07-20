@@ -9,6 +9,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -106,6 +107,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         response.setStatusCode(status);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         String errorMessage = "JWT claims string is empty";
-        response.writeAndFlushWith(Mono.just(Mono.just(response.bufferFactory().wrap(errorMessage.getBytes()))));
+
+        DataBuffer buffer = response.bufferFactory().wrap(errorMessage.getBytes());
+        response.writeWith(Mono.just(buffer));
     }
 }
