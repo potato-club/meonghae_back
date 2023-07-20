@@ -89,8 +89,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     }
 
     private void handleTokenValidationFailure(ServerHttpResponse response, RuntimeException e) {
-        HttpStatus status = null;
-        ErrorCode errorCode = null;
+        HttpStatus status = HttpStatus.UNAUTHORIZED;;
+        ErrorCode errorCode = ErrorCode.INVALID_JWT_TOKEN;
 
         if (e instanceof InvalidTokenException) {
             status = HttpStatus.UNAUTHORIZED;
