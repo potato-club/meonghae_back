@@ -84,7 +84,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     }
 
     private boolean isPublicPath(String path) {
-        return path.endsWith("/health") || path.endsWith("/prometheus") ||
+        return path.startsWith("/health") || path.endsWith("/prometheus") ||
                 path.startsWith("/user-service/signup") || path.startsWith("/user-service/login") ||
                 path.endsWith("/swagger-ui/index.html") || path.startsWith("/s3-file-service/files/users");
     }
@@ -94,17 +94,13 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         ErrorCode errorCode = ErrorCode.INVALID_JWT_TOKEN;
 
         if (e instanceof ExpiredJwtException) {
-            status = HttpStatus.UNAUTHORIZED;
             errorCode = ErrorCode.JWT_TOKEN_EXPIRED;
         } else if (e instanceof UnsupportedJwtException) {
-            status = HttpStatus.UNAUTHORIZED;
             errorCode = ErrorCode.UNSUPPORTED_JWT_TOKEN;
         } else if (e instanceof IllegalArgumentException){
-            status = HttpStatus.UNAUTHORIZED;
             errorCode = ErrorCode.EMPTY_JWT_CLAIMS;
-            log.info("여기서 에러 발생!!!");
+            log.info("{} -> ", errorCode.getMessage());
         } else if (e instanceof SignatureException) {
-            status = HttpStatus.UNAUTHORIZED;
             errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH;
         }
 
