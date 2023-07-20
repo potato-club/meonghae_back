@@ -99,14 +99,13 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             errorCode = ErrorCode.UNSUPPORTED_JWT_TOKEN;
         } else if (e instanceof IllegalArgumentException){
             errorCode = ErrorCode.EMPTY_JWT_CLAIMS;
-            log.info("{} -> ", errorCode.getMessage());
         } else if (e instanceof SignatureException) {
             errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH;
         }
 
         response.setStatusCode(status);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        String errorMessage = errorCode.getMessage();
+        String errorMessage = "JWT claims string is empty";
         response.writeAndFlushWith(Mono.just(Mono.just(response.bufferFactory().wrap(errorMessage.getBytes()))));
     }
 }
