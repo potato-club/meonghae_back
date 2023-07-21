@@ -63,8 +63,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                         refreshToken = tokenList.get(1);
                     }
                 } catch (RuntimeException e) {
-                    return chain.filter(exchange)
-                            .onErrorResume(RuntimeException.class, ex -> handleTokenValidationFailure(exchange, ex));
+                    return handleTokenValidationFailure(exchange, e);
                 }
             } else {
                 try {
@@ -72,8 +71,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                         log.info("JWT Token is good.");
                     }
                 } catch (RuntimeException e) {
-                    return chain.filter(exchange)
-                            .onErrorResume(RuntimeException.class, ex -> handleTokenValidationFailure(exchange, ex));
+                    return handleTokenValidationFailure(exchange, e);
                 }
             }
 
