@@ -88,41 +88,4 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 path.startsWith("/user-service/signup") || path.startsWith("/user-service/login") ||
                 path.endsWith("/swagger-ui/index.html");
     }
-
-//    private Mono<Void> handleTokenValidationFailure(ServerWebExchange exchange, RuntimeException e) {
-//        HttpStatus status = HttpStatus.UNAUTHORIZED;;
-//        ErrorCode errorCode = ErrorCode.INVALID_JWT_TOKEN;
-//
-//        if (e instanceof ExpiredJwtException) {
-//            errorCode = ErrorCode.JWT_TOKEN_EXPIRED;
-//        } else if (e instanceof UnsupportedJwtException) {
-//            errorCode = ErrorCode.UNSUPPORTED_JWT_TOKEN;
-//        } else if (e instanceof IllegalArgumentException) {
-//            errorCode = ErrorCode.EMPTY_JWT_CLAIMS;
-//        } else if (e instanceof SignatureException) {
-//            errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH;
-//        }
-//
-//        exchange.getResponse().setStatusCode(status);
-//        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
-//
-//        ErrorResponse errorResponse = new ErrorResponse();
-//        errorResponse.setErrorCode(errorCode);
-//        errorResponse.setErrorMessage(errorCode.getMessage());
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String errorMessageJson;
-//
-//        try {
-//            errorMessageJson = objectMapper.writeValueAsString(errorResponse);
-//        } catch (JsonProcessingException ex) {
-//            // JSON 변환 오류가 발생할 경우에 대한 예외 처리
-//            errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
-//            exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//
-//        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(errorMessageJson.getBytes());
-//        exchange.getResponse().writeWith(Mono.just(buffer));
-//        return exchange.getResponse().setComplete();
-//    }
 }
