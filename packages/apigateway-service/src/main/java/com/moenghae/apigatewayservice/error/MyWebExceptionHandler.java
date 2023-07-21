@@ -15,30 +15,30 @@ import java.security.SignatureException;
 
 public class MyWebExceptionHandler implements ErrorWebExceptionHandler {
 
-    private String errorCodeMaker(int errorCode) {
-        return "{\"errorCode\":" + errorCode + "}";
+    private String errorCodeMaker(String errorMessage) {
+        return "{\"errorMessage\":" + errorMessage + "}";
     }
 
     @Override
     public Mono<Void> handle(
             ServerWebExchange exchange, Throwable ex) {
 
-        int errorCode = 401;
+        String errorMessage = "JWT Error";
 
         if (ex.getClass() == MalformedJwtException.class) {
-            errorCode = 4001;
+            errorMessage = ErrorCode.INVALID_JWT_TOKEN.getMessage();
         } else if (ex.getClass() == UnsupportedJwtException.class) {
-            errorCode = 4002;
+            errorMessage = ErrorCode.UNSUPPORTED_JWT_TOKEN.getMessage();
         } else if (ex.getClass() == ExpiredJwtException.class) {
-            errorCode = 4003;
+            errorMessage = ErrorCode.JWT_TOKEN_EXPIRED.getMessage();
         } else if (ex.getClass() == IllegalArgumentException.class) {
-            errorCode = 4004;
+            errorMessage = ErrorCode.EMPTY_JWT_CLAIMS.getMessage();
         } else if (ex.getClass() == SignatureException.class) {
-            errorCode = 4005;
+            errorMessage = ErrorCode.JWT_SIGNATURE_MISMATCH.getMessage();
         }
 
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-        byte[] bytes = errorCodeMaker(errorCode).getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = errorCodeMaker(errorMessage).getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
         return exchange.getResponse().writeWith(Flux.just(buffer));
     }
