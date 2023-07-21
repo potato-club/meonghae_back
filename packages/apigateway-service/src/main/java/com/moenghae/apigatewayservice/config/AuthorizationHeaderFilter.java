@@ -117,13 +117,15 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         ObjectMapper objectMapper = new ObjectMapper();
         String errorMessageJson;
 
-        try {
-            errorMessageJson = objectMapper.writeValueAsString(errorResponse);
-        } catch (JsonProcessingException ex) {
-            // JSON 변환 오류가 발생할 경우에 대한 예외 처리
-            errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
-            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
+
+//        try {
+//            errorMessageJson = objectMapper.writeValueAsString(errorResponse);
+//        } catch (JsonProcessingException ex) {
+//            // JSON 변환 오류가 발생할 경우에 대한 예외 처리
+//            errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
+//            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
 
         DataBuffer buffer = response.bufferFactory().wrap(errorMessageJson.getBytes());
         response.writeWith(Mono.just(buffer));
