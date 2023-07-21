@@ -127,6 +127,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         }
 
         DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(errorMessageJson.getBytes());
-        return exchange.getResponse().writeAndFlushWith(Mono.just(Flux.just(buffer)));
+        return exchange.getResponse().writeWith(Flux.just(buffer))
+                .doOnError(err -> log.error("Error while sending response", err))
+                .doOnTerminate(() -> exchange.getResponse().getHeaders().remove(HttpHeaders.TRANSFER_ENCODING));
     }
 }
