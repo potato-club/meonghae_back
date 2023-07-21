@@ -87,7 +87,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     private boolean isPublicPath(String path) {
         return path.startsWith("/health") || path.endsWith("/prometheus") ||
                 path.startsWith("/user-service/signup") || path.startsWith("/user-service/login") ||
-                path.endsWith("/swagger-ui/index.html") || path.startsWith("/s3-file-service/files/users");
+                path.endsWith("/swagger-ui/index.html");
     }
 
     private Mono<Void> handleTokenValidationFailure(ServerWebExchange exchange, RuntimeException e) {
