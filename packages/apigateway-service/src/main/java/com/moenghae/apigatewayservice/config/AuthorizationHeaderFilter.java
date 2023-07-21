@@ -1,6 +1,9 @@
 package com.moenghae.apigatewayservice.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moenghae.apigatewayservice.error.ErrorCode;
+import com.moenghae.apigatewayservice.error.ErrorResponse;
 import com.moenghae.apigatewayservice.jwt.JwtTokenProvider;
 import com.moenghae.apigatewayservice.jwt.RedisService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -98,7 +101,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             errorCode = ErrorCode.JWT_TOKEN_EXPIRED;
         } else if (e instanceof UnsupportedJwtException) {
             errorCode = ErrorCode.UNSUPPORTED_JWT_TOKEN;
-        } else if (e instanceof IllegalArgumentException){
+        } else if (e instanceof IllegalArgumentException) {
             errorCode = ErrorCode.EMPTY_JWT_CLAIMS;
         } else if (e instanceof SignatureException) {
             errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH;
@@ -106,9 +109,23 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
         response.setStatusCode(status);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        String errorMessage = "JWT claims string is empty";
 
-        DataBuffer buffer = response.bufferFactory().wrap(errorMessage.getBytes());
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrorCode(errorCode);
+        errorResponse.setErrorMessage(errorCode.getMessage());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String errorMessageJson;
+
+        try {
+            errorMessageJson = objectMapper.writeValueAsString(errorResponse);
+        } catch (JsonProcessingException ex) {
+            // JSON 변환 오류가 발생할 경우에 대한 예외 처리
+            errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
+            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        DataBuffer buffer = response.bufferFactory().wrap(errorMessageJson.getBytes());
         response.writeWith(Mono.just(buffer));
     }
 }
