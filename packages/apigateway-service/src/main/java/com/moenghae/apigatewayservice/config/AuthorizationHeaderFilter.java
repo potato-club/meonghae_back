@@ -125,6 +125,10 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         }
 
         DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(errorMessageJson.getBytes());
-        return exchange.getResponse().writeWith(Mono.just(buffer));
+        return exchange.getResponse().writeWith(Mono.just(buffer))
+                .flatMap(responseResult -> {
+                    exchange.getResponse().setComplete();
+                    return Mono.empty();
+                });
     }
 }
