@@ -104,12 +104,16 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH;
         }
 
+        log.error("errorCode : " + errorCode.getMessage());
+
         exchange.getResponse().setStatusCode(status);
         exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrorCode(errorCode);
         errorResponse.setErrorMessage(errorCode.getMessage());
+
+        log.error("errorResponse : " + errorResponse.getErrorMessage());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String errorMessageJson;
