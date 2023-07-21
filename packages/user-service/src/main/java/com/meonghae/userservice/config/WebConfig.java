@@ -1,5 +1,6 @@
 package com.meonghae.userservice.config;
 
+import com.meonghae.userservice.error.ErrorExceptionControllerAdvice;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,4 +18,9 @@ public class WebConfig {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
+//    @Bean
+//    public ErrorExceptionControllerAdvice customExceptionHandler() {
+//        return new ErrorExceptionControllerAdvice();
+//    }
 }
