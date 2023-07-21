@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -117,17 +118,15 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         ObjectMapper objectMapper = new ObjectMapper();
         String errorMessageJson;
 
-        errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
-
-//        try {
-//            errorMessageJson = objectMapper.writeValueAsString(errorResponse);
-//        } catch (JsonProcessingException ex) {
-//            // JSON 변환 오류가 발생할 경우에 대한 예외 처리
-//            errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
-//            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
+        try {
+            errorMessageJson = objectMapper.writeValueAsString(errorResponse);
+        } catch (JsonProcessingException ex) {
+            // JSON 변환 오류가 발생할 경우에 대한 예외 처리
+            errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
+            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         DataBuffer buffer = response.bufferFactory().wrap(errorMessageJson.getBytes());
-        response.writeWith(Mono.just(buffer));
+        response.writeWith(Flux.just(buffer));
     }
 }
