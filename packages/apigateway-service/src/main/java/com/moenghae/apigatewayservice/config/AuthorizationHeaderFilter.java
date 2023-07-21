@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -43,7 +44,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
-            ServerHttpResponse response = exchange.getResponse();
 
             String path = request.getURI().getPath();
             String androidId = request.getHeaders().getFirst("AndroidId");
@@ -65,8 +65,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                         refreshToken = tokenList.get(1);
                     }
                 } catch (RuntimeException e) {
-                    handleTokenValidationFailure(response, e);
-                    return response.setComplete();
+                    handleTokenValidationFailure(exchange, e);
+                    return exchange.getResponse().setComplete();
                 }
             } else {
                 try {
@@ -74,8 +74,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                         log.info("JWT Token is good.");
                     }
                 } catch (RuntimeException e) {
-                    handleTokenValidationFailure(response, e);
-                    return response.setComplete();
+                    handleTokenValidationFailure(exchange, e);
+                    return exchange.getResponse().setComplete();
                 }
             }
 
@@ -94,7 +94,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 path.endsWith("/swagger-ui/index.html") || path.startsWith("/s3-file-service/files/users");
     }
 
-    private Mono<Void> handleTokenValidationFailure(ServerHttpResponse response, RuntimeException e) {
+    private Mono<Void> handleTokenValidationFailure(ServerWebExchange exchange, RuntimeException e) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;;
         ErrorCode errorCode = ErrorCode.INVALID_JWT_TOKEN;
 
@@ -108,8 +108,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH;
         }
 
-        response.setStatusCode(status);
-        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        exchange.getResponse().setStatusCode(status);
+        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrorCode(errorCode);
@@ -123,10 +123,10 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         } catch (JsonProcessingException ex) {
             // JSON 변환 오류가 발생할 경우에 대한 예외 처리
             errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
-            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+            exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        DataBuffer buffer = response.bufferFactory().wrap(errorMessageJson.getBytes());
-        return response.writeWith(Flux.just(buffer));
+        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(errorMessageJson.getBytes());
+        return exchange.getResponse().writeWith(Mono.just(buffer));
     }
 }
