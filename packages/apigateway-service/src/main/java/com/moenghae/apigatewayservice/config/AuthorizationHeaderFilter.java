@@ -94,7 +94,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 path.endsWith("/swagger-ui/index.html") || path.startsWith("/s3-file-service/files/users");
     }
 
-    private void handleTokenValidationFailure(ServerHttpResponse response, RuntimeException e) {
+    private Mono<Void> handleTokenValidationFailure(ServerHttpResponse response, RuntimeException e) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;;
         ErrorCode errorCode = ErrorCode.INVALID_JWT_TOKEN;
 
@@ -127,6 +127,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         }
 
         DataBuffer buffer = response.bufferFactory().wrap(errorMessageJson.getBytes());
-        response.writeWith(Flux.just(buffer));
+        return response.writeWith(Flux.just(buffer));
     }
 }
