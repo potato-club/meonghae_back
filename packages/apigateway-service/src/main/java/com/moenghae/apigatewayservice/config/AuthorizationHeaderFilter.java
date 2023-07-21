@@ -62,23 +62,15 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             }
 
             if (accessToken == null) {
-                try {
-                    if (jwtTokenProvider.validateToken(refreshToken) && redisService.isRefreshTokenValid(refreshToken)
-                            && redisService.isAndroidIdValid(refreshToken)) {
-                        List<String> tokenList = jwtTokenProvider.reissueToken(refreshToken, androidId);
-                        accessToken = tokenList.get(0);
-                        refreshToken = tokenList.get(1);
-                    }
-                } catch (RuntimeException e) {
-                    throw new RuntimeException(e);
+                if (jwtTokenProvider.validateToken(refreshToken) && redisService.isRefreshTokenValid(refreshToken)
+                        && redisService.isAndroidIdValid(refreshToken)) {
+                    List<String> tokenList = jwtTokenProvider.reissueToken(refreshToken, androidId);
+                    accessToken = tokenList.get(0);
+                    refreshToken = tokenList.get(1);
                 }
             } else {
-                try {
-                    if (jwtTokenProvider.validateToken(accessToken) && !redisService.isTokenInBlacklist(accessToken)) {
-                        log.info("JWT Token is good.");
-                    }
-                } catch (RuntimeException e) {
-                    throw new RuntimeException(e);
+                if (jwtTokenProvider.validateToken(accessToken) && !redisService.isTokenInBlacklist(accessToken)) {
+                    log.info("JWT Token is good.");
                 }
             }
 
