@@ -10,6 +10,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -127,12 +129,17 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        byte[] bytes = errorMessageJson.getBytes(StandardCharsets.UTF_8);
-        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
-        HttpHeaders headers = exchange.getResponse().getHeaders();
-        headers.setContentLength(bytes.length);
-        headers.remove(HttpHeaders.TRANSFER_ENCODING);
+        ServerHttpResponse response = exchange.getResponse();
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        return exchange.getResponse().writeWith(Flux.just(buffer));
+        DataBuffer buffer = response.bufferFactory().wrap(errorMessageJson.getBytes(StandardCharsets.UTF_8));
+
+        ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(response) {
+            @Override
+            public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
+                return super.writeWith(Flux.just(buffer));
+            }
+        };
+        return exchange.mutate().response(decoratedResponse).build().getResponse().setComplete();
     }
 }
