@@ -1,6 +1,8 @@
 package com.moenghae.apigatewayservice.config;
 
+import com.moenghae.apigatewayservice.error.MyWebExceptionHandler;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -18,8 +20,8 @@ public class WebConfig {
         return new RestTemplate();
     }
 
-//    @Bean
-//    public CustomExceptionHandler customExceptionHandler() {
-//        return new CustomExceptionHandler();
-//    }
+    @Bean
+    public ErrorWebExceptionHandler myExceptionHandler() {
+        return new MyWebExceptionHandler();
+    }
 }

@@ -12,6 +12,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,8 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
+public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config>
+        implements Ordered {
 
     JwtTokenProvider jwtTokenProvider;
     RedisService redisService;
@@ -34,6 +36,11 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         super(Config.class);
         this.jwtTokenProvider = jwtTokenProvider;
         this.redisService = redisService;
+    }
+
+    @Override
+    public int getOrder() {
+        return -2;  // -1 is response write filter, must be called before that
     }
 
     public static class Config {}
@@ -63,7 +70,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                         refreshToken = tokenList.get(1);
                     }
                 } catch (RuntimeException e) {
-                    return handleTokenValidationFailure(exchange, e);
+                    throw new RuntimeException(e);
                 }
             } else {
                 try {
@@ -71,7 +78,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                         log.info("JWT Token is good.");
                     }
                 } catch (RuntimeException e) {
-                    return handleTokenValidationFailure(exchange, e);
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -90,44 +97,40 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 path.endsWith("/swagger-ui/index.html");
     }
 
-    private Mono<Void> handleTokenValidationFailure(ServerWebExchange exchange, RuntimeException e) {
-        HttpStatus status = HttpStatus.UNAUTHORIZED;;
-        ErrorCode errorCode = ErrorCode.INVALID_JWT_TOKEN;
-
-        if (e instanceof ExpiredJwtException) {
-            errorCode = ErrorCode.JWT_TOKEN_EXPIRED;
-        } else if (e instanceof UnsupportedJwtException) {
-            errorCode = ErrorCode.UNSUPPORTED_JWT_TOKEN;
-        } else if (e instanceof IllegalArgumentException) {
-            errorCode = ErrorCode.EMPTY_JWT_CLAIMS;
-        } else if (e instanceof SignatureException) {
-            errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH;
-        }
-
-        log.error("errorCode : " + errorCode.getMessage());
-
-        exchange.getResponse().setStatusCode(status);
-        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setErrorCode(errorCode);
-        errorResponse.setErrorMessage(errorCode.getMessage());
-
-        log.error("errorResponse : " + errorResponse.getErrorMessage());
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String errorMessageJson;
-
-        try {
-            errorMessageJson = objectMapper.writeValueAsString(errorResponse);
-        } catch (JsonProcessingException ex) {
-            // JSON 변환 오류가 발생할 경우에 대한 예외 처리
-            errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
-            exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(errorMessageJson.getBytes());
-        exchange.getResponse().writeWith(Mono.just(buffer));
-        return exchange.getResponse().setComplete();
-    }
+//    private Mono<Void> handleTokenValidationFailure(ServerWebExchange exchange, RuntimeException e) {
+//        HttpStatus status = HttpStatus.UNAUTHORIZED;;
+//        ErrorCode errorCode = ErrorCode.INVALID_JWT_TOKEN;
+//
+//        if (e instanceof ExpiredJwtException) {
+//            errorCode = ErrorCode.JWT_TOKEN_EXPIRED;
+//        } else if (e instanceof UnsupportedJwtException) {
+//            errorCode = ErrorCode.UNSUPPORTED_JWT_TOKEN;
+//        } else if (e instanceof IllegalArgumentException) {
+//            errorCode = ErrorCode.EMPTY_JWT_CLAIMS;
+//        } else if (e instanceof SignatureException) {
+//            errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH;
+//        }
+//
+//        exchange.getResponse().setStatusCode(status);
+//        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+//
+//        ErrorResponse errorResponse = new ErrorResponse();
+//        errorResponse.setErrorCode(errorCode);
+//        errorResponse.setErrorMessage(errorCode.getMessage());
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String errorMessageJson;
+//
+//        try {
+//            errorMessageJson = objectMapper.writeValueAsString(errorResponse);
+//        } catch (JsonProcessingException ex) {
+//            // JSON 변환 오류가 발생할 경우에 대한 예외 처리
+//            errorMessageJson = "{\"errorCode\":\"INTERNAL_SERVER_ERROR\",\"errorMessage\":\"Failed to process the request.\"}";
+//            exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//
+//        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(errorMessageJson.getBytes());
+//        exchange.getResponse().writeWith(Mono.just(buffer));
+//        return exchange.getResponse().setComplete();
+//    }
 }
