@@ -23,6 +23,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -126,9 +127,12 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(errorMessageJson.getBytes());
-        return exchange.getResponse().writeWith(Flux.just(buffer))
-                .doOnError(err -> log.error("Error while sending response", err))
-                .doOnTerminate(() -> exchange.getResponse().getHeaders().remove(HttpHeaders.TRANSFER_ENCODING));
+        byte[] bytes = errorMessageJson.getBytes(StandardCharsets.UTF_8);
+        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
+        HttpHeaders headers = exchange.getResponse().getHeaders();
+        headers.setContentLength(bytes.length);
+        headers.remove(HttpHeaders.TRANSFER_ENCODING);
+
+        return exchange.getResponse().writeWith(Flux.just(buffer));
     }
 }
