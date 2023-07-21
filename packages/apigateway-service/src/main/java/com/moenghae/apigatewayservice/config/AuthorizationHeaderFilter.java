@@ -129,17 +129,15 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        ServerHttpResponse response = exchange.getResponse();
-        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(errorMessageJson.getBytes(StandardCharsets.UTF_8));
+        exchange.getResponse().getHeaders().setContentLength(errorMessageJson.getBytes().length);
 
-        DataBuffer buffer = response.bufferFactory().wrap(errorMessageJson.getBytes(StandardCharsets.UTF_8));
-
-        ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(response) {
-            @Override
-            public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
-                return super.writeWith(Flux.just(buffer));
-            }
-        };
-        return exchange.mutate().response(decoratedResponse).build().getResponse().setComplete();
+        return exchange.getResponse().writeWith(Flux.just(buffer)).then(Mono.fromRunnable(() -> {
+            ServerHttpResponse response = exchange.getResponse();
+            response.getHeaders().entrySet().stream()
+                    .filter(kv -> HttpHeaders.TRANSFER_ENCODING.equals(kv.getKey()) && kv.getValue().contains("chunked"))
+                    .forEach(kv -> response.getHeaders().set(HttpHeaders.TRANSFER_ENCODING, ""));
+            response.getHeaders().set(HttpHeaders.TRANSFER_ENCODING, "identity");
+        }));
     }
 }
