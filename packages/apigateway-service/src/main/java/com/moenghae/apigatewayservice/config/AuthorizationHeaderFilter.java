@@ -10,7 +10,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -18,14 +17,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -68,8 +63,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                         refreshToken = tokenList.get(1);
                     }
                 } catch (RuntimeException e) {
-                    handleTokenValidationFailure(exchange, e);
-                    return exchange.getResponse().setComplete();
+                    return chain.filter(exchange)
+                            .onErrorResume(RuntimeException.class, ex -> handleTokenValidationFailure(exchange, ex));
                 }
             } else {
                 try {
@@ -77,8 +72,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                         log.info("JWT Token is good.");
                     }
                 } catch (RuntimeException e) {
-                    handleTokenValidationFailure(exchange, e);
-                    return exchange.getResponse().setComplete();
+                    return chain.filter(exchange)
+                            .onErrorResume(RuntimeException.class, ex -> handleTokenValidationFailure(exchange, ex));
                 }
             }
 
@@ -129,15 +124,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(errorMessageJson.getBytes(StandardCharsets.UTF_8));
-        exchange.getResponse().getHeaders().setContentLength(errorMessageJson.getBytes().length);
-
-        return exchange.getResponse().writeWith(Flux.just(buffer)).then(Mono.fromRunnable(() -> {
-            ServerHttpResponse response = exchange.getResponse();
-            response.getHeaders().entrySet().stream()
-                    .filter(kv -> HttpHeaders.TRANSFER_ENCODING.equals(kv.getKey()) && kv.getValue().contains("chunked"))
-                    .forEach(kv -> response.getHeaders().set(HttpHeaders.TRANSFER_ENCODING, ""));
-            response.getHeaders().set(HttpHeaders.TRANSFER_ENCODING, "identity");
-        }));
+        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(errorMessageJson.getBytes());
+        return exchange.getResponse().writeWith(Mono.just(buffer));
     }
 }
