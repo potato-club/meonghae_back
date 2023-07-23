@@ -32,6 +32,11 @@ public class PetController {
   public PetDetaileResponseDTO getUserPet(@ApiParam(value = "반려동물 id", required = true) @PathVariable Long id) {
     return petService.getOneOfPet(id);
   }
+  @Operation(summary = "전체 반려동물 세부 정보")
+  @GetMapping("/all")
+  public List<PetDetaileResponseDTO> getAllUserPet(@RequestHeader("Authorization") String token){
+    return petService.getAllPet(token);
+  }
 
   @Operation(summary = "반려동물 단일 추가")
   @PostMapping("")

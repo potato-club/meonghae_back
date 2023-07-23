@@ -40,6 +40,16 @@ public class PetDetaileResponseDTO {
     this.meetRoute = pet.getMeetRoute();
   }
 
+  public PetDetaileResponseDTO(Pet pet, S3ResponseDto image) {
+    this.id = pet.getId();
+    this.petName = pet.getPetName();
+    this.petGender = pet.getPetGender().getKey();
+    this.petBirth = pet.getPetBirth().toString();
+    this.petSpecies = pet.getPetSpecies();
+    this.meetRoute = pet.getMeetRoute();
+    this.s3ResponseDto = image;
+  }
+
 
   public void setImage(S3ResponseDto s3ResponseDto) {
     this.s3ResponseDto = s3ResponseDto;

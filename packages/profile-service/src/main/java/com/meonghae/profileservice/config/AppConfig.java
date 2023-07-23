@@ -1,5 +1,6 @@
 package com.meonghae.profileservice.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.meonghae.profileservice.dto.calendar.AlarmDto;
 import com.meonghae.profileservice.entity.Calendar;
 import com.meonghae.profileservice.entity.QCalendar;
@@ -46,11 +47,13 @@ public class AppConfig implements SchedulingConfigurer {
                             .where(qCalendar.alarmTime.between(startOfDay, endOfDay))
                             .orderBy(qCalendar.alarmTime.asc())
                             .fetch();
+
+
                     List<AlarmDto> alarms = result.stream().map(AlarmDto::new).collect(Collectors.toList());
                     rabbitService.sendToRabbitMq(alarms);
 
                 },
-                triggerContext -> new CronTrigger("0 0 0 * * *").nextExecutionTime(triggerContext) // 매일 자정에 실행
+                triggerContext -> new CronTrigger("0 0 * * * *").nextExecutionTime(triggerContext) // 매일 자정에 실행
         );
     }
 
