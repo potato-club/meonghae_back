@@ -1,5 +1,10 @@
 server:
   port: 40002
+  error:
+    include-exception: false
+    include-message: always
+    include-stacktrace: on_param
+    whitelabel.enabled: true
 
 spring:
   application:

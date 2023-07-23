@@ -1,10 +1,16 @@
 package com.meonghae.userservice.jwt;
 
 import com.meonghae.userservice.enums.UserRole;
+import com.meonghae.userservice.error.ErrorCode;
+import com.meonghae.userservice.error.exception.InvalidTokenException;
+import com.meonghae.userservice.error.exception.JwtExpiredException;
+import com.meonghae.userservice.error.exception.IllegalArgumentException;
+import com.meonghae.userservice.error.exception.UnsupportedJwtException;
+import com.meonghae.userservice.error.exception.SignatureException;
 import com.meonghae.userservice.service.Jwt.CustomUserDetailService;
 import com.meonghae.userservice.service.Jwt.RedisService;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.SignatureException;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.Key;
 import java.util.*;
 
 @Slf4j
@@ -61,12 +68,14 @@ public class JwtTokenProvider {
         roles.add(userRole.toString());
         claims.put("roles", roles); // 권한 설정, key/ value 쌍으로 저장
 
+        Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
         Date date = new Date();
+
         return Jwts.builder()
                 .setClaims(claims) // 발행 유저 정보 저장
                 .setIssuedAt(date) // 발행 시간 저장
                 .setExpiration(new Date(date.getTime() + tokenValid)) // 토큰 유효 시간 저장
-                .signWith(SignatureAlgorithm.HS256, secretKey) // 해싱 알고리즘 및 키 설정
+                .signWith(key, SignatureAlgorithm.HS256) // 해싱 알고리즘 및 키 설정
                 .compact(); // 생성
     }
 
@@ -78,7 +87,11 @@ public class JwtTokenProvider {
 
     // 토큰에서 회원 정보 추출
     public String getUserEmail(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+        JwtParser jwtParser = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                .build();
+
+        return jwtParser.parseClaimsJws(token).getBody().getSubject();
     }
 
     // Request의 Header에서 AccessToken 값을 가져옵니다. "authorization" : "token"
@@ -99,7 +112,12 @@ public class JwtTokenProvider {
 
     // Expire Token
     public void expireToken(String token) {
-        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
         Date expiration = claims.getExpiration();
         Date now = new Date();
         if (now.after(expiration)) {
@@ -110,18 +128,23 @@ public class JwtTokenProvider {
     // 토큰의 유효성 + 만료일자 확인
     public boolean validateToken(String jwtToken) {
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
+            Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(jwtToken);
+
             return !claims.getBody().getExpiration().before(new Date());
         } catch (MalformedJwtException e) {
-            throw new MalformedJwtException("Invalid JWT token");
+            throw new InvalidTokenException("4001", ErrorCode.INVALID_TOKEN_EXCEPTION);
         } catch (ExpiredJwtException e) {
-            throw new JwtExpiredException("JWT token has expired");
+            throw new JwtExpiredException("4002", ErrorCode.JWT_TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
-            throw new UnsupportedJwtException("JWT token is unsupported");
+            throw new UnsupportedJwtException("4003", ErrorCode.UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("JWT claims string is empty");
+            throw new IllegalArgumentException("4004", ErrorCode.EMPTY_JWT_CLAIMS);
         } catch (SignatureException e) {
-            throw new SignatureException("JWT signature does not match");
+            throw new SignatureException("4005", ErrorCode.JWT_SIGNATURE_MISMATCH);
         }
     }
 
