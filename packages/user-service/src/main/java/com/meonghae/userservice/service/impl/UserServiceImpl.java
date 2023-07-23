@@ -101,14 +101,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(MultipartFile file, UserUpdateDto userDto, HttpServletRequest request) {
+    public void update(UserUpdateDto userDto, HttpServletRequest request) {
         String email = this.findByEmailFromAccessToken(request);
         User user = userRepository.findByEmail(email).orElseThrow();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate birth = LocalDate.parse(userDto.getBirth(), formatter);
 
-        if (!file.isEmpty()) {
+        if (!userDto.getFile().isEmpty()) {
             List<MultipartFile> fileList = new ArrayList<>();
             List<S3UpdateDto> updateList = new ArrayList<>();
 

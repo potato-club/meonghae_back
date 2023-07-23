@@ -68,8 +68,8 @@ public class UserController {
 
     @Operation(summary = "회원정보 수정 API")
     @PutMapping("/")
-    public ResponseEntity<String> updateUser(MultipartFile file, UserUpdateDto userDto, HttpServletRequest request) {
-        userService.update(file, userDto, request);
+    public ResponseEntity<String> updateUser(UserUpdateDto userDto, HttpServletRequest request) {
+        userService.update(userDto, request);
         return ResponseEntity.ok("내 정보가 변경되었습니다.");
     }
 
