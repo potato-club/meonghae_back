@@ -1,12 +1,14 @@
 package com.meonghae.userservice.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 @Builder
 @Data
+@AllArgsConstructor
 public class UserUpdateDto {
 
     @ApiModelProperty(value = "닉네임")
