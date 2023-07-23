@@ -47,8 +47,9 @@ public class RedisService {
         valueOperations.set(token, true, expiration, TimeUnit.MILLISECONDS);
     }
 
-    // RefreshToken, email, IP Address 삭제
-    public void delValues(String token) {
+    // RefreshToken, Android-Id 삭제
+    public void delValues(String token, String email) {
         redisTemplate.delete(token);
+        redisTemplate.delete(email);
     }
 }
