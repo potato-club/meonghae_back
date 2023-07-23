@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate birth = LocalDate.parse(userDto.getBirth(), formatter);
 
-        if (!userDto.getFile().isEmpty()) {
+        if (userDto.getFile() != null) {
             List<MultipartFile> fileList = new ArrayList<>();
             List<S3UpdateDto> updateList = new ArrayList<>();
 
