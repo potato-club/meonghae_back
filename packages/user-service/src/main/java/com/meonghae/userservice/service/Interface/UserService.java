@@ -21,7 +21,7 @@ public interface UserService {
 
     void signUp(UserRequestDto userDto, HttpServletRequest request, HttpServletResponse response);
 
-    void update(UserUpdateDto userDto, HttpServletRequest request);
+    void update(MultipartFile file, UserUpdateDto userDto, HttpServletRequest request);
 
     void logout(HttpServletRequest request);
 
