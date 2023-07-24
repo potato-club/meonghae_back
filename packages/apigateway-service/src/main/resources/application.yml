@@ -161,7 +161,8 @@ spring:
 
 jwt:
   secret: ENC(x8GNvxKr5nVqTNMKE2NANP3W1uS/DLM87uDxE+QXTn1GGbnMEy1wIBcCx1aMEWuZay+2e98QkpHqxAwKVsP8M00gNrSKTDdZ/VBmCy3YyCImHEBIqNCivVVQu8gYKRIJl15Zmq4KKqATWR+g0OhNCxua1TzBMLex3RroHGAWXDGlR5YmWwE6oNxRNipEsmOVf8qNAWDkbiC06WDz6QqqhQYwfl9IZJFH)
-  accessTokenExpiration: ENC(jkBRHyoqOSkps+WX9WykyQ==)
+  #  accessTokenExpiration: ENC(jkBRHyoqOSkps+WX9WykyQ==)
+  accessTokenExpiration: 60000
   refreshTokenExpiration: ENC(3/8Y9x9H4y/Q9uI0VcpwMgRBRr1UhKjD)
 
 management:
