@@ -23,7 +23,7 @@ public class MyWebExceptionHandler implements ErrorWebExceptionHandler {
     public Mono<Void> handle(
             ServerWebExchange exchange, Throwable ex) {
 
-        int errorCode = 401;
+        int errorCode = 4006;
 
         if (ex.getClass() == MalformedJwtException.class) {
             errorCode = ErrorCode.INVALID_JWT_TOKEN.getCode();
