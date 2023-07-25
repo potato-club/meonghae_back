@@ -113,7 +113,7 @@ public class JwtTokenProvider {
     public String resolveRefreshToken(ServerHttpRequest request) {
         if(request.getHeaders().containsKey("refreshToken"))
             return request.getHeaders().get("refreshToken").get(0).substring(7);
-        return null;
+        return "empty";
     }
 
     // 토큰의 유효성 + 만료일자 확인
