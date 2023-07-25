@@ -76,7 +76,7 @@ public class JwtTokenProvider {
             throw new ForbiddenClassException(Exception.class);
         }
 
-        String url = "https://api.meonghae.site/user-service/users/" + email;
+        String url = "https://api.meonghae.site/user-service/users?email=" + email;
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 
         String accessToken = createAccessToken(email, responseEntity.getBody());

@@ -23,8 +23,8 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "Gateway 서비스 내 토큰 재발급 로직용 API")
-    @GetMapping("/users/{email}")
-    public String getUserRoles(@PathVariable String email) {
+    @GetMapping("/users")
+    public String getUserRoles(@RequestParam String email) {
         return userRepository.findByEmail(email).get().getUserRole().toString();
     }
 
