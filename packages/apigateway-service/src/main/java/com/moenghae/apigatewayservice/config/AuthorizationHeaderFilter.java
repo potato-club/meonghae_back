@@ -49,7 +49,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 ).build());
             }
 
-            if (accessToken == null) {
+            if (accessToken.equals("empty")) {
                 if (jwtTokenProvider.validateToken(refreshToken) && redisService.isRefreshTokenValid(refreshToken)
                         && redisService.isAndroidIdValid(refreshToken, androidId)) {
                     List<String> tokenList = jwtTokenProvider.reissueToken(refreshToken, androidId);

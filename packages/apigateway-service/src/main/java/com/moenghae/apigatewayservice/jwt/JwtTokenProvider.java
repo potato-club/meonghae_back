@@ -106,7 +106,7 @@ public class JwtTokenProvider {
                 return authorizationHeader.substring(7);
             }
         }
-        return null;
+        return "empty";
     }
 
     // Request의 Header에서 RefreshToken 값을 가져옵니다. "refreshToken" : "token"
