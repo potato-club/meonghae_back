@@ -38,7 +38,7 @@ public class MyWebExceptionHandler implements ErrorWebExceptionHandler {
         } else if (ex.getClass() == SignatureException.class) {
             errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH.getCode();
         } else {
-            errorName = ex.getMessage();
+            errorName = ex.getClass().getName();
         }
 
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
