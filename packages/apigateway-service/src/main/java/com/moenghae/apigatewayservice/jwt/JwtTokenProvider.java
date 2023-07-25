@@ -128,7 +128,7 @@ public class JwtTokenProvider {
             return !claims.getBody().getExpiration().before(new Date());
         } catch (MalformedJwtException e) {
             throw new MalformedJwtException("Invalid JWT token");
-        } catch (ExpiredJwtException e) {
+        } catch (JwtExpiredException e) {
             throw new JwtExpiredException("JWT token has expired");
         } catch (UnsupportedJwtException e) {
             throw new UnsupportedJwtException("JWT token is unsupported");
