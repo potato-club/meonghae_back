@@ -82,14 +82,24 @@ public class UserServiceImpl implements UserService {
         });
 
         S3ResponseDto responseDto = s3Service.viewUserFile(user.getEmail());
-        return UserMyPageDto.builder()
-                .nickname(user.getNickname())
-                .email(user.getEmail())
-                .age(user.getAge())
-                .birth(user.getBirth().toLocalDate())
-                .fileName(responseDto.getFileName())
-                .fileUrl(responseDto.getFileUrl())
-                .build();
+
+        if (responseDto.getFileName() == null) {
+            return UserMyPageDto.builder()
+                    .nickname(user.getNickname())
+                    .email(user.getEmail())
+                    .age(user.getAge())
+                    .birth(user.getBirth().toLocalDate())
+                    .build();
+        } else {
+            return UserMyPageDto.builder()
+                    .nickname(user.getNickname())
+                    .email(user.getEmail())
+                    .age(user.getAge())
+                    .birth(user.getBirth().toLocalDate())
+                    .fileName(responseDto.getFileName())
+                    .fileUrl(responseDto.getFileUrl())
+                    .build();
+        }
     }
 
     @Override
