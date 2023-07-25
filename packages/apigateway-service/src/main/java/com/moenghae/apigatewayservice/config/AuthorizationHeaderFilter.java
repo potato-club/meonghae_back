@@ -50,7 +50,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             }
 
             if (accessToken.equals("empty")) {
-                if (jwtTokenProvider.validateToken(refreshToken)) {
+                if (jwtTokenProvider.validateToken(refreshToken) && redisService.isRefreshTokenValid(refreshToken)
+                        && redisService.isAndroidIdValid(refreshToken, androidId)) {
                     List<String> tokenList = jwtTokenProvider.reissueToken(refreshToken, androidId);
                     accessToken = tokenList.get(0);
                     refreshToken = tokenList.get(1);
@@ -73,6 +74,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     private boolean isPublicPath(String path) {
         return path.startsWith("/health") || path.endsWith("/prometheus") ||
                 path.startsWith("/user-service/signup") || path.startsWith("/user-service/login") ||
-                path.endsWith("/swagger-ui/index.html");
+                path.endsWith("/swagger-ui/index.html") || path.startsWith("/user-service/users");
     }
 }
