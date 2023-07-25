@@ -38,6 +38,7 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
 //	implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
 //	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
 //	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
 //	implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
