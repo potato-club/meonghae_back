@@ -1,6 +1,5 @@
 package com.moenghae.apigatewayservice.error;
 
-import com.moenghae.apigatewayservice.jwt.JwtExpiredException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;

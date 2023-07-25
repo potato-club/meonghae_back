@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +86,7 @@ public class UserServiceImpl implements UserService {
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .age(user.getAge())
-                .birth(user.getBirth())
+                .birth(user.getBirth().toLocalDate())
                 .fileName(responseDto.getFileName())
                 .fileUrl(responseDto.getFileUrl())
                 .build();
@@ -113,7 +114,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email).orElseThrow();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate birth = LocalDate.parse(userDto.getBirth(), formatter);
+        LocalDateTime birth = LocalDateTime.parse(userDto.getBirth(), formatter);
 
         if (userDto.getFile() != null) {
             List<MultipartFile> fileList = new ArrayList<>();

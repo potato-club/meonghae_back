@@ -24,7 +24,7 @@ public class UserMyPageDto {
     @ApiModelProperty(value = "나이")
     private int age;
 
-    @ApiModelProperty(value = "생년월일", example = "20010101")
+    @ApiModelProperty(value = "생년월일")
     private LocalDate birth;
 
     @ApiModelProperty(value = "프로필 파일 이름")
