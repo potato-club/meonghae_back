@@ -15,8 +15,8 @@ import java.security.SignatureException;
 
 public class MyWebExceptionHandler implements ErrorWebExceptionHandler {
 
-    private String errorCodeMaker(String errorTest) {
-        return "{\"errorCode\":" + errorTest + "}";
+    private String errorCodeMaker(int errorCode) {
+        return "{\"errorCode\":" + errorCode + "}";
     }
 
     @Override
@@ -24,7 +24,6 @@ public class MyWebExceptionHandler implements ErrorWebExceptionHandler {
             ServerWebExchange exchange, Throwable ex) {
 
         int errorCode = 4006;
-        String errorTest = exchange.getResponse().getHeaders().get("refreshToken").get(0).substring(7);
 
         if (ex.getClass() == MalformedJwtException.class) {
             errorCode = ErrorCode.INVALID_JWT_TOKEN.getCode();
@@ -39,7 +38,7 @@ public class MyWebExceptionHandler implements ErrorWebExceptionHandler {
         }
 
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-        byte[] bytes = errorCodeMaker(errorTest).getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = errorCodeMaker(errorCode).getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
         return exchange.getResponse().writeWith(Flux.just(buffer));
     }
