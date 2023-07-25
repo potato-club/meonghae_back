@@ -1,5 +1,6 @@
 package com.moenghae.apigatewayservice.error;
 
+import com.thoughtworks.xstream.security.ForbiddenClassException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -35,6 +36,8 @@ public class MyWebExceptionHandler implements ErrorWebExceptionHandler {
             errorCode = ErrorCode.EMPTY_JWT_CLAIMS.getCode();
         } else if (ex.getClass() == SignatureException.class) {
             errorCode = ErrorCode.JWT_SIGNATURE_MISMATCH.getCode();
+        } else if (ex.getClass() == ForbiddenClassException.class) {
+            errorCode = 4007;
         }
 
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
