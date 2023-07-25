@@ -1,5 +1,6 @@
 package com.meonghae.s3fileservice.dto;
 
+import com.meonghae.s3fileservice.enums.EntityType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ public class FileUserResponseDto {
 
     private String fileUrl;
 
-    private String entityType;
+    private EntityType entityType;
 
     private String email;
 
