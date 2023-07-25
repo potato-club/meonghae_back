@@ -1,5 +1,6 @@
 package com.moenghae.apigatewayservice.error;
 
+import com.moenghae.apigatewayservice.jwt.JwtExpiredException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -23,7 +24,7 @@ public class MyWebExceptionHandler implements ErrorWebExceptionHandler {
     public Mono<Void> handle(
             ServerWebExchange exchange, Throwable ex) {
 
-        int errorCode = 401;
+        int errorCode = 4006;
 
         if (ex.getClass() == MalformedJwtException.class) {
             errorCode = ErrorCode.INVALID_JWT_TOKEN.getCode();
