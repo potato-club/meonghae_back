@@ -81,7 +81,14 @@ public class UserServiceImpl implements UserService {
         });
 
         S3ResponseDto responseDto = s3Service.viewUserFile(user.getEmail());
-        return new UserMyPageDto(user, responseDto);
+        return UserMyPageDto.builder()
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .age(user.getAge())
+                .birth(user.getBirth())
+                .fileName(responseDto.getFileName())
+                .fileUrl(responseDto.getFileUrl())
+                .build();
     }
 
     @Override

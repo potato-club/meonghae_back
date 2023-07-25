@@ -41,13 +41,13 @@ public class RedisService {
         return !values.isEmpty();
     }
 
-    public boolean isAndroidIdValid(String token) {
+    public boolean isAndroidIdValid(String token, String androidId) {
         Map<String, String> tokenValue = getValues(token);
         String email = tokenValue.get("email");
 
         if (email != null) {
             Map<String, String> emailValue = getValues(email);
-            return emailValue.containsKey("androidId");
+            return emailValue.get("androidId").equals(androidId);
         } else {
             return false;
         }
