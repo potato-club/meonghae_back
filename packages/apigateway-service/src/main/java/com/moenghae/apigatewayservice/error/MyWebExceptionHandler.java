@@ -30,7 +30,7 @@ public class MyWebExceptionHandler implements ErrorWebExceptionHandler {
             errorCode = ErrorCode.INVALID_JWT_TOKEN.getCode();
         } else if (ex.getClass() == UnsupportedJwtException.class) {
             errorCode = ErrorCode.UNSUPPORTED_JWT_TOKEN.getCode();
-        } else if (ex.getClass() == JwtExpiredException.class) {
+        } else if (ex.getClass() == ExpiredJwtException.class) {
             errorCode = ErrorCode.JWT_TOKEN_EXPIRED.getCode();
         } else if (ex.getClass() == IllegalArgumentException.class) {
             errorCode = ErrorCode.EMPTY_JWT_CLAIMS.getCode();
