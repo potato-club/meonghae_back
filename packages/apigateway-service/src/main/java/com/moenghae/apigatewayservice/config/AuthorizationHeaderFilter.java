@@ -50,8 +50,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             }
 
             if (accessToken.equals("empty")) {
-                if (jwtTokenProvider.validateToken(refreshToken) && redisService.isRefreshTokenValid(refreshToken)
-                        && redisService.isAndroidIdValid(refreshToken, androidId)) {
+                if (jwtTokenProvider.validateToken(refreshToken)) {
                     List<String> tokenList = jwtTokenProvider.reissueToken(refreshToken, androidId);
                     accessToken = tokenList.get(0);
                     refreshToken = tokenList.get(1);
