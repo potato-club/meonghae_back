@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.meonghae.userservice.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
@@ -176,6 +177,30 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new UnAuthorizedException("401_NOT_ALLOW", NOT_ALLOW_WRITE_EXCEPTION);
         }
+    }
+
+    @Override
+    public void reissueToken(HttpServletRequest request, HttpServletResponse response) {
+
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
+        String androidId = request.getHeader("androidId");
+
+        String email = jwtTokenProvider.getUserEmail(refreshToken);
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        String newAccessToken = jwtTokenProvider.createAccessToken(email, user.getUserRole());
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(email, user.getUserRole());
+
+        // Redis에서 기존 리프레시 토큰과 Android-Id를 삭제한다.
+        redisService.delValues(refreshToken, email);
+
+        // Redis에 새로운 리프레시 토큰과 Android-Id를 저장한다.
+        redisService.setValues(newRefreshToken, email);
+        redisService.setAndroidId(email, androidId);
+
+        // 헤더에 토큰들을 넣는다.
+        jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);
+        jwtTokenProvider.setHeaderRefreshToken(response, newRefreshToken);
     }
 
     private String findByEmailFromAccessToken(HttpServletRequest request) {

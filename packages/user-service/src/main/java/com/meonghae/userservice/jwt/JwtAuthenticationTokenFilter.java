@@ -1,5 +1,6 @@
 package com.meonghae.userservice.jwt;
 
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,9 +36,15 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         }
 
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
-        if (jwtTokenProvider.validateToken(accessToken)) {
+        if (accessToken == null && jwtTokenProvider.validateToken(refreshToken)) {
+            filterChain.doFilter(request, response);
+            return;
+        } else if (jwtTokenProvider.validateToken(accessToken)){
             this.setAuthentication(accessToken);
+        } else {
+            throw new MalformedJwtException("Invalid JWT Token");
         }
 
         filterChain.doFilter(request, response);
