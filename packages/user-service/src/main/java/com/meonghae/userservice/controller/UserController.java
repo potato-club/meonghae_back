@@ -91,6 +91,6 @@ public class UserController {
     @GetMapping("/reissue")
     public ResponseEntity<String> reissueToken(HttpServletRequest request, HttpServletResponse response) {
         userService.reissueToken(request, response);
-        return ResponseEntity.ok("회원탈퇴 처리가 취소되었습니다");
+        return ResponseEntity.ok("토큰 재발급이 완료되었습니다");
     }
 }
