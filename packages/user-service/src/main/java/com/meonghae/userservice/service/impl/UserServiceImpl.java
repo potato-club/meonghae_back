@@ -10,6 +10,7 @@ import com.meonghae.userservice.dto.UserResponseDto;
 import com.meonghae.userservice.dto.UserUpdateDto;
 import com.meonghae.userservice.entity.User;
 import com.meonghae.userservice.enums.UserRole;
+import com.meonghae.userservice.error.ErrorCode;
 import com.meonghae.userservice.error.exception.UnAuthorizedException;
 import com.meonghae.userservice.jwt.JwtTokenProvider;
 import com.meonghae.userservice.repository.UserRepository;
@@ -186,7 +187,9 @@ public class UserServiceImpl implements UserService {
         String androidId = request.getHeader("androidId");
 
         String email = jwtTokenProvider.getUserEmail(refreshToken);
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
+        });
 
         String newAccessToken = jwtTokenProvider.createAccessToken(email, user.getUserRole());
         String newRefreshToken = jwtTokenProvider.createRefreshToken(email, user.getUserRole());
