@@ -120,14 +120,14 @@ public class JwtTokenProvider {
                 return authorizationHeader.substring(7);
             }
         }
-        return "empty";
+        return null;
     }
 
     // Request의 Header에서 RefreshToken 값을 가져옵니다. "refreshToken" : "token"
     public String resolveRefreshToken(ServerHttpRequest request) {
         if(request.getHeaders().containsKey("refreshToken"))
             return request.getHeaders().get("refreshToken").get(0).substring(7);
-        return "empty";
+        return null;
     }
 
     // 토큰의 유효성 + 만료일자 확인

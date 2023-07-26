@@ -8,7 +8,9 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -37,6 +39,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
+            ServerHttpResponse response = exchange.getResponse();
 
             String path = request.getURI().getPath();
             String androidId = request.getHeaders().getFirst("AndroidId");
@@ -49,12 +52,14 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 ).build());
             }
 
-            if (accessToken.equals("empty")) {
+            if (accessToken == null) {
                 if (jwtTokenProvider.validateToken(refreshToken) && redisService.isRefreshTokenValid(refreshToken)
                         && redisService.isAndroidIdValid(refreshToken, androidId)) {
-                    List<String> tokenList = jwtTokenProvider.reissueToken(refreshToken, androidId);
-                    accessToken = tokenList.get(0);
-                    refreshToken = tokenList.get(1);
+                    return chain.filter(exchange.mutate().request(
+                            request.mutate()
+                                    .header("androidId", androidId)
+                                    .header("refreshToken", refreshToken)
+                                    .build()).build());
                 }
             } else {
                 if (jwtTokenProvider.validateToken(accessToken) && !redisService.isTokenInBlacklist(accessToken)) {
@@ -66,8 +71,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                     request.mutate()
                             .header(HttpHeaders.AUTHORIZATION, accessToken)
                             .header("refreshToken", refreshToken)
-                            .build()
-            ).build());
+                            .build()).build());
         });
     }
 
