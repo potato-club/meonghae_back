@@ -40,7 +40,7 @@ public class User {
     private int age;
 
     @Column
-    private LocalDate birth;
+    private LocalDateTime birth;
 
     @Column(nullable = false)
     private String nickname;
@@ -52,7 +52,7 @@ public class User {
     @Column
     private boolean deleted;
 
-    public void update(UserUpdateDto userDto, LocalDate birth) {
+    public void update(UserUpdateDto userDto, LocalDateTime birth) {
         this.nickname = userDto.getNickname();
         this.age = userDto.getAge();
         this.birth = birth;

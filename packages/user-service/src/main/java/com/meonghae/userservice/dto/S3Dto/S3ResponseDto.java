@@ -1,5 +1,6 @@
 package com.meonghae.userservice.dto.S3Dto;
 
+import com.meonghae.userservice.enums.FileEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class S3ResponseDto {
     private String fileUrl;
 
     @ApiModelProperty(value = "엔티티 타입", example = "USER")
-    private String entityType;
+    private FileEnum entityType;
 
     @ApiModelProperty(value = "사용자 Email", example = "test@test.com")
     private String email;

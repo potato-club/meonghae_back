@@ -28,4 +28,6 @@ public interface UserService {
     void withdrawalMembership(HttpServletRequest request);
 
     void cancelWithdrawal(String email, boolean agreement);
+
+    void reissueToken(HttpServletRequest request, HttpServletResponse response);
 }

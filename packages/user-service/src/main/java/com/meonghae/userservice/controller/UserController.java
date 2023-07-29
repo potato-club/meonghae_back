@@ -23,8 +23,8 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "Gateway 서비스 내 토큰 재발급 로직용 API")
-    @GetMapping("/users/{email}")
-    public String getUserRoles(@PathVariable String email) {
+    @GetMapping("/users")
+    public String getUserRoles(@RequestParam String email) {
         return userRepository.findByEmail(email).get().getUserRole().toString();
     }
 
@@ -85,5 +85,12 @@ public class UserController {
     public ResponseEntity<String> cancelWithdrawal(@RequestBody UserCancelDto cancelDto) {
         userService.cancelWithdrawal(cancelDto.getEmail(), cancelDto.isAgreement());
         return ResponseEntity.ok("회원탈퇴 처리가 취소되었습니다");
+    }
+
+    @Operation(summary = "JWT 토큰 재발급 API")
+    @GetMapping("/reissue")
+    public ResponseEntity<String> reissueToken(HttpServletRequest request, HttpServletResponse response) {
+        userService.reissueToken(request, response);
+        return ResponseEntity.ok("토큰 재발급이 완료되었습니다");
     }
 }

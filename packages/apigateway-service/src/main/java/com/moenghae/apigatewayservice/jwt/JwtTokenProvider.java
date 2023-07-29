@@ -1,18 +1,14 @@
 package com.moenghae.apigatewayservice.jwt;
 
-import com.thoughtworks.xstream.security.ForbiddenClassException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.security.Key;
@@ -23,9 +19,6 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 public class JwtTokenProvider {
-
-    private final RedisService redisService;
-    private final RestTemplate restTemplate;
 
     // 키
     @Value("${jwt.secret}")
@@ -68,35 +61,6 @@ public class JwtTokenProvider {
                 .compact(); // 생성
     }
 
-    public List<String> reissueToken(String refreshToken, String androidId) {
-        Map<String, String> values = redisService.getValues(refreshToken);
-        String email = values.get("email");
-
-        if (Objects.isNull(email)) {
-            throw new ForbiddenClassException(Exception.class);
-        }
-
-        String url = "https://api.meonghae.site/user-service/users/" + email;
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
-
-        String accessToken = createAccessToken(email, responseEntity.getBody());
-        String newRefreshToken = createRefreshToken(email, responseEntity.getBody());
-
-        // Redis에서 기존 리프레시 토큰과 Android-Id를 삭제한다.
-        redisService.delValues(refreshToken);
-        redisService.delValues(email);
-
-        // Redis에 새로운 리프레시 토큰과 Android-Id를 저장한다.
-        redisService.setValues(newRefreshToken, email);
-        redisService.setAndroidId(email, androidId);
-
-        List<String> tokenList = new ArrayList<>();
-        tokenList.add(accessToken);
-        tokenList.add(newRefreshToken);
-
-        return tokenList;
-    }
-
     // Request의 Header에서 AccessToken 값을 가져옵니다. "Authorization" : "token"
     public String resolveAccessToken(ServerHttpRequest request) {
         List<String> authorizationHeaders = request.getHeaders().get(HttpHeaders.AUTHORIZATION);
@@ -137,11 +101,5 @@ public class JwtTokenProvider {
         } catch (SignatureException e) {
             throw new SignatureException("JWT signature does not match");
         }
-    }
-
-    // 어세스 토큰 헤더 설정
-    public void setHeaderAccessToken(ServerHttpResponse response, String accessToken) {
-        response.getHeaders().remove(HttpHeaders.AUTHORIZATION);
-        response.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer "+ accessToken);
     }
 }
