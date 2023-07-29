@@ -42,7 +42,7 @@ public class UserRequestDto {
                 .nickname(nickname)
                 .userRole(UserRole.USER)
                 .age(age)
-                .birth(LocalDate.parse(birth, formatter))
+                .birth(LocalDateTime.parse(birth, formatter))
                 .deleted(false)
                 .build();
 

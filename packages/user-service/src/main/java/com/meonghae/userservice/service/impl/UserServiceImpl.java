@@ -10,6 +10,7 @@ import com.meonghae.userservice.dto.UserResponseDto;
 import com.meonghae.userservice.dto.UserUpdateDto;
 import com.meonghae.userservice.entity.User;
 import com.meonghae.userservice.enums.UserRole;
+import com.meonghae.userservice.error.ErrorCode;
 import com.meonghae.userservice.error.exception.UnAuthorizedException;
 import com.meonghae.userservice.jwt.JwtTokenProvider;
 import com.meonghae.userservice.repository.UserRepository;
@@ -24,9 +25,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.meonghae.userservice.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
@@ -81,7 +84,24 @@ public class UserServiceImpl implements UserService {
         });
 
         S3ResponseDto responseDto = s3Service.viewUserFile(user.getEmail());
-        return new UserMyPageDto(user, responseDto);
+
+        if (responseDto == null) {
+            return UserMyPageDto.builder()
+                    .nickname(user.getNickname())
+                    .email(user.getEmail())
+                    .age(user.getAge())
+                    .birth(user.getBirth().toLocalDate())
+                    .build();
+        } else {
+            return UserMyPageDto.builder()
+                    .nickname(user.getNickname())
+                    .email(user.getEmail())
+                    .age(user.getAge())
+                    .birth(user.getBirth().toLocalDate())
+                    .fileName(responseDto.getFileName())
+                    .fileUrl(responseDto.getFileUrl())
+                    .build();
+        }
     }
 
     @Override
@@ -106,9 +126,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email).orElseThrow();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate birth = LocalDate.parse(userDto.getBirth(), formatter);
+        LocalDateTime birth = LocalDateTime.parse(userDto.getBirth(), formatter);
 
-        if (!userDto.getFile().isEmpty()) {
+        if (userDto.getFile() != null) {
             List<MultipartFile> fileList = new ArrayList<>();
             List<S3UpdateDto> updateList = new ArrayList<>();
 
@@ -158,6 +178,32 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new UnAuthorizedException("401_NOT_ALLOW", NOT_ALLOW_WRITE_EXCEPTION);
         }
+    }
+
+    @Override
+    public void reissueToken(HttpServletRequest request, HttpServletResponse response) {
+
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
+        String androidId = request.getHeader("androidId");
+
+        String email = jwtTokenProvider.getUserEmail(refreshToken);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
+        });
+
+        String newAccessToken = jwtTokenProvider.createAccessToken(email, user.getUserRole());
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(email, user.getUserRole());
+
+        // Redis에서 기존 리프레시 토큰과 Android-Id를 삭제한다.
+        redisService.delValues(refreshToken, email);
+
+        // Redis에 새로운 리프레시 토큰과 Android-Id를 저장한다.
+        redisService.setValues(newRefreshToken, email);
+        redisService.setAndroidId(email, androidId);
+
+        // 헤더에 토큰들을 넣는다.
+        jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);
+        jwtTokenProvider.setHeaderRefreshToken(response, newRefreshToken);
     }
 
     private String findByEmailFromAccessToken(HttpServletRequest request) {
