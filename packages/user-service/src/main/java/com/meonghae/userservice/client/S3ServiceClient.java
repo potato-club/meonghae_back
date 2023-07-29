@@ -21,9 +21,9 @@ public interface S3ServiceClient {
     ResponseEntity<String> uploadFileForUser(@RequestPart(value = "file", name = "file") MultipartFile file,
                                        @RequestPart(value = "data", name = "data") S3RequestDto data);
 
-    @PutMapping("/files")
-    ResponseEntity<String> updateImage(@RequestPart List<MultipartFile> images,
-                                       @RequestPart List<S3UpdateDto> requestDto);
+    @PutMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<String> updateImage(@RequestPart(value = "files", name = "files") List<MultipartFile> files,
+                                       @RequestPart(value = "dataList", name = "dataList") List<S3UpdateDto> dataList);
 
     @DeleteMapping("/files/users")
     ResponseEntity<String> deleteFileForUser(@RequestBody S3RequestDto requestDto);

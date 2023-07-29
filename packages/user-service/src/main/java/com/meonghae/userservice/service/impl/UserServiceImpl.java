@@ -3,6 +3,7 @@ package com.meonghae.userservice.service.impl;
 import com.meonghae.userservice.client.S3ServiceClient;
 import com.meonghae.userservice.dto.S3Dto.S3RequestDto;
 import com.meonghae.userservice.dto.S3Dto.S3ResponseDto;
+import com.meonghae.userservice.dto.S3Dto.S3UpdateDto;
 import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
@@ -24,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.meonghae.userservice.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
@@ -105,12 +108,32 @@ public class UserServiceImpl implements UserService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate birth = LocalDate.parse(userDto.getBirth(), formatter);
 
+        if (!userDto.getFile().isEmpty()) {
+            List<MultipartFile> fileList = new ArrayList<>();
+            List<S3UpdateDto> updateList = new ArrayList<>();
+
+            S3ResponseDto s3ResponseDto = s3Service.viewUserFile(email);
+
+            S3UpdateDto s3UpdateDto = S3UpdateDto.builder()
+                    .fileName(s3ResponseDto.getFileName())
+                    .fileUrl(s3ResponseDto.getFileUrl())
+                    .entityType(s3ResponseDto.getEntityType())
+                    .email(s3ResponseDto.getEmail())
+                    .deleted(true)
+                    .build();
+
+            fileList.add(userDto.getFile());
+            updateList.add(s3UpdateDto);
+
+            s3Service.updateImage(fileList, updateList);
+        }
+
         user.update(userDto, birth);
     }
 
     @Override
     public void logout(HttpServletRequest request) {
-        redisService.delValues(jwtTokenProvider.resolveRefreshToken(request));
+        redisService.delValues(jwtTokenProvider.resolveRefreshToken(request), this.findByEmailFromAccessToken(request));
         jwtTokenProvider.expireToken(jwtTokenProvider.resolveAccessToken(request));
     }
 
