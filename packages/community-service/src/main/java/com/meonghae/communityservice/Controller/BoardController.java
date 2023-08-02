@@ -66,7 +66,6 @@ public class BoardController {
     @PostMapping("/{id}/like")
     public ResponseEntity<String> addLike(@PathVariable(name = "id") Long id,
                                           @RequestHeader("Authorization") String token) {
-        log.info("=============== 게시글 좋아요 몇번 호출되나 ===============");
         String result = likeService.addLike(id, token);
         return ResponseEntity.ok(result);
     }
