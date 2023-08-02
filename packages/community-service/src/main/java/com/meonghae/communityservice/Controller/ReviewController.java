@@ -3,7 +3,6 @@ package com.meonghae.communityservice.Controller;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewListDto;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewReactionTypeDto;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewRequestDto;
-import com.meonghae.communityservice.Enum.ReviewSortType;
 import com.meonghae.communityservice.Service.ReviewReactionService;
 import com.meonghae.communityservice.Service.ReviewService;
 import io.swagger.annotations.Api;
@@ -14,10 +13,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.util.List;
 
 
 @RestController
@@ -40,7 +37,7 @@ public class ReviewController {
                                                               required = false) String keyword,
                                                               @RequestParam(value = "sort",
                                                                       defaultValue = "LATEST",
-                                                                      required = false) ReviewSortType sort,
+                                                                      required = false) String sort,
                                                               @RequestParam(value = "photo",
                                                               defaultValue = "false",
                                                               required = false) boolean photoOnly

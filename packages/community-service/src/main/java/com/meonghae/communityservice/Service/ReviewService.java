@@ -38,13 +38,15 @@ public class ReviewService {
 
     @Transactional
     public Slice<ReviewListDto> getReviewByType(int key, String token, int page,
-                                                String keyword, ReviewSortType sort, boolean photoOnly) {
+                                                String keyword, String sort, boolean photoOnly) {
         ReviewCatalog catalog = ReviewCatalog.findWithKey(key);
         if(catalog == null) throw new ReviewException(BAD_REQUEST, "잘못된 Catalog Type 입니다.");
+        ReviewSortType sortType = ReviewSortType.findType(sort);
         Slice<Review> reviews;
 
         reviews = photoOnly ?
-                getPagingReviewWithPhoto(page, catalog, keyword, sort) : getPagingReview(page, catalog, keyword, sort);
+                getPagingReviewWithPhoto(page, catalog, keyword, sortType)
+                : getPagingReview(page, catalog, keyword, sortType);
 
         return reviews.map(r -> convertTypeAndAddImage(r, token));
     }
