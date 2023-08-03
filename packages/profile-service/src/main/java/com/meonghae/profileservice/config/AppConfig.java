@@ -53,7 +53,7 @@ public class AppConfig implements SchedulingConfigurer {
                     rabbitService.sendToRabbitMq(alarms);
 
                 },
-                triggerContext -> new CronTrigger("0 0 * * * *").nextExecutionTime(triggerContext) // 매일 자정에 실행
+                triggerContext -> new CronTrigger("0 0 0 0 0 *").nextExecutionTime(triggerContext) // 매일 자정에 실행
         );
     }
 

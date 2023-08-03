@@ -13,8 +13,8 @@ spring:
     sampler:
       probability: 1.0
 
-  zipkin:
-    base-url: http://zipkin-server:9411/
+#  zipkin:
+#    base-url: http://zipkin-server:9411/
 
   servlet:
     multipart:
