@@ -6,7 +6,6 @@ import com.meonghae.profileservice.enumCustom.PetGender;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,7 @@ public class Pet extends BaseTimeEntity {
   private Long id;
 
   @OneToMany(mappedBy = "pet", orphanRemoval = true)
-  private List<Calendar> petCalendar = new ArrayList<>();
+  private List<Schedule> petSchedule = new ArrayList<>();
 
   @Column(nullable = false)
   private String userEmail;

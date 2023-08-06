@@ -1,9 +1,8 @@
 package com.meonghae.profileservice.entity;
 
-import com.meonghae.profileservice.dto.calendar.CalendarRequestDTO;
+import com.meonghae.profileservice.dto.calendar.ScheduleRequestDTO;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import javax.persistence.*;
 
 import com.meonghae.profileservice.enumCustom.ScheduleType;
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Calendar extends BaseTimeEntity{
+public class Schedule extends BaseTimeEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
@@ -40,12 +39,12 @@ public class Calendar extends BaseTimeEntity{
   private String text;
 
 
-  public void update(CalendarRequestDTO calendarRequestDTO, Pet pet) {
+  public void update(ScheduleRequestDTO scheduleRequestDTO, Pet pet) {
     this.pet = pet;
-    this.title = calendarRequestDTO.getTitle();
-    this.scheduleType = calendarRequestDTO.getScheduleType();
-    this.text = calendarRequestDTO.getText();
-    this.scheduleTime = calendarRequestDTO.getScheduleTime();
-    this.alarmTime = calendarRequestDTO.getAlarmTime();
+    this.title = scheduleRequestDTO.getTitle();
+    this.scheduleType = scheduleRequestDTO.getScheduleType();
+    this.text = scheduleRequestDTO.getText();
+    this.scheduleTime = scheduleRequestDTO.getScheduleTime();
+    this.alarmTime = scheduleRequestDTO.getAlarmTime();
   }
 }
