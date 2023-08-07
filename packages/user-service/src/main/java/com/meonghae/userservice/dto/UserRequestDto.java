@@ -30,8 +30,8 @@ public class UserRequestDto {
     @ApiModelProperty(value = "생년월일")
     private String birth;
 
-//    @ApiModelProperty(value = "프로필 사진")
-//    private MultipartFile file;
+    @ApiModelProperty(value = "프로필 사진")
+    private MultipartFile file;
 
     public User toEntity() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
