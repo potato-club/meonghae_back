@@ -8,6 +8,7 @@ import com.meonghae.communityservice.Dto.S3Dto.UserImageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.stereotype.Service;
 
@@ -60,8 +61,11 @@ public class RedisService {
     }
 
     public List<S3ResponseDto> getReviewImages(Long reviewId) {
-        List<S3ResponseDto> dtos = (List<S3ResponseDto>) cacheManager.getCache(getImages).get(reviewId).get();
-        if(dtos == null) {
+        List<S3ResponseDto> dtos;
+        Cache.ValueWrapper value = cacheManager.getCache(getImages).get(reviewId);
+        if (value != null) {
+            dtos = (List<S3ResponseDto>) value.get();
+        } else {
             log.info("=========== S3 Feign 호출 ===========");
             dtos = s3Service.getImages(new S3RequestDto(reviewId, "REVIEW"));
             if(dtos == null) return null;
