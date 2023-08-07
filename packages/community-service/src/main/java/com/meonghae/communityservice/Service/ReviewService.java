@@ -5,6 +5,7 @@ import com.meonghae.communityservice.Client.UserServiceClient;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewListDto;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewRequestDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3RequestDto;
+import com.meonghae.communityservice.Dto.S3Dto.S3ResponseDto;
 import com.meonghae.communityservice.Entity.Review.Review;
 import com.meonghae.communityservice.Enum.RecommendStatus;
 import com.meonghae.communityservice.Enum.ReviewCatalog;
@@ -138,8 +139,8 @@ public class ReviewService {
         RecommendStatus status = reactionService.getReviewReaction(review, token);
         ReviewListDto reviewDto = new ReviewListDto(review, nickname, url, status);
         if (review.getHasImage()) {
-            S3RequestDto requestDto = new S3RequestDto(review.getId(), "REVIEW");
-            reviewDto.setImages(s3Service.getImages(requestDto));
+            List<S3ResponseDto> reviewImages = redisService.getReviewImages(review.getId());
+            reviewDto.setImages(reviewImages);
         }
         return reviewDto;
     }
