@@ -42,7 +42,8 @@ public class UserController {
 
     @Operation(summary = "회원가입 API")
     @PostMapping(value = "/signup")
-    public ResponseEntity<String> signUp(UserRequestDto userDto, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<String> signUp(UserRequestDto userDto,
+                                         HttpServletRequest request, HttpServletResponse response) {
         userService.signUp(userDto, request, response);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
@@ -68,7 +69,7 @@ public class UserController {
 
     @Operation(summary = "회원정보 수정 API")
     @PutMapping("/mypage")
-    public ResponseEntity<String> updateUser(UserUpdateDto userDto, HttpServletRequest request) {
+    public ResponseEntity<String> updateUser(@RequestPart UserUpdateDto userDto, HttpServletRequest request) {
         userService.update(userDto, request);
         return ResponseEntity.ok("내 정보가 변경되었습니다.");
     }

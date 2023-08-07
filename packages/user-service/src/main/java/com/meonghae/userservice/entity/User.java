@@ -1,6 +1,5 @@
 package com.meonghae.userservice.entity;
 
-import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserUpdateDto;
 import com.meonghae.userservice.enums.UserRole;
 import lombok.AllArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -40,7 +38,7 @@ public class User {
     private int age;
 
     @Column
-    private LocalDateTime birth;
+    private LocalDate birth;
 
     @Column(nullable = false)
     private String nickname;
@@ -52,7 +50,7 @@ public class User {
     @Column
     private boolean deleted;
 
-    public void update(UserUpdateDto userDto, LocalDateTime birth) {
+    public void update(UserUpdateDto userDto, LocalDate birth) {
         this.nickname = userDto.getNickname();
         this.age = userDto.getAge();
         this.birth = birth;
