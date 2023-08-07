@@ -10,7 +10,6 @@ import com.meonghae.userservice.dto.UserResponseDto;
 import com.meonghae.userservice.dto.UserUpdateDto;
 import com.meonghae.userservice.entity.User;
 import com.meonghae.userservice.enums.UserRole;
-import com.meonghae.userservice.error.ErrorCode;
 import com.meonghae.userservice.error.exception.UnAuthorizedException;
 import com.meonghae.userservice.jwt.JwtTokenProvider;
 import com.meonghae.userservice.repository.UserRepository;
@@ -29,7 +28,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.meonghae.userservice.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
@@ -90,14 +88,14 @@ public class UserServiceImpl implements UserService {
                     .nickname(user.getNickname())
                     .email(user.getEmail())
                     .age(user.getAge())
-                    .birth(user.getBirth().toLocalDate())
+                    .birth(user.getBirth())
                     .build();
         } else {
             return UserMyPageDto.builder()
                     .nickname(user.getNickname())
                     .email(user.getEmail())
                     .age(user.getAge())
-                    .birth(user.getBirth().toLocalDate())
+                    .birth(user.getBirth())
                     .fileName(responseDto.getFileName())
                     .fileUrl(responseDto.getFileUrl())
                     .build();
@@ -126,7 +124,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email).orElseThrow();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDateTime birth = LocalDateTime.parse(userDto.getBirth(), formatter);
+        LocalDate birth = LocalDate.parse(userDto.getBirth(), formatter);
 
         if (userDto.getFile() != null) {
             List<MultipartFile> fileList = new ArrayList<>();
