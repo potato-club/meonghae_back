@@ -60,7 +60,7 @@ public class RedisService {
     }
 
     public List<S3ResponseDto> getReviewImages(Long reviewId) {
-        List<S3ResponseDto> dtos = (List<S3ResponseDto>) cacheManager.getCache(getImages).get(reviewId);
+        List<S3ResponseDto> dtos = (List<S3ResponseDto>) cacheManager.getCache(getImages).get(reviewId).get();
         if(dtos == null) {
             log.info("=========== S3 Feign 호출 ===========");
             dtos = s3Service.getImages(new S3RequestDto(reviewId, "REVIEW"));
