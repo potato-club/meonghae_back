@@ -104,6 +104,7 @@ management:
 cacheName:
   getByEmail: cacheByEmail
   getProfile: cacheProfile
+  getImages: cacheByReview
 
 jasypt:
   encryptor:

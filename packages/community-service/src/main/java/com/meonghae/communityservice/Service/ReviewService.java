@@ -5,6 +5,7 @@ import com.meonghae.communityservice.Client.UserServiceClient;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewListDto;
 import com.meonghae.communityservice.Dto.ReviewDto.ReviewRequestDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3RequestDto;
+import com.meonghae.communityservice.Dto.S3Dto.S3ResponseDto;
 import com.meonghae.communityservice.Entity.Review.Review;
 import com.meonghae.communityservice.Enum.RecommendStatus;
 import com.meonghae.communityservice.Enum.ReviewCatalog;
@@ -22,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.meonghae.communityservice.Exception.Error.ErrorCode.*;
 
@@ -38,58 +41,61 @@ public class ReviewService {
 
     @Transactional
     public Slice<ReviewListDto> getReviewByType(int key, String token, int page,
-                                                String keyword, ReviewSortType sort, boolean photoOnly) {
+                                                String keyword, String sort, boolean photoOnly) {
         ReviewCatalog catalog = ReviewCatalog.findWithKey(key);
         if(catalog == null) throw new ReviewException(BAD_REQUEST, "잘못된 Catalog Type 입니다.");
+        ReviewSortType sortType = ReviewSortType.findType(sort);
         Slice<Review> reviews;
 
         reviews = photoOnly ?
-                getPagingReviewWithPhoto(page, catalog, keyword, sort) : getPagingReview(page, catalog, keyword, sort);
+                getPagingReviewWithPhoto(page, catalog, keyword, sortType)
+                : getPagingReview(page, catalog, keyword, sortType);
 
-        return reviews.map(r -> convertTypeAndAddImage(r, token));
+        List<Long> reviewIds = reviews.getContent().stream().map(Review::getId).collect(Collectors.toList());
+        Map<Long, RecommendStatus> reactions = reactionService.getReviewReactions(reviewIds, token);
+
+        return reviews.map(r -> convertTypeAndAddImage(r, token, reactions.get(r.getId())));
     }
-
     private Slice<Review> getPagingReview(int page, ReviewCatalog catalog, String keyword, ReviewSortType sort) {
         PageRequest request;
         switch (sort) {
             case RATING_ASC:
-                request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.ASC, "rating")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.ASC, "rating")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndKeywordAndSortType(request, catalog, keyword);
             case RATING_DESC:
-                request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.DESC, "rating")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.DESC, "rating")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndKeywordAndSortType(request, catalog, keyword);
             case RECOMMEND:
-                request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.DESC, "likes")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.DESC, "likes")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndKeywordAndSortType(request, catalog, keyword);
             case LATEST:
             default:
-                request = PageRequest.of(page - 1, 20,
+                request = PageRequest.of(page - 1, 15,
                         Sort.by(Sort.Direction.DESC, "createdDate"));
                 return reviewRepository.findByCatalogAndKeywordAndSortType(request, catalog, keyword);
         }
     }
-
     private Slice<Review> getPagingReviewWithPhoto(int page, ReviewCatalog catalog, String keyword, ReviewSortType sort) {
         PageRequest request;
         switch (sort) {
             case RATING_ASC:
-                request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.ASC, "rating")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.ASC, "rating")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndHasImageAndKeywordAndSortType(request, catalog, keyword);
             case RATING_DESC:
-                request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.DESC, "rating")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.DESC, "rating")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndHasImageAndKeywordAndSortType(request, catalog, keyword);
             case RECOMMEND:
-                request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.DESC, "likes")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.DESC, "likes")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndHasImageAndKeywordAndSortType(request, catalog, keyword);
             case LATEST:
             default:
-                request = PageRequest.of(page - 1, 20,
+                request = PageRequest.of(page - 1, 15,
                         Sort.by(Sort.Direction.DESC, "createdDate"));
                 return reviewRepository.findByCatalogAndHasImageAndKeywordAndSortType(request, catalog, keyword);
         }
@@ -132,14 +138,13 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
-    private ReviewListDto convertTypeAndAddImage(Review review, String token) {
+    private ReviewListDto convertTypeAndAddImage(Review review, String token, RecommendStatus status) {
         String nickname = redisService.getNickname(review.getEmail());
         String url = redisService.getProfileImage(review.getEmail());
-        RecommendStatus status = reactionService.getReviewReaction(review, token);
         ReviewListDto reviewDto = new ReviewListDto(review, nickname, url, status);
         if (review.getHasImage()) {
-            S3RequestDto requestDto = new S3RequestDto(review.getId(), "REVIEW");
-            reviewDto.setImages(s3Service.getImages(requestDto));
+            List<S3ResponseDto> reviewImages = redisService.getReviewImages(review.getId());
+            reviewDto.setImages(reviewImages);
         }
         return reviewDto;
     }
