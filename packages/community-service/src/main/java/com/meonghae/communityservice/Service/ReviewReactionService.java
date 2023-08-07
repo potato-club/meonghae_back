@@ -14,6 +14,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static com.meonghae.communityservice.Enum.RecommendStatus.*;
 import static com.meonghae.communityservice.Exception.Error.ErrorCode.*;
 
@@ -44,20 +48,37 @@ public class ReviewReactionService {
                 return "비추 완료";
             }
         } else {
-            String result = reaction.updateStatus(isLikes);
-            return result;
+            return reaction.updateStatus(isLikes);
         }
     }
 
-    public RecommendStatus getReviewReaction(Review review, String token) {
+    public Map<Long, RecommendStatus> getReviewReactions(List<Long> reviewIds, String token) {
         String email = userService.getUserEmail(token);
-        ReviewReaction reaction = reactionRepository.findByEmailAndReview(email, review);
-        if(reaction == null || reaction.getRecommendStatus() == null) {
-            return NONE;
-        } else if (reaction.getRecommendStatus()) {
-            return TRUE;
-        } else {
-            return FALSE;
+        List<ReviewReaction> reactions = reactionRepository.findByEmailAndReviewIdIn(email, reviewIds);
+        Map<Long, RecommendStatus> reviewReactions = new HashMap<>();
+        for (ReviewReaction reaction : reactions) {
+            RecommendStatus status;
+            if(reaction.getRecommendStatus() == null) {
+                status = NONE;
+            } else if (reaction.getRecommendStatus()) {
+                status = TRUE;
+            } else {
+                status = FALSE;
+            }
+            reviewReactions.put(reaction.getReview().getId(), status);
         }
+        return reviewReactions;
     }
+//
+//    public RecommendStatus getReviewReaction(Review review, String token) {
+//        String email = userService.getUserEmail(token);
+//        ReviewReaction reaction = reactionRepository.findByEmailAndReview(email, review);
+//        if(reaction == null || reaction.getRecommendStatus() == null) {
+//            return NONE;
+//        } else if (reaction.getRecommendStatus()) {
+//            return TRUE;
+//        } else {
+//            return FALSE;
+//        }
+//    }
 }

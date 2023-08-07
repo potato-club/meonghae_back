@@ -23,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.meonghae.communityservice.Exception.Error.ErrorCode.*;
 
@@ -49,7 +51,10 @@ public class ReviewService {
                 getPagingReviewWithPhoto(page, catalog, keyword, sortType)
                 : getPagingReview(page, catalog, keyword, sortType);
 
-        return reviews.map(r -> convertTypeAndAddImage(r, token));
+        List<Long> reviewIds = reviews.getContent().stream().map(Review::getId).collect(Collectors.toList());
+        Map<Long, RecommendStatus> reactions = reactionService.getReviewReactions(reviewIds, token);
+
+        return reviews.map(r -> convertTypeAndAddImage(r, token, reactions.get(r.getId())));
     }
     private Slice<Review> getPagingReview(int page, ReviewCatalog catalog, String keyword, ReviewSortType sort) {
         PageRequest request;
@@ -133,10 +138,9 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
-    private ReviewListDto convertTypeAndAddImage(Review review, String token) {
+    private ReviewListDto convertTypeAndAddImage(Review review, String token, RecommendStatus status) {
         String nickname = redisService.getNickname(review.getEmail());
         String url = redisService.getProfileImage(review.getEmail());
-        RecommendStatus status = reactionService.getReviewReaction(review, token);
         ReviewListDto reviewDto = new ReviewListDto(review, nickname, url, status);
         if (review.getHasImage()) {
             List<S3ResponseDto> reviewImages = redisService.getReviewImages(review.getId());

@@ -35,7 +35,7 @@ public class Review extends BaseTimeEntity {
     @Column(name = "likes", nullable = false, columnDefinition = "int")
     private int likes;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "int")
     private int dislikes;
 
     public void addLikes() {
