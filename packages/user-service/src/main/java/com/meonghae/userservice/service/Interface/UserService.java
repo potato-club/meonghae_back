@@ -19,7 +19,7 @@ public interface UserService {
 
     UserMyPageDto viewMyPage(HttpServletRequest request);
 
-    void signUp(UserRequestDto userDto, HttpServletRequest request, HttpServletResponse response);
+    void signUp(UserRequestDto userDto, MultipartFile file, HttpServletRequest request, HttpServletResponse response);
 
     void update(UserUpdateDto userDto, HttpServletRequest request);
 
