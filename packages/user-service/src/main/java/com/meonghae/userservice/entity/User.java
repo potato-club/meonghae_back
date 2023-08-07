@@ -1,6 +1,5 @@
 package com.meonghae.userservice.entity;
 
-import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserUpdateDto;
 import com.meonghae.userservice.enums.UserRole;
 import lombok.AllArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
