@@ -55,20 +55,20 @@ public class ReviewService {
         PageRequest request;
         switch (sort) {
             case RATING_ASC:
-                request = PageRequest.of(page - 1, 6, Sort.by(Sort.Direction.ASC, "rating")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.ASC, "rating")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndKeywordAndSortType(request, catalog, keyword);
             case RATING_DESC:
-                request = PageRequest.of(page - 1, 6, Sort.by(Sort.Direction.DESC, "rating")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.DESC, "rating")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndKeywordAndSortType(request, catalog, keyword);
             case RECOMMEND:
-                request = PageRequest.of(page - 1, 6, Sort.by(Sort.Direction.DESC, "likes")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.DESC, "likes")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndKeywordAndSortType(request, catalog, keyword);
             case LATEST:
             default:
-                request = PageRequest.of(page - 1, 6,
+                request = PageRequest.of(page - 1, 15,
                         Sort.by(Sort.Direction.DESC, "createdDate"));
                 return reviewRepository.findByCatalogAndKeywordAndSortType(request, catalog, keyword);
         }
@@ -77,20 +77,20 @@ public class ReviewService {
         PageRequest request;
         switch (sort) {
             case RATING_ASC:
-                request = PageRequest.of(page - 1, 6, Sort.by(Sort.Direction.ASC, "rating")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.ASC, "rating")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndHasImageAndKeywordAndSortType(request, catalog, keyword);
             case RATING_DESC:
-                request = PageRequest.of(page - 1, 6, Sort.by(Sort.Direction.DESC, "rating")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.DESC, "rating")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndHasImageAndKeywordAndSortType(request, catalog, keyword);
             case RECOMMEND:
-                request = PageRequest.of(page - 1, 6, Sort.by(Sort.Direction.DESC, "likes")
+                request = PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.DESC, "likes")
                         .and(Sort.by(Sort.Direction.DESC, "createdDate")));
                 return reviewRepository.findByCatalogAndHasImageAndKeywordAndSortType(request, catalog, keyword);
             case LATEST:
             default:
-                request = PageRequest.of(page - 1, 6,
+                request = PageRequest.of(page - 1, 15,
                         Sort.by(Sort.Direction.DESC, "createdDate"));
                 return reviewRepository.findByCatalogAndHasImageAndKeywordAndSortType(request, catalog, keyword);
         }
