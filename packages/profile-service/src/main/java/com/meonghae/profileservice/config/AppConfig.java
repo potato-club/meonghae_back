@@ -1,10 +1,8 @@
 package com.meonghae.profileservice.config;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.meonghae.profileservice.dto.calendar.AlarmDto;
-import com.meonghae.profileservice.entity.Calendar;
-import com.meonghae.profileservice.entity.QCalendar;
-import com.meonghae.profileservice.repository.CalendarRepository;
+import com.meonghae.profileservice.entity.QSchedule;
+import com.meonghae.profileservice.entity.Schedule;
 import com.meonghae.profileservice.service.RabbitService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -41,11 +39,11 @@ public class AppConfig implements SchedulingConfigurer {
                     LocalDateTime startOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
                     LocalDateTime endOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
 
-                    QCalendar qCalendar = QCalendar.calendar;
-                    List<Calendar> result = jpaQueryFactory.select(qCalendar)
-                            .from(qCalendar)
-                            .where(qCalendar.alarmTime.between(startOfDay, endOfDay))
-                            .orderBy(qCalendar.alarmTime.asc())
+                    QSchedule qSchedule = QSchedule.schedule;
+                    List<Schedule> result = jpaQueryFactory.select(qSchedule)
+                            .from(qSchedule)
+                            .where(qSchedule.alarmTime.between(startOfDay, endOfDay))
+                            .orderBy(qSchedule.alarmTime.asc())
                             .fetch();
 
 
@@ -53,7 +51,7 @@ public class AppConfig implements SchedulingConfigurer {
                     rabbitService.sendToRabbitMq(alarms);
 
                 },
-                triggerContext -> new CronTrigger("0 0 * * * *").nextExecutionTime(triggerContext) // 매일 자정에 실행
+                triggerContext -> new CronTrigger("0 0 1 1 * *").nextExecutionTime(triggerContext) // 매일 자정에 실행
         );
     }
 

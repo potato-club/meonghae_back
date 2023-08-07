@@ -5,11 +5,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
-public class CalendarRequestDTO {
+public class ScheduleRequestDTO {
   @ApiModelProperty(notes = "반려동물 id", example = "LONG", required = true)
   private Long petId;
   @ApiModelProperty(notes = "사용자 지정 일정", example = "지정된 타입이 있으면 null처리")
