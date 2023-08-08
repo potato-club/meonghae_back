@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 public class ScheduleResponseDTO {
   private Long id;
   private String petName;
-  private String title;
   private ScheduleType scheduleType;
   private LocalDateTime scheduleTime;
   private String alarmTime;
