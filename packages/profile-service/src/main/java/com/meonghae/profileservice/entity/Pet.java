@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Pet extends BaseTimeEntity {
@@ -25,7 +24,9 @@ public class Pet extends BaseTimeEntity {
   private Long id;
 
   @OneToMany(mappedBy = "pet", orphanRemoval = true)
-  private List<Schedule> petSchedule = new ArrayList<>();
+  private List<Schedule> petScheduleList;
+  @OneToMany(mappedBy = "pet", orphanRemoval = true)
+  private List<RecurringSchedule> petRecurringScheduleList;
 
   @Column(nullable = false)
   private String userEmail;
