@@ -10,9 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Slf4j
 @Component
@@ -39,7 +36,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
-            ServerHttpResponse response = exchange.getResponse();
 
             String path = request.getURI().getPath();
             String androidId = request.getHeaders().getFirst("AndroidId");
@@ -77,7 +73,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
     private boolean isPublicPath(String path) {
         return path.startsWith("/health") || path.endsWith("/prometheus") ||
-                path.startsWith("/user-service/signup") || path.startsWith("/user-service/login") ||
-                path.endsWith("/swagger-ui/index.html") || path.startsWith("/user-service/users");
+                path.contains("/signup") || path.contains("/login") ||
+                path.contains("/swagger-ui/index.html") || path.startsWith("/user-service/users") ||
+                path.contains("/cancel");
     }
 }
