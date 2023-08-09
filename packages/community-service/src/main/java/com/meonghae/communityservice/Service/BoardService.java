@@ -107,10 +107,14 @@ public class BoardService {
         if(!board.getEmail().equals(email)) {
             throw new BoardException(UNAUTHORIZED, "글 작성자만 수정 가능합니다.");
         }
+        int reuseSize = 0;
         board.updateBoard(updateDto.getTitle(), updateDto.getContent());
-        List<S3UpdateDto> reuseDto = updateDto.getUpdateDto()
-                .stream().filter(dto -> !dto.isDeleted()).collect(Collectors.toList());
-        int reuseSize = reuseDto.size();
+        if(updateDto.getUpdateDto() != null) {
+            List<S3UpdateDto> reuseDto = updateDto.getUpdateDto()
+                    .stream().filter(dto -> !dto.isDeleted()).collect(Collectors.toList());
+
+            reuseSize = reuseDto.size();
+        }
 
         List<MultipartFile> images = updateDto.getImages();
         if(images != null) {
