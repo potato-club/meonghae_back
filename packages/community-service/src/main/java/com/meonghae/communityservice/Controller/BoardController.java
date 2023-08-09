@@ -57,7 +57,7 @@ public class BoardController {
     @PostMapping("/{type}")
     public ResponseEntity<String> createBoard(@PathVariable(name = "type") int type,
                                               @RequestHeader("Authorization") String token,
-                                              BoardRequestDto requestDto) {
+                                              @RequestPart BoardRequestDto requestDto) {
         boardService.createBoard(type, requestDto, token);
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글 생성 완료");
     }
@@ -75,7 +75,7 @@ public class BoardController {
     @PutMapping("/{id}")
     public ResponseEntity<String> modifyBoard(@PathVariable(name = "id") Long id,
                                               @RequestHeader("Authorization") String token,
-                                              BoardUpdateDto updateDto) {
+                                              @RequestPart BoardUpdateDto updateDto) {
         boardService.modifyBoard(id, updateDto, token);
         return ResponseEntity.ok("수정 완료");
     }
