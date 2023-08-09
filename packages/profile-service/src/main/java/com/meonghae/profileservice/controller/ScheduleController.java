@@ -35,6 +35,7 @@ public class ScheduleController {
            @RequestParam("month")int month,
            @RequestParam(value = "day", required = false)Integer day,
            @RequestHeader("Authorization") String token) {
+
        if (day != null) {
            LocalDateTime startOfDate = LocalDateTime.of(year, month, day, 0, 0, 0);
            return scheduleService.getSchedule(startOfDate, token);

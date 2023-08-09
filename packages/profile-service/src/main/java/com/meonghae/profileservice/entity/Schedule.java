@@ -12,9 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class Schedule extends BaseTimeEntity{
   @Id
@@ -28,8 +26,6 @@ public class Schedule extends BaseTimeEntity{
   @JoinColumn(name = "pet_id",nullable = false)
   private Pet pet;
   @Column
-  private String title;
-  @Column
   private ScheduleType scheduleType;
   @Column(nullable = false)
   private LocalDateTime scheduleTime;
@@ -38,10 +34,18 @@ public class Schedule extends BaseTimeEntity{
   @Column(nullable = false)
   private String text;
 
+  public Schedule(Pet pet, String userEmail,ScheduleRequestDTO scheduleRequestDTO) {
+    this.pet = pet;
+    this.userEmail = userEmail;
+    this.scheduleTime = scheduleRequestDTO.getScheduleTime();
+    this.scheduleType = scheduleRequestDTO.getScheduleType();
+    this.alarmTime = scheduleRequestDTO.getAlarmTime();
+    this.text = scheduleRequestDTO.getText();
+  }
+
 
   public void update(ScheduleRequestDTO scheduleRequestDTO, Pet pet) {
     this.pet = pet;
-    this.title = scheduleRequestDTO.getTitle();
     this.scheduleType = scheduleRequestDTO.getScheduleType();
     this.text = scheduleRequestDTO.getText();
     this.scheduleTime = scheduleRequestDTO.getScheduleTime();
