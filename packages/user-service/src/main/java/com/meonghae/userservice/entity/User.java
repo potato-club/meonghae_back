@@ -6,12 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -19,18 +16,10 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 @Table(name = "users")
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
     private String uid;
-
-    @Column(name = "created_date")
-    @CreatedDate
-    private LocalDateTime createdDate;
-
-    @Column(name = "modified_date")
-    @LastModifiedDate
-    private LocalDateTime modifiedDate;
 
     @Column(nullable = false, unique = true)
     private String email;
