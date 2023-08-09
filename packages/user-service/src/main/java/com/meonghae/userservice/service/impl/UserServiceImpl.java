@@ -30,8 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.meonghae.userservice.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
-import static com.meonghae.userservice.error.ErrorCode.NOT_ALLOW_WRITE_EXCEPTION;
+import static com.meonghae.userservice.error.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Transactional
@@ -54,7 +53,7 @@ public class UserServiceImpl implements UserService {
                     .responseCode("200_OK")
                     .build();
         } else if (userRepository.existsByEmailAndDeleted(email, true)) {
-            throw new UnAuthorizedException("401_NOT_ALLOW", NOT_ALLOW_WRITE_EXCEPTION);
+            throw new UnAuthorizedException("Already Withdrawal", NOT_ALLOW_WITHDRAWAL_EXCEPTION);
         }
 
         return UserResponseDto.builder()
