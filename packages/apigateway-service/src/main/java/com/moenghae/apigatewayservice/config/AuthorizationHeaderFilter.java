@@ -73,7 +73,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
     private boolean isPublicPath(String path) {
         return path.startsWith("/health") || path.endsWith("/prometheus") ||
-                path.startsWith("/user-service/signup") || path.startsWith("/user-service/login") ||
-                path.endsWith("/swagger-ui/index.html") || path.startsWith("/user-service/users");
+                path.contains("/signup") || path.contains("/login") ||
+                path.contains("/swagger-ui/index.html") || path.startsWith("/user-service/users") ||
+                path.contains("/cancel");
     }
 }
