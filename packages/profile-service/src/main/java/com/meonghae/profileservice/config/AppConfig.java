@@ -1,9 +1,7 @@
 package com.meonghae.profileservice.config;
 
-import com.meonghae.profileservice.dto.calendar.AlarmDto;
-import com.meonghae.profileservice.entity.QRecurringSchedule;
+import com.meonghae.profileservice.dto.schedule.AlarmDto;
 import com.meonghae.profileservice.entity.QSchedule;
-import com.meonghae.profileservice.entity.RecurringSchedule;
 import com.meonghae.profileservice.entity.Schedule;
 import com.meonghae.profileservice.service.RabbitService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -41,7 +39,7 @@ public class AppConfig implements SchedulingConfigurer {
                     LocalDateTime endOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
 
                     QSchedule qSchedule = QSchedule.schedule;
-                    QRecurringSchedule qRecurringSchedule = QRecurringSchedule.recurringSchedule;
+
 
                     List<Schedule> result =
                             jpaQueryFactory
@@ -52,28 +50,7 @@ public class AppConfig implements SchedulingConfigurer {
 
                     List<AlarmDto> alarmDtoList = result.stream().map(AlarmDto::new).collect(Collectors.toList());
 
-                    List<RecurringSchedule> recurringScheduleList =
-                            jpaQueryFactory
-                                    .selectFrom(qRecurringSchedule)
-                                    .fetch();
 
-                    for (RecurringSchedule recurringSchedule : recurringScheduleList) {
-                        if ((startOfDay.getMonthValue() - recurringSchedule.getScheduleTime().getMonthValue())
-                                % recurringSchedule.getScheduleType().getRepeatCycle() == 0
-                                && startOfDay.getDayOfMonth() == recurringSchedule.getScheduleTime().getDayOfMonth()){
-
-                            LocalDateTime intendedTime = LocalDateTime.of(
-                                    startOfDay.getYear()
-                                    ,startOfDay.getMonthValue()
-                                    ,recurringSchedule.getScheduleTime().getDayOfMonth()
-                                    ,recurringSchedule.getScheduleTime().getHour()
-                                    ,recurringSchedule.getScheduleTime().getMinute()
-                                    ,recurringSchedule.getScheduleTime().getMinute()
-                                    ,recurringSchedule.getScheduleTime().getSecond());
-
-                            alarmDtoList.add(new AlarmDto(recurringSchedule,intendedTime));
-                        }
-                    }
 
                     rabbitService.sendToRabbitMq(alarmDtoList);
                 },

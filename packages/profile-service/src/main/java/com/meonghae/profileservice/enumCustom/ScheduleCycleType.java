@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ScheduleCycleType {
-    Month(1),Day(0);
+    Month(0),Day(1);
 
     private final int key;
 }

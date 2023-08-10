@@ -25,8 +25,6 @@ public class Pet extends BaseTimeEntity {
 
   @OneToMany(mappedBy = "pet", orphanRemoval = true)
   private List<Schedule> petScheduleList;
-  @OneToMany(mappedBy = "pet", orphanRemoval = true)
-  private List<RecurringSchedule> petRecurringScheduleList;
 
   @Column(nullable = false)
   private String userEmail;
