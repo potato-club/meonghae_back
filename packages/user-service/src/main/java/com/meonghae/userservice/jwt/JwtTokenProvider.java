@@ -52,21 +52,22 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성.
-    public String createAccessToken(String email, UserRole userRole) {
-        return this.createToken(email, userRole, accessTokenValidTime);
+    public String createAccessToken(String email, UserRole userRole, String androidId) {
+        return this.createToken(email, userRole, accessTokenValidTime, androidId);
     }
 
     // Refresh Token 생성.
-    public String createRefreshToken(String email, UserRole userRole) {
-        return this.createToken(email, userRole, refreshTokenValidTime);
+    public String createRefreshToken(String email, UserRole userRole, String androidId) {
+        return this.createToken(email, userRole, refreshTokenValidTime, androidId);
     }
 
     // Create token
-    public String createToken(String email, UserRole userRole, long tokenValid) {
+    public String createToken(String email, UserRole userRole, long tokenValid, String androidId) {
         Claims claims = Jwts.claims().setSubject(email); // claims 생성 및 payload 설정
         List<String> roles = new ArrayList<>();
         roles.add(userRole.toString());
         claims.put("roles", roles); // 권한 설정, key/ value 쌍으로 저장
+        claims.put("androidId", androidId);
 
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
         Date date = new Date();
@@ -83,6 +84,15 @@ public class JwtTokenProvider {
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {
         UserDetails userDetails = customUserDetailService.loadUserByUsername(this.getUserEmail(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    // 토큰에서 AndroidId 정보 추출
+    public String getAndroidIdFromToken(String token) {
+        JwtParser jwtParser = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                .build();
+
+        return (String) jwtParser.parseClaimsJws(token).getBody().get("androidId");
     }
 
     // 토큰에서 회원 정보 추출

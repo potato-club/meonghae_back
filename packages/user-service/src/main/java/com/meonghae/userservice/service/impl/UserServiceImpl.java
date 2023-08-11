@@ -24,10 +24,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.meonghae.userservice.error.ErrorCode.*;
@@ -190,15 +190,15 @@ public class UserServiceImpl implements UserService {
             throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         });
 
-        String newAccessToken = jwtTokenProvider.createAccessToken(email, user.getUserRole());
-        String newRefreshToken = jwtTokenProvider.createRefreshToken(email, user.getUserRole());
+        String newAccessToken = jwtTokenProvider.createAccessToken(email, user.getUserRole(), androidId);
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(email, user.getUserRole(), androidId);
 
         // Redis에서 기존 리프레시 토큰과 Android-Id를 삭제한다.
         redisService.delValues(refreshToken, email);
 
         // Redis에 새로운 리프레시 토큰과 Android-Id를 저장한다.
-        redisService.setValues(newRefreshToken, email);
-        redisService.setAndroidId(email, androidId);
+        redisService.setValues(newRefreshToken, email, androidId);
+        redisService.setValues(email, androidId, newAccessToken, newRefreshToken);
 
         // 헤더에 토큰들을 넣는다.
         jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);
@@ -212,13 +212,21 @@ public class UserServiceImpl implements UserService {
     private void createToken(UserRole userRole, String email, HttpServletRequest request, HttpServletResponse response) {
         String androidId = request.getHeader("androidId");
 
-        String accessToken = jwtTokenProvider.createAccessToken(email, userRole);
-        String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole);
+        Map<String, String> refreshTokenData = redisService.getValues(email);
+
+        if (refreshTokenData != null) {
+            String existingRefreshToken = refreshTokenData.get("refreshToken");
+            redisService.delValues(existingRefreshToken, email);
+            jwtTokenProvider.expireToken(refreshTokenData.get("accessToken"));
+        }
+
+        String accessToken = jwtTokenProvider.createAccessToken(email, userRole, androidId);
+        String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole, androidId);
 
         jwtTokenProvider.setHeaderAccessToken(response, accessToken);
         jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
 
-        redisService.setValues(refreshToken, email);
-        redisService.setAndroidId(email, androidId);
+        redisService.setValues(refreshToken, email, androidId);
+        redisService.setValues(email, androidId, accessToken, refreshToken);
     }
 }
