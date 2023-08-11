@@ -75,57 +75,8 @@ public class ScheduleService {
         resultList.add(new SchedulePreviewResponseDto(schedule));
       }
       else {
-        if (schedule.getScheduleType() != ScheduleType.Custom) {
-          LocalDateTime nextScheduleTime = schedule.getScheduleTime();
-          // 목표 날짜와 시작 날짜 사이의 차이 계산 / 필요한 반복 횟수 계산
-          int repeatCount = (int) ((ChronoUnit.MONTHS.between(nextScheduleTime, LocalDateTime.now())) / schedule.getScheduleType().getRepeatCycle());
-
-          //같은 달일때 일자가 이전이면 repeatCount를 1로 변환하여 강제로 1번 사이클을 돌린다.
-          if (repeatCount == 0) {
-            repeatCount = nextScheduleTime.isBefore(LocalDateTime.now()) ? 1 : 0;
-          }
-          nextScheduleTime = nextScheduleTime.plusMonths(repeatCount * schedule.getScheduleType().getRepeatCycle());
-
-          for (int i =0; i <5; i++) {
-            resultList.add(new SchedulePreviewResponseDto(schedule,nextScheduleTime));
-            nextScheduleTime = nextScheduleTime.plusMonths(schedule.getScheduleType().getRepeatCycle());
-            if (schedule.getScheduleEndTime().isBefore(nextScheduleTime))
-              break;
-          }
-        }
-        else if (schedule.getScheduleType() == ScheduleType.Custom && schedule.getCycleType() ==ScheduleCycleType.Month) {
-          LocalDateTime nextScheduleTime = schedule.getScheduleTime();
-          int repeatCount = (int) ((ChronoUnit.MONTHS.between(nextScheduleTime, LocalDateTime.now())) / schedule.getCycle());
-
-          if (repeatCount == 0) {
-            repeatCount = nextScheduleTime.isBefore(LocalDateTime.now()) ? 1 : 0;
-          }
-
-          nextScheduleTime = nextScheduleTime.plusMonths(repeatCount * schedule.getCycle());
-
-          for (int i =0; i <5; i++) {
-            resultList.add(new SchedulePreviewResponseDto(schedule, nextScheduleTime));
-            nextScheduleTime = nextScheduleTime.plusMonths(schedule.getCycle());
-            if (schedule.getScheduleEndTime().isBefore(nextScheduleTime))
-              break;
-          }
-        }
-        else if (schedule.getScheduleType() == ScheduleType.Custom && schedule.getCycleType() ==ScheduleCycleType.Day) {
-          LocalDateTime nextScheduleTime = schedule.getScheduleTime();
-          int repeatCount = (int) ((ChronoUnit.DAYS.between(nextScheduleTime, LocalDateTime.now())) / schedule.getCycle());
-
-          if (repeatCount == 0) {
-            repeatCount = nextScheduleTime.isBefore(LocalDateTime.now()) ? 1 : 0;
-          }
-          nextScheduleTime = nextScheduleTime.plusDays(repeatCount * schedule.getCycle());
-
-          for (int i =0; i <5; i++) {
-            resultList.add(new SchedulePreviewResponseDto(schedule,nextScheduleTime));
-            nextScheduleTime = nextScheduleTime.plusDays(schedule.getCycle());
-            if (schedule.getScheduleEndTime().isBefore(nextScheduleTime))
-              break;
-          }
-        }
+        ChronoUnit unit = (schedule.getCycleType() == ScheduleCycleType.Month) ? ChronoUnit.MONTHS : ChronoUnit.DAYS;
+        processRepeatSchedule(resultList, schedule, unit);
       }
     }
     // SchedulePreviewResponseDto.scheduleDate로 현재 날짜에 가까운 순으로 정렬
@@ -134,6 +85,7 @@ public class ScheduleService {
     // 상위 5개만 리턴
     return resultList.subList(0, Math.min(resultList.size(), 5));
   }
+
 
   //날짜 하나 클릭시 그 날짜에 대한 일정들 리턴
   @Transactional
@@ -183,16 +135,8 @@ public class ScheduleService {
         addSimpleSchedule(scheduleMap, schedule.getScheduleTime().getDayOfMonth(), schedule.getId().intValue());
 
       }
-      //반복 일정 && 타입이 커스텀이 아닌 것
-      else if (schedule.isHasRepeat() && schedule.getScheduleType() != ScheduleType.Custom) {
-        if ((targetDate.getMonthValue() - schedule.getScheduleTime().getMonthValue()) % schedule.getScheduleType().getRepeatCycle() == 0) {
-
-          addSimpleSchedule(scheduleMap, schedule.getScheduleTime().getDayOfMonth(), schedule.getId().intValue());
-
-        }
-      }
-      //반복 일정 && 타입이 커스텀이면서 주기타입이 month 인 것
-      else if (schedule.isHasRepeat() && schedule.getScheduleType() == ScheduleType.Custom && schedule.getCycleType() == ScheduleCycleType.Month) {
+      //주기타입이 month 인 것
+      else if (schedule.getCycleType() == ScheduleCycleType.Month) {
         if ((targetDate.getMonthValue() - schedule.getScheduleTime().getMonthValue()) % schedule.getCycle() == 0) {
 
           addSimpleSchedule(scheduleMap, schedule.getScheduleTime().getDayOfMonth(), schedule.getId().intValue());
@@ -206,7 +150,6 @@ public class ScheduleService {
 
           addSimpleSchedule(scheduleMap, intendedTime.getDayOfMonth(), schedule.getId().intValue());
         }
-
       } else throw new RuntimeException();
     }
 
@@ -258,6 +201,8 @@ public class ScheduleService {
       } else {// 무한 반복설정 or 반복주기 * 반복횟수
         repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
                 : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getScheduleType().getRepeatCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
+        scheduleRequestDTO.setCycleType(ScheduleCycleType.Month);
+        scheduleRequestDTO.setCycle(scheduleRequestDTO.getScheduleType().getRepeatCycle());
       }
     }
 
@@ -333,5 +278,22 @@ public class ScheduleService {
     }
 
     return recurringDates;
+  }
+
+  private void processRepeatSchedule(List<SchedulePreviewResponseDto> resultList, Schedule schedule, ChronoUnit unit) {
+    LocalDateTime nextScheduleTime = schedule.getScheduleTime();
+    int repeatCount = (int) (unit.between(nextScheduleTime, LocalDateTime.now()) / schedule.getCycle());
+    if (repeatCount == 0) {
+      repeatCount = nextScheduleTime.isBefore(LocalDateTime.now()) ? 1 : 0;
+    }
+    nextScheduleTime = nextScheduleTime.plus(repeatCount * schedule.getCycle(), unit);
+
+    for (int i = 0; i < 5; i++) {
+      resultList.add(new SchedulePreviewResponseDto(schedule, nextScheduleTime));
+      nextScheduleTime = nextScheduleTime.plus(schedule.getCycle(), unit);
+      if (schedule.getScheduleEndTime().isBefore(nextScheduleTime)) {
+        break;
+      }
+    }
   }
 }

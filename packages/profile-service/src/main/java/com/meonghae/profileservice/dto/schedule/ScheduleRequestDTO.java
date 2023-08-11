@@ -4,11 +4,13 @@ import com.meonghae.profileservice.enumCustom.ScheduleCycleType;
 import com.meonghae.profileservice.enumCustom.ScheduleType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 public class ScheduleRequestDTO {
   @ApiModelProperty(notes = "반려동물 id", example = "LONG", required = true)
   private Long petId;

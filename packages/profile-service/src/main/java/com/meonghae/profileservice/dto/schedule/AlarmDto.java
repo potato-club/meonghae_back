@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -26,4 +27,13 @@ public class AlarmDto {
         this.token = "플러터 사용자 식별 토큰";
     }
 
+    public AlarmDto(Schedule schedule, LocalDateTime intendedAlarmTime) {
+        this.alarmTime = Timestamp.valueOf(intendedAlarmTime);
+        if (schedule.getScheduleType().getKey() < 10)
+            this.text = schedule.getUserEmail()+"님, "+ schedule.getScheduleType().getTitle();
+        else if(schedule.getScheduleType().getKey() > 10)
+            this.text = schedule.getUserEmail()+"님, 오늘은 "+ schedule.getText()+ schedule.getScheduleType().getTitle()+" 일정이 있어요";
+
+        this.token = "플러터 사용자 식별 토큰";
+    }
 }
