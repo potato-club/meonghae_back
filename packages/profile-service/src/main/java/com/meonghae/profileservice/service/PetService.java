@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.meonghae.profileservice.repository.ScheduleRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 public class PetService {
   private final PetRepository petRepository;
+  private final ScheduleRepository scheduleRepository;
   private final FeignService feignService;
   private final S3ServiceClient s3ServiceClient;
 
@@ -163,6 +165,7 @@ public class PetService {
   }
   @Transactional
   public void deleteByUserEmail(String userEmail){
-    petRepository.deleteByUserEmail(userEmail);
+    scheduleRepository.deleteAllByUserEmail(userEmail);
+    petRepository.deleteAllByUserEmail(userEmail);
   }
 }
