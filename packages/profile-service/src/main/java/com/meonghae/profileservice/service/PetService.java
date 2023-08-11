@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import com.meonghae.profileservice.repository.ScheduleRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +27,7 @@ import javax.transaction.Transactional;
 
 @Service
 @Transactional
+@Slf4j
 @RequiredArgsConstructor
 public class PetService {
   private final PetRepository petRepository;
@@ -127,21 +129,23 @@ public class PetService {
             ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
     //기존 엔티티랑 비교해서 업데이트 시키고
     updatedPet.update(petDto);
-
+    log.info("0");
     //pet이 이미지를 가지고 있지 않고, 들어온 이미지가 null이 아닐때
     if ( !(updatedPet.isHasImage()) && petDto.getImage() != null ){
 
       S3RequestDto s3RequestDto = new S3RequestDto(updatedPet.getId(),"PET");
       List<MultipartFile> images = new ArrayList<>();
       images.add(petDto.getImage());
-
+      log.info("1");
       s3ServiceClient.uploadImages(images, s3RequestDto);
       updatedPet.setHasImage();
 
     }else if (updatedPet.isHasImage() && petDto.getImage() != null){
       //사진을 이미 가지고있고, 바뀔 image가 들릴때 기존 이미지를 삭제하고 새로 업로드
       //사진 받아오기
+      log.info("2-1");
       S3ResponseDto s3ResponseDto = s3ServiceClient.viewPetFile(new S3RequestDto(updatedPet.getId(),"PET"));
+      log.info("2-2");
       // 기존 사진 삭제처리
       S3UpdateDto s3UpdateDto = new S3UpdateDto(s3ResponseDto);
 
@@ -149,8 +153,9 @@ public class PetService {
       imageList.add(petDto.getImage());
       List<S3UpdateDto> s3UpdateDtoList = new ArrayList<>();
       s3UpdateDtoList.add(s3UpdateDto);
-
+      log.info("2-3");
       s3ServiceClient.updateFiles(imageList, s3UpdateDtoList);
+      log.info("2-4");
     }
 
     // images == null 일때 서비스 코드 미구현
