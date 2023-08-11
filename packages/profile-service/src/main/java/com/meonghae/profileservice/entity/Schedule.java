@@ -58,7 +58,7 @@ public class Schedule extends BaseTimeEntity{
   }
 
 
-  public void update(ScheduleRequestDTO scheduleRequestDTO, Pet pet) {
+  public void update(ScheduleRequestDTO scheduleRequestDTO, Pet pet, LocalDateTime scheduleEndTime) {
     this.pet = pet;
     this.scheduleType = scheduleRequestDTO.getScheduleType();
     this.hasRepeat = scheduleRequestDTO.isHasRepeat();
@@ -66,6 +66,7 @@ public class Schedule extends BaseTimeEntity{
     this.cycle = scheduleRequestDTO.getCycle();
     this.scheduleTime = scheduleRequestDTO.getScheduleTime();
     this.alarmTime = scheduleRequestDTO.getAlarmTime();
+    this.scheduleEndTime = scheduleEndTime;
     this.text = scheduleRequestDTO.getText();
   }
 }

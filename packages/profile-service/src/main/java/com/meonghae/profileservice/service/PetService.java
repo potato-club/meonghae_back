@@ -27,7 +27,6 @@ import javax.transaction.Transactional;
 
 @Service
 @Transactional
-@Slf4j
 @RequiredArgsConstructor
 public class PetService {
   private final PetRepository petRepository;
@@ -129,7 +128,7 @@ public class PetService {
             ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
     //기존 엔티티랑 비교해서 업데이트 시키고
     updatedPet.update(petDto);
-    log.info("0");
+
     //pet이 이미지를 가지고 있지 않고, 들어온 이미지가 null이 아닐때
     if ( !(updatedPet.isHasImage()) && petDto.getImage() != null ){
 
@@ -151,13 +150,8 @@ public class PetService {
       imageList.add(petDto.getImage());
       List<S3UpdateDto> s3UpdateDtoList = new ArrayList<>();
       s3UpdateDtoList.add(s3UpdateDto);
-      log.info("2-3");
-      log.info(imageList.get(0).getName());
-      log.info(s3UpdateDtoList.get(0).getEmail() + ",  " + s3UpdateDtoList.get(0).getFileName());
-      log.info(s3UpdateDtoList.get(0).getEntityType());
-      log.info(s3UpdateDtoList.get(0).getEntityId().toString());
+
       s3ServiceClient.updateFiles(imageList, s3UpdateDtoList);
-      log.info("2-4");
     }
 
     // images == null 일때 서비스 코드 미구현
