@@ -1,6 +1,6 @@
 package com.meonghae.profileservice.service;
 
-import com.meonghae.profileservice.dto.calendar.AlarmDto;
+import com.meonghae.profileservice.dto.schedule.AlarmDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;

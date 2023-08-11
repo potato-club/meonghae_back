@@ -1,10 +1,12 @@
 package com.meonghae.profileservice.config;
 
-import com.meonghae.profileservice.dto.calendar.AlarmDto;
-import com.meonghae.profileservice.entity.QRecurringSchedule;
+import com.meonghae.profileservice.dto.schedule.AlarmDto;
+import com.meonghae.profileservice.dto.schedule.SchedulePreviewResponseDto;
+import com.meonghae.profileservice.entity.QPet;
 import com.meonghae.profileservice.entity.QSchedule;
-import com.meonghae.profileservice.entity.RecurringSchedule;
 import com.meonghae.profileservice.entity.Schedule;
+import com.meonghae.profileservice.enumCustom.ScheduleCycleType;
+import com.meonghae.profileservice.enumCustom.ScheduleType;
 import com.meonghae.profileservice.service.RabbitService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,8 @@ import org.springframework.scheduling.support.CronTrigger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -41,37 +45,33 @@ public class AppConfig implements SchedulingConfigurer {
                     LocalDateTime endOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
 
                     QSchedule qSchedule = QSchedule.schedule;
-                    QRecurringSchedule qRecurringSchedule = QRecurringSchedule.recurringSchedule;
+                    QPet qPet = QPet.pet;
 
-                    List<Schedule> result =
-                            jpaQueryFactory
-                                    .selectFrom(qSchedule)
-                                    .where(qSchedule.alarmTime.between(startOfDay, endOfDay))
-                                    .orderBy(qSchedule.alarmTime.asc())
-                                    .fetch();
+                    List<Schedule> scheduleList = jpaQueryFactory
+                            .selectFrom(qSchedule)
+                            .leftJoin(qSchedule.pet,qPet)
+                            .where(
+                                    qSchedule.scheduleEndTime.goe(LocalDateTime.now())
+                                    .or(qSchedule.hasRepeat.isFalse()
+                                            .and(qSchedule.scheduleTime.between(startOfDay,endOfDay))))
+                            .fetch();
 
-                    List<AlarmDto> alarmDtoList = result.stream().map(AlarmDto::new).collect(Collectors.toList());
+                    List<AlarmDto> alarmDtoList = new ArrayList<>();
 
-                    List<RecurringSchedule> recurringScheduleList =
-                            jpaQueryFactory
-                                    .selectFrom(qRecurringSchedule)
-                                    .fetch();
+                    for (Schedule schedule : scheduleList) {
+                        if (schedule.getCycleType() == ScheduleCycleType.Month) {
+                            if ((startOfDay.getMonthValue() - schedule.getAlarmTime().getMonthValue()) % schedule.getCycle() == 0
+                                    && startOfDay.getDayOfMonth() == schedule.getAlarmTime().getDayOfMonth()) {
 
-                    for (RecurringSchedule recurringSchedule : recurringScheduleList) {
-                        if ((startOfDay.getMonthValue() - recurringSchedule.getScheduleTime().getMonthValue())
-                                % recurringSchedule.getScheduleType().getRepeatCycle() == 0
-                                && startOfDay.getDayOfMonth() == recurringSchedule.getScheduleTime().getDayOfMonth()){
-
-                            LocalDateTime intendedTime = LocalDateTime.of(
-                                    startOfDay.getYear()
-                                    ,startOfDay.getMonthValue()
-                                    ,recurringSchedule.getScheduleTime().getDayOfMonth()
-                                    ,recurringSchedule.getScheduleTime().getHour()
-                                    ,recurringSchedule.getScheduleTime().getMinute()
-                                    ,recurringSchedule.getScheduleTime().getMinute()
-                                    ,recurringSchedule.getScheduleTime().getSecond());
-
-                            alarmDtoList.add(new AlarmDto(recurringSchedule,intendedTime));
+                               alarmDtoList.add(this.setIntendedAlarmTime(startOfDay,schedule));
+                            }
+                        }
+                        else if (schedule.getCycleType() == ScheduleCycleType.Day) {
+                            LocalDateTime nextScheduleTime = schedule.getAlarmTime()
+                                    .plusDays(schedule.getCycle() * (ChronoUnit.DAYS.between(schedule.getAlarmTime(), LocalDateTime.now())) / schedule.getCycle());
+                            if (startOfDay.getDayOfMonth() == nextScheduleTime.getDayOfMonth()) {
+                                alarmDtoList.add(this.setIntendedAlarmTime(startOfDay,schedule));
+                            }
                         }
                     }
 
@@ -79,6 +79,12 @@ public class AppConfig implements SchedulingConfigurer {
                 },
                 triggerContext -> new CronTrigger("0 0 1 1 * *").nextExecutionTime(triggerContext) // 매일 자정에 실행
         );
+    }
+    private AlarmDto setIntendedAlarmTime(LocalDateTime startOfDay, Schedule schedule) {
+        LocalDateTime intendedAlarmTime = startOfDay
+                .withHour(schedule.getAlarmTime().getHour())
+                .withMinute(schedule.getAlarmTime().getMinute());
+        return new AlarmDto(schedule,intendedAlarmTime);
     }
 
     @Bean

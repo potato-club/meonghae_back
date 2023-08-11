@@ -1,6 +1,6 @@
 package com.meonghae.profileservice.controller;
 
-import com.meonghae.profileservice.dto.calendar.AlarmDto;
+import com.meonghae.profileservice.dto.schedule.AlarmDto;
 import com.meonghae.profileservice.service.RabbitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

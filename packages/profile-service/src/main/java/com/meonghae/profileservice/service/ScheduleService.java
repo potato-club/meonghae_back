@@ -1,23 +1,22 @@
 package com.meonghae.profileservice.service;
 
-import com.meonghae.profileservice.dto.calendar.ScheduleRequestDTO;
-import com.meonghae.profileservice.dto.calendar.ScheduleResponseDTO;
+import com.meonghae.profileservice.dto.schedule.SchedulePreviewResponseDto;
+import com.meonghae.profileservice.dto.schedule.ScheduleRequestDTO;
+import com.meonghae.profileservice.dto.schedule.ScheduleResponseDTO;
+import com.meonghae.profileservice.dto.schedule.SimpleSchedule;
 import com.meonghae.profileservice.entity.*;
 import com.meonghae.profileservice.enumCustom.ScheduleCycleType;
+import com.meonghae.profileservice.enumCustom.ScheduleType;
 import com.meonghae.profileservice.error.ErrorCode;
 import com.meonghae.profileservice.error.exception.NotFoundException;
 import com.meonghae.profileservice.repository.ScheduleRepository;
 import com.meonghae.profileservice.repository.PetRepository;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,204 +29,153 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ScheduleService {
   private final PetRepository petRepository;
-
   private final ScheduleRepository scheduleRepository;
-//  private final RecurringScheduleRepository recurringScheduleRepository;
-  // dsl
   private final JPAQueryFactory jpaQueryFactory;
   private final FeignService feignService;
 
-
-  // 프로필 화면에서 가까운 일정 순서대로 표시하기위함.
-//  @Transactional
-//  public List<ScheduleResponseDTO> getProfileSchedule(String token) {
-//    String userEmail = feignService.getUserEmail(token);
-//
-//    QSchedule qSchedule = QSchedule.schedule;
-//    QRecurringSchedule qRecurringSchedule = QRecurringSchedule.recurringSchedule;
-//    QPet qPet = QPet.pet;
-//    //일단 반복 없는 알림들 30개 뽑아놓고?
-//    List<Schedule> normalSchedules  =
-//            jpaQueryFactory
-//                    .select(qSchedule)
-//                    .from(qSchedule)
-//                    .leftJoin(qSchedule.pet, qPet)
-//                    .where(
-//                            qSchedule
-//                                    .userEmail
-//                                    .eq(userEmail)
-//                                    .and(qSchedule.scheduleTime.after(LocalDate.now().atStartOfDay())))
-//                    .limit(30)
-//                    .orderBy(qSchedule.scheduleTime.asc())
-//                    .fetch();
-//
-//    List<ScheduleResponseDTO> resultList = normalSchedules.stream().map(ScheduleResponseDTO::new).collect(Collectors.toList());
-//    //반복 되는 알림들 뽑기
-//    List<RecurringSchedule> recurringScheduleList =
-//            jpaQueryFactory
-//                    .selectFrom(qRecurringSchedule)
-//                    .leftJoin(qRecurringSchedule.pet, qPet)
-//                    .where(qRecurringSchedule.userEmail.eq(userEmail))
-//                    .fetch();
-//    // 반복 일정을 가장 가까운 미래 일정으로 변환하여 allSchedules에 추가
-//    for ( RecurringSchedule recurringSchedule : recurringScheduleList ){
-//      LocalDateTime nextScheduleTime = recurringSchedule.getScheduleTime();
-//      while (nextScheduleTime.isBefore(LocalDateTime.now())) {
-//        nextScheduleTime = nextScheduleTime.plus(recurringSchedule.getScheduleType().getRepeatCycle(), ChronoUnit.MONTHS);
-//      }
-//      // nextScheduleTime은 일정이 예정된 가장 가까운 시간
-//      resultList.add(new ScheduleResponseDTO(recurringSchedule, nextScheduleTime));
-//    }
-//    // 일정을 시간순으로 정렬하고 상위 30개를 선택
-//    resultList.sort(Comparator.comparing(ScheduleResponseDTO::getScheduleTime));
-//    return resultList.stream().limit(30).collect(Collectors.toList());
-//  }
-//
-//  //날짜 하나 클릭시 그 날짜에 대한 일정들 리턴
-//  @Transactional
-//  public List<ScheduleResponseDTO> getSchedule(
-//          LocalDateTime startOfDate, String token) {
-//    LocalDateTime endOfDate = startOfDate.plusDays(1).minusNanos(1); // ex)23시 59분
-//
-//    String userEmail = feignService.getUserEmail(token);
-//
-//    QRecurringSchedule qRecurringSchedule = QRecurringSchedule.recurringSchedule;
-//    QSchedule qSchedule = QSchedule.schedule;
-//    QPet qPet = QPet.pet;
-//
-//    List<Schedule> nomalScheduleList =
-//            jpaQueryFactory
-//                    .select(qSchedule)
-//                    .from(qSchedule)
-//                    .innerJoin(qSchedule.pet, qPet)
-//                    .where(
-//                            qSchedule.userEmail.eq(userEmail).and(qSchedule.scheduleTime.between(startOfDate, endOfDate)))
-//                    .orderBy(qSchedule.scheduleTime.asc())
-//                    .fetch();
-//    List<ScheduleResponseDTO> resultList =  nomalScheduleList.stream().map(ScheduleResponseDTO::new).collect(Collectors.toList());
-//
-//    //유저가 저장한 반복되는 일정들을 모두 가져온다.
-//    List<RecurringSchedule> recurringScheduleList =
-//            jpaQueryFactory
-//                    .select(qRecurringSchedule)
-//                    .from(qRecurringSchedule)
-//                    .leftJoin(qRecurringSchedule.pet,qPet)
-//                    .where(
-//                            qRecurringSchedule.userEmail.eq(userEmail)
-//                    )
-//                    .fetch();
-//
-//    for ( RecurringSchedule recurringSchedule : recurringScheduleList ) {
-//      //(기준 달 - 일정 달) % 반복주기가 0 이면서 기준 날과 day가 같은 일정 출력
-//      if ((startOfDate.getMonthValue() - recurringSchedule.getScheduleTime().getMonthValue())
-//              % recurringSchedule.getScheduleType().getRepeatCycle() == 0
-//              && startOfDate.getDayOfMonth() == recurringSchedule.getScheduleTime().getDayOfMonth()) {
-//
-//        LocalDateTime intendedTime = LocalDateTime.of(
-//                startOfDate.getYear()
-//                ,startOfDate.getMonthValue()
-//                ,recurringSchedule.getScheduleTime().getDayOfMonth()
-//                ,recurringSchedule.getScheduleTime().getHour()
-//                ,recurringSchedule.getScheduleTime().getMinute(),0);
-//
-//        resultList.add(new ScheduleResponseDTO(recurringSchedule,intendedTime));
-//      }
-//    }
-//    resultList.sort(Comparator.comparing(ScheduleResponseDTO::getScheduleTime));
-//
-//    return resultList;
-//
-//  }
-
-  // 달력 월단위 일정들 보기 위한 함수 - 같은 해 같은 월 데이터 출력
   @Transactional
-  public List<ScheduleResponseDTO> getMonthSchedule(LocalDate targetDate, String token) {
-
-    LocalDate endOfDate = targetDate.plusMonths(1).minusDays(1);
-
+  public ScheduleResponseDTO getSchedule(Long id, String token) {
     String userEmail = feignService.getUserEmail(token);
 
-    BooleanBuilder whereBuilder = this.existsFilterOption(userEmail,targetDate);
     QSchedule qSchedule = QSchedule.schedule;
     QPet qPet = QPet.pet;
 
-    List<Schedule> ScheduleList =
-            jpaQueryFactory
-                    .select(qSchedule)
-                    .from(qSchedule)
-                    .leftJoin(qSchedule.pet, qPet)
-                    .where(whereBuilder)
-//                    .where(
-//                            qSchedule
-//                                    .userEmail
-//                                    .eq(userEmail)
-//                                    .and(
-//                                            qSchedule.scheduleTime.between(
-//                                                    TargetDate.atStartOfDay(), endOfDate.atStartOfDay())))
-                    .orderBy(qSchedule.scheduleTime.asc())
-                    .fetch();
+    Schedule schedule = (Schedule) jpaQueryFactory
+            .selectFrom(qSchedule)
+            .leftJoin(qSchedule.pet,qPet)
+            .where(qSchedule.userEmail.eq(userEmail)
+                    .and(qSchedule.id.eq(id)))
+            .fetch();
 
-    return ScheduleList.stream().map(ScheduleResponseDTO::new).collect(Collectors.toList());
-
+    return new ScheduleResponseDTO(schedule);
   }
 
-  private BooleanBuilder existsFilterOption(String userEmail, LocalDate targetDate){
-    BooleanBuilder whereBuilder = new BooleanBuilder();
-    whereBuilder.and(QSchedule.schedule.userEmail.eq(userEmail));
+  // 프로필 화면에서 가까운 일정 순서대로 표시하기위함.
+  @Transactional
+  public List<SchedulePreviewResponseDto> getProfileSchedule(String token) {
+    String userEmail = feignService.getUserEmail(token);
 
-    //반복이 없는거 먼저 달에 맞는거 다 가져오고
-    whereBuilder.and(QSchedule.schedule.hasRepeat.isFalse());
-    whereBuilder.and(QSchedule.schedule.scheduleTime.month().eq(targetDate.getMonthValue()));
-    //반복 있는거는 다 가져오기 그 다음에 로직 수행
-    whereBuilder.and(QSchedule.schedule.hasRepeat.isTrue());
+    QSchedule qSchedule = QSchedule.schedule;
+    QPet qPet = QPet.pet;
 
-    return whereBuilder;
+    List<Schedule> scheduleList = jpaQueryFactory
+            .selectFrom(qSchedule)
+            .leftJoin(qSchedule.pet,qPet)
+            .where(qSchedule.userEmail.eq(userEmail)
+                    .and(qSchedule.scheduleEndTime.goe(LocalDateTime.now()))
+                    .or(qSchedule.hasRepeat.isFalse()
+                            .and(qSchedule.scheduleTime.goe(LocalDateTime.now()))))
+            .fetch();
+
+    List<SchedulePreviewResponseDto> resultList = new ArrayList<>();
+
+    // 반복 일정을 가장 가까운 미래 일정으로 변환하여 allSchedules에 추가
+    for ( Schedule schedule : scheduleList ) {
+      if (!schedule.isHasRepeat()) {
+        resultList.add(new SchedulePreviewResponseDto(schedule));
+      }
+      else {
+        ChronoUnit unit = (schedule.getCycleType() == ScheduleCycleType.Month) ? ChronoUnit.MONTHS : ChronoUnit.DAYS;
+        processRepeatSchedule(resultList, schedule, unit);
+      }
+    }
+    // SchedulePreviewResponseDto.scheduleDate로 현재 날짜에 가까운 순으로 정렬
+    resultList.sort(Comparator.comparing(SchedulePreviewResponseDto::getScheduleDate));
+
+    // 상위 5개만 리턴
+    return resultList.subList(0, Math.min(resultList.size(), 5));
   }
-//
-//    //유저가 저장한 반복되는 일정들을 모두 가져온다.
 
-//    for ( RecurringSchedule recurringSchedule : recurringScheduleList ) {
-//      //(기준 달 - 일정 달) % 반복주기가 0인 일정들 출력 // 밑의 조건을 where 절에 추가 할 수 있지 않을까?
-//      if ((startOfDate.getMonthValue() - recurringSchedule.getScheduleTime().getMonthValue())
-//              % recurringSchedule.getScheduleType().getRepeatCycle() == 0 ) {
-//        LocalDateTime intendedTime = LocalDateTime.of(
-//                startOfDate.getYear(), startOfDate.getMonthValue(),recurringSchedule.getScheduleTime().getDayOfMonth(),recurringSchedule.getScheduleTime().getHour(),recurringSchedule.getScheduleTime().getMinute(),0);
-//
-//        resultList.add(new ScheduleResponseDTO(recurringSchedule,intendedTime));
-//      }
-//    }
-//    resultList.sort(Comparator.comparing(ScheduleResponseDTO::getScheduleTime));
-//
-//    return resultList;
-//
-//  @Transactional
-//  public List<ScheduleResponseDTO> getScheduleOfFindByText(String key, String token){
-//    String userEmail = feignService.getUserEmail(token);
-//
-//    QSchedule qSchedule = QSchedule.schedule;
-//    QRecurringSchedule qRecurringSchedule = QRecurringSchedule.recurringSchedule;
-//    QPet qPet = QPet.pet;
-//
-//    List<Schedule> scheduleList = jpaQueryFactory
-//            .selectFrom(qSchedule)
-//            .innerJoin(qSchedule.pet, qPet).fetchJoin()
-//            .where(qSchedule.userEmail.eq(userEmail)
-//                    .and((qSchedule.text.like("%"+key+"%")
-//                            .or(qPet.petName.like("%"+key+"%")))))
-//            .orderBy(qSchedule.scheduleTime.asc())
-//            .fetch();
-//    List<ScheduleResponseDTO> resultList = scheduleList.stream().map(ScheduleResponseDTO::new).collect(Collectors.toList());
-//
-//    List<RecurringSchedule> recurringScheduleList = jpaQueryFactory
-//            .selectFrom(qRecurringSchedule)
-//            .innerJoin(qRecurringSchedule.pet,qPet).fetchJoin()
-//            .where(qRecurringSchedule.userEmail.eq(userEmail)
-//                    .and(qRecurringSchedule.text.like("%"+key+"%")
-//                            .or(qPet.petName.like("%"+key+"%"))))
-//            .fetch();
-//    resultList.addAll(recurringScheduleList.stream().map(ScheduleResponseDTO::new).collect(Collectors.toList()));
-//    return resultList;
-//  }
+
+  //날짜 하나 클릭시 그 날짜에 대한 일정들 리턴
+  @Transactional
+  public List<ScheduleResponseDTO> getDayOfSchedule(
+          LocalDate targetDate, String token, List<Long> scheduleId) {
+
+    String userEmail = feignService.getUserEmail(token);
+    QSchedule qSchedule = QSchedule.schedule;
+
+    List<Schedule> scheduleList = jpaQueryFactory
+            .selectFrom(qSchedule)
+            .where(qSchedule.id.in(scheduleId).and(qSchedule.userEmail.eq(userEmail)))
+            .fetch();
+
+    List<ScheduleResponseDTO> resultList = new ArrayList<>();
+
+    for (Schedule schedule : scheduleList) {
+      resultList.add(new ScheduleResponseDTO(schedule,LocalDateTime.of(targetDate.getYear(),targetDate.getMonth(),schedule.getScheduleTime().getDayOfMonth(),schedule.getScheduleTime().getHour(),schedule.getScheduleTime().getMinute())));
+    }
+    return resultList;
+  }
+
+  // 달력 월단위 일정들 보기 위한 함수 - 같은 해 같은 월 데이터 출력
+  @Transactional
+  public List<SimpleSchedule> getMonthOfSchedule(LocalDate targetDate, String token) {
+
+    String userEmail = feignService.getUserEmail(token);
+    QSchedule qSchedule = QSchedule.schedule;
+    QPet qPet = QPet.pet;
+
+    LocalDateTime monthEndPoint = targetDate.atStartOfDay().plusMonths(1) .minusDays(1);
+    List<Schedule> scheduleList = jpaQueryFactory
+            .selectFrom(qSchedule)
+            .leftJoin(qSchedule.pet,qPet)
+            .where(qSchedule.userEmail.eq(userEmail)
+                    .and(qSchedule.scheduleEndTime.goe(targetDate.atStartOfDay()))
+                    .or(qSchedule.hasRepeat.isFalse()
+                            .and(qSchedule.scheduleTime.between(targetDate.atStartOfDay(),monthEndPoint))))
+            .fetch();
+
+    Map<Integer, SimpleSchedule> scheduleMap = new HashMap<>();
+
+    for (Schedule schedule : scheduleList) {
+      //일반 일정은 시작지점은 골랐으니 달 비교로 해당하는거만 넣고
+      if (!schedule.isHasRepeat() && schedule.getScheduleTime().getMonthValue() == targetDate.getMonthValue()) {
+
+        addSimpleSchedule(scheduleMap, schedule.getScheduleTime().getDayOfMonth(), schedule.getId().intValue());
+
+      }
+      //주기타입이 month 인 것
+      else if (schedule.getCycleType() == ScheduleCycleType.Month) {
+        if ((targetDate.getMonthValue() - schedule.getScheduleTime().getMonthValue()) % schedule.getCycle() == 0) {
+
+          addSimpleSchedule(scheduleMap, schedule.getScheduleTime().getDayOfMonth(), schedule.getId().intValue());
+
+        }
+      }
+      //반복 일정 && 타입이 커스텀이면서 주기타입이 day 인 것
+      else if (schedule.isHasRepeat() && schedule.getScheduleType() == ScheduleType.Custom && schedule.getCycleType() == ScheduleCycleType.Day) {
+        List<LocalDateTime> intendedTimeList = calculateRepeatedDays(schedule,targetDate);
+        for (LocalDateTime intendedTime : intendedTimeList) {
+
+          addSimpleSchedule(scheduleMap, intendedTime.getDayOfMonth(), schedule.getId().intValue());
+        }
+      } else throw new RuntimeException();
+    }
+
+    return new ArrayList<>(scheduleMap.values());
+  }
+
+
+
+  @Transactional
+  public List<ScheduleResponseDTO> getScheduleOfFindByText(String key, String token){
+    String userEmail = feignService.getUserEmail(token);
+
+    QSchedule qSchedule = QSchedule.schedule;
+    QPet qPet = QPet.pet;
+
+    List<Schedule> scheduleList = jpaQueryFactory
+            .selectFrom(qSchedule)
+            .innerJoin(qSchedule.pet, qPet).fetchJoin()
+            .where(qSchedule.userEmail.eq(userEmail)
+                    .and((qSchedule.text.like("%"+key+"%")
+                            .or(qPet.petName.like("%"+key+"%")))))
+            .orderBy(qSchedule.scheduleTime.asc())
+            .fetch();
+
+    return scheduleList.stream().map(ScheduleResponseDTO::new).collect(Collectors.toList());
+  }
 
   @Transactional
   public String addSchedule(ScheduleRequestDTO scheduleRequestDTO, String token) {
@@ -235,8 +183,31 @@ public class ScheduleService {
             .orElseThrow(() -> {throw new NotFoundException(ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
 
     String userEmail = feignService.getUserEmail(token);
+    LocalDateTime repeatEndTime = LocalDateTime.of(1,1,1,1,0);
+    //반복하니? // 반복 안되는 것들은 다 위 기본값으로 들어감
+    if (scheduleRequestDTO.isHasRepeat()) {
+      //일정 타입비교
+      if (scheduleRequestDTO.getScheduleType().equals(ScheduleType.Custom)) {
+        switch (scheduleRequestDTO.getCycleType().getKey()) {
+          //0이 달 1이 일 // 무한 반복설정 or 반복주기 * 반복횟수
+          case 0 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+                  : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
+          break;
+          case 1 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+                  : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.DAYS);
+          break;
+        }
 
-    Schedule schedule = new Schedule(pet,userEmail,scheduleRequestDTO);
+      } else {// 무한 반복설정 or 반복주기 * 반복횟수
+        repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+                : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getScheduleType().getRepeatCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
+        scheduleRequestDTO.setCycleType(ScheduleCycleType.Month);
+        scheduleRequestDTO.setCycle(scheduleRequestDTO.getScheduleType().getRepeatCycle());
+      }
+    }
+
+
+    Schedule schedule = new Schedule(pet,userEmail,repeatEndTime,scheduleRequestDTO);
     scheduleRepository.save(schedule);
     return "일정 추가 완료";
   }
@@ -276,5 +247,53 @@ public class ScheduleService {
 
     scheduleRepository.deleteById(id);
     return "삭제 완료";
+  }
+
+  private void addSimpleSchedule(Map<Integer, SimpleSchedule> scheduleMap, int day, int scheduleId) {
+    SimpleSchedule simpleSchedule = scheduleMap.getOrDefault(day, new SimpleSchedule());
+    simpleSchedule.setDay(day);
+    if (simpleSchedule.getScheduleIds() == null) {
+      simpleSchedule.setScheduleIds(new ArrayList<>());
+    }
+    simpleSchedule.getScheduleIds().add(scheduleId);
+    scheduleMap.put(day, simpleSchedule);
+  }
+
+  // 날짜 관련 유틸리티 메서드
+  private List<LocalDateTime> calculateRepeatedDays(Schedule schedule, LocalDate targetDate) {
+    List<LocalDateTime> recurringDates = new ArrayList<>();
+
+    LocalDateTime nextScheduleTime = schedule.getScheduleTime();
+    // 목표 날짜와 시작 날짜 사이의 차이 계산 / 필요한 반복 횟수 계산
+    long repeatCount = (ChronoUnit.DAYS.between(nextScheduleTime.toLocalDate(), targetDate)) / schedule.getCycle();
+
+    nextScheduleTime = nextScheduleTime.plusDays(repeatCount * schedule.getCycle());
+
+    // 해당 월의 마지막 날짜까지 반복
+    while (nextScheduleTime.toLocalDate().isBefore(targetDate.plusMonths(1))) {
+      if (nextScheduleTime.getMonthValue() == targetDate.getMonthValue()) {
+        recurringDates.add(nextScheduleTime);
+      }
+      nextScheduleTime = nextScheduleTime.plusDays(schedule.getCycle());
+    }
+
+    return recurringDates;
+  }
+
+  private void processRepeatSchedule(List<SchedulePreviewResponseDto> resultList, Schedule schedule, ChronoUnit unit) {
+    LocalDateTime nextScheduleTime = schedule.getScheduleTime();
+    int repeatCount = (int) (unit.between(nextScheduleTime, LocalDateTime.now()) / schedule.getCycle());
+    if (repeatCount == 0) {
+      repeatCount = nextScheduleTime.isBefore(LocalDateTime.now()) ? 1 : 0;
+    }
+    nextScheduleTime = nextScheduleTime.plus(repeatCount * schedule.getCycle(), unit);
+
+    for (int i = 0; i < 5; i++) {
+      resultList.add(new SchedulePreviewResponseDto(schedule, nextScheduleTime));
+      nextScheduleTime = nextScheduleTime.plus(schedule.getCycle(), unit);
+      if (schedule.getScheduleEndTime().isBefore(nextScheduleTime)) {
+        break;
+      }
+    }
   }
 }

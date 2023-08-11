@@ -1,6 +1,6 @@
 package com.meonghae.profileservice.config;
 
-import com.meonghae.profileservice.dto.calendar.AlarmDto;
+import com.meonghae.profileservice.dto.schedule.AlarmDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
