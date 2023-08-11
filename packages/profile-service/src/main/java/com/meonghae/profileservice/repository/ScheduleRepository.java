@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findAllByUserEmail(String userEmail);
+    void deleteAllByUserEmail(String userEmail);
 }
