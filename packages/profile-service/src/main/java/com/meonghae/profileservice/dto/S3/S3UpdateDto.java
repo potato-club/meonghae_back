@@ -25,11 +25,12 @@ public class S3UpdateDto {
     @ApiModelProperty(value = "파일 삭제/교체 여부")
     private boolean deleted;
 
-    public S3UpdateDto (S3ResponseDto s3ResponseDto){
+    public S3UpdateDto (S3ResponseDto s3ResponseDto, Long id){
         fileName = s3ResponseDto.getFileName();
         fileUrl = s3ResponseDto.getFileUrl();
         entityType = s3ResponseDto.getEntityType();
-        entityId = s3ResponseDto.getTypeId();
+        entityId = id;
+        email = s3ResponseDto.getEmail();
         deleted = true;
     }
 }

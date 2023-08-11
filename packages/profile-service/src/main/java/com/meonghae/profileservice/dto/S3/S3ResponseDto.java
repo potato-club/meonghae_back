@@ -11,7 +11,7 @@ public class S3ResponseDto {
     private String fileName;
     private String fileUrl;
     private String entityType;
-    private Long typeId;
+    private String email;
 
 
 
