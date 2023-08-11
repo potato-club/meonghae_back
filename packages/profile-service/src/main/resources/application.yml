@@ -68,7 +68,7 @@ management:
       exposure:
         include: health, beans, refresh, busrefresh, info, metrics, prometheus
 subnet:
-  allowed: ENC(Ukgwjn67jBwgc+IXEKhpO3U/Q7kF8wgZ)
+  allowed: ENC(aMJqBPeWj4gQbVP0wvJFkXe9leTsbhGv)
 
 
 jasypt:

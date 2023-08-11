@@ -75,9 +75,13 @@ public class PetController {
     if (!isIpInSubnet(request.getRemoteAddr(), allowedSubnet)) {
       throw new RuntimeException();
     }
-    petService.deleteByUserEmail(userEmail);
+    log.info("******** = " + request.getRemoteAddr());
+    //petService.deleteByUserEmail(userEmail);
   }
   private boolean isIpInSubnet(String ipAddress, String subnet) {
+    if (ipAddress.contains(":")) {
+      return false; // IPv6 주소는 거부
+    }
     SubnetUtils utils = new SubnetUtils(subnet);
     return utils.getInfo().isInRange(ipAddress);
   }
