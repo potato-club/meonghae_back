@@ -145,7 +145,7 @@ public class PetService {
       //사진 받아오기
       S3ResponseDto s3ResponseDto = s3ServiceClient.viewPetFile(new S3RequestDto(updatedPet.getId(),"PET"));
       // 기존 사진 삭제처리
-      S3UpdateDto s3UpdateDto = new S3UpdateDto(s3ResponseDto);
+      S3UpdateDto s3UpdateDto = new S3UpdateDto(s3ResponseDto,updatedPet.getId());
 
       List<MultipartFile> imageList = new ArrayList<>();
       imageList.add(petDto.getImage());
@@ -154,6 +154,8 @@ public class PetService {
       log.info("2-3");
       log.info(imageList.get(0).getName());
       log.info(s3UpdateDtoList.get(0).getEmail() + ",  " + s3UpdateDtoList.get(0).getFileName());
+      log.info(s3UpdateDtoList.get(0).getEntityType());
+      log.info(s3UpdateDtoList.get(0).getEntityId().toString());
       s3ServiceClient.updateFiles(imageList, s3UpdateDtoList);
       log.info("2-4");
     }
