@@ -136,16 +136,14 @@ public class PetService {
       S3RequestDto s3RequestDto = new S3RequestDto(updatedPet.getId(),"PET");
       List<MultipartFile> images = new ArrayList<>();
       images.add(petDto.getImage());
-      log.info("1");
+
       s3ServiceClient.uploadImages(images, s3RequestDto);
       updatedPet.setHasImage();
 
     }else if (updatedPet.isHasImage() && petDto.getImage() != null){
       //사진을 이미 가지고있고, 바뀔 image가 들릴때 기존 이미지를 삭제하고 새로 업로드
       //사진 받아오기
-      log.info("2-1");
       S3ResponseDto s3ResponseDto = s3ServiceClient.viewPetFile(new S3RequestDto(updatedPet.getId(),"PET"));
-      log.info("2-2");
       // 기존 사진 삭제처리
       S3UpdateDto s3UpdateDto = new S3UpdateDto(s3ResponseDto);
 
@@ -154,6 +152,8 @@ public class PetService {
       List<S3UpdateDto> s3UpdateDtoList = new ArrayList<>();
       s3UpdateDtoList.add(s3UpdateDto);
       log.info("2-3");
+      log.info(imageList.get(0).getName());
+      log.info(s3UpdateDtoList.get(0).getEmail() + ",  " + s3UpdateDtoList.get(0).getFileName());
       s3ServiceClient.updateFiles(imageList, s3UpdateDtoList);
       log.info("2-4");
     }
