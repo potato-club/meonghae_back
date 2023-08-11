@@ -219,14 +219,7 @@ public class ScheduleService {
     QSchedule qSchedule = QSchedule.schedule;
     QPet qPet = QPet.pet;
 
-    Pet pet =
-        petRepository
-            .findById(scheduleRequestDTO.getPetId())
-            .orElseThrow(
-                () -> {
-                  throw new NotFoundException(
-                      ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());
-                });
+    Pet pet = petRepository.findById(scheduleRequestDTO.getPetId()).orElseThrow(() -> {throw new NotFoundException(ErrorCode.NOT_FOUND_PET, ErrorCode.NOT_FOUND_PET.getMessage());});
 
     Schedule schedule =
         jpaQueryFactory
@@ -236,8 +229,29 @@ public class ScheduleService {
             .where(qSchedule.id.eq(id))
             .fetchOne(); // 단일 건수의 데이터 조회 둘 이상일 경우 NonUniqueResultException
 
-    schedule.update(scheduleRequestDTO, pet);
-    scheduleRepository.save(schedule);
+    LocalDateTime repeatEndTime = LocalDateTime.of(1,1,1,1,0);
+    //반복하니? // 반복 안되는 것들은 다 위 기본값으로 들어감
+    if (scheduleRequestDTO.isHasRepeat()) {
+      //일정 타입비교
+      if (scheduleRequestDTO.getScheduleType().equals(ScheduleType.Custom)) {
+        switch (scheduleRequestDTO.getCycleType().getKey()) {
+          //0이 달 1이 일 // 무한 반복설정 or 반복주기 * 반복횟수
+          case 0 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+                  : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
+            break;
+          case 1 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+                  : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.DAYS);
+            break;
+        }
+
+      } else {// 무한 반복설정 or 반복주기 * 반복횟수
+        repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+                : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getScheduleType().getRepeatCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
+        scheduleRequestDTO.setCycleType(ScheduleCycleType.Month);
+        scheduleRequestDTO.setCycle(scheduleRequestDTO.getScheduleType().getRepeatCycle());
+      }
+    }
+    schedule.update(scheduleRequestDTO, pet, repeatEndTime);
     return "수정 완료";
   }
 
@@ -248,6 +262,8 @@ public class ScheduleService {
     scheduleRepository.deleteById(id);
     return "삭제 완료";
   }
+
+ //=========================================================
 
   private void addSimpleSchedule(Map<Integer, SimpleSchedule> scheduleMap, int day, int scheduleId) {
     SimpleSchedule simpleSchedule = scheduleMap.getOrDefault(day, new SimpleSchedule());
