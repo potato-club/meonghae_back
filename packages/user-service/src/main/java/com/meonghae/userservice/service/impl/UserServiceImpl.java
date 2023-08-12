@@ -8,10 +8,12 @@ import com.meonghae.userservice.dto.UserMyPageDto;
 import com.meonghae.userservice.dto.UserRequestDto;
 import com.meonghae.userservice.dto.UserResponseDto;
 import com.meonghae.userservice.dto.UserUpdateDto;
+import com.meonghae.userservice.entity.FCMToken;
 import com.meonghae.userservice.entity.User;
 import com.meonghae.userservice.enums.UserRole;
 import com.meonghae.userservice.error.exception.UnAuthorizedException;
 import com.meonghae.userservice.jwt.JwtTokenProvider;
+import com.meonghae.userservice.repository.FCMTokenRepository;
 import com.meonghae.userservice.repository.UserRepository;
 import com.meonghae.userservice.service.Jwt.RedisService;
 import com.meonghae.userservice.service.Interface.UserService;
@@ -38,6 +40,7 @@ import static com.meonghae.userservice.error.ErrorCode.*;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final FCMTokenRepository fcmTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
     private final S3ServiceClient s3Service;
@@ -211,21 +214,33 @@ public class UserServiceImpl implements UserService {
 
     private void createToken(UserRole userRole, String email, HttpServletRequest request, HttpServletResponse response) {
         String androidId = request.getHeader("androidId");
+        String fcm = request.getHeader("FCMToken");
 
         Map<String, String> refreshTokenData = redisService.getValues(email);
 
-        if (refreshTokenData != null) {
+        if (refreshTokenData != null) { // 중복 로그인 시 먼저 로그인 한 기기의 토큰 정보 삭제 (로그아웃)
             String existingRefreshToken = refreshTokenData.get("refreshToken");
             redisService.delValues(existingRefreshToken, email);
             jwtTokenProvider.expireToken(refreshTokenData.get("accessToken"));
+            fcmTokenRepository.deleteByEmail(email);
         }
 
+        FCMToken fcmToken = FCMToken.builder()  // FCM 토큰 저장 준비
+                .token(fcm)
+                .email(email)
+                .build();
+
+        fcmTokenRepository.save(fcmToken);      // 저장
+
+        // 토큰 발급
         String accessToken = jwtTokenProvider.createAccessToken(email, userRole, androidId);
         String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole, androidId);
 
+        // 발급한 토큰을 헤더에 삽입
         jwtTokenProvider.setHeaderAccessToken(response, accessToken);
         jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
 
+        // redis에 토큰 정보 저장
         redisService.setValues(refreshToken, email, androidId);
         redisService.setValues(email, androidId, accessToken, refreshToken);
     }
