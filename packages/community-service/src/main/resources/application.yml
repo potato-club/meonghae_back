@@ -105,6 +105,7 @@ cacheName:
   getByEmail: cacheByEmail
   getProfile: cacheProfile
   getImages: cacheByReview
+  getFCM: cacheFcmToken
 
 jasypt:
   encryptor:

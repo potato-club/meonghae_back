@@ -87,4 +87,11 @@ public class BoardController {
         boardService.deleteBoard(id, token);
         return ResponseEntity.ok("삭제 완료");
     }
+
+    @Operation(summary = "유저의 게시글 삭제 API")
+    @DeleteMapping("/users")
+    public String deleteUserBoard(@RequestParam(name = "email") String email) {
+        boardService.deleteBoardByEmail(email);
+        return "삭제 완료";
+    }
 }

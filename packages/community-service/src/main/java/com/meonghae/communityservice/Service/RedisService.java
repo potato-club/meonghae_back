@@ -2,6 +2,7 @@ package com.meonghae.communityservice.Service;
 
 import com.meonghae.communityservice.Client.S3ServiceClient;
 import com.meonghae.communityservice.Client.UserServiceClient;
+import com.meonghae.communityservice.Dto.FcmDto.FcmDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3RequestDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3ResponseDto;
 import com.meonghae.communityservice.Dto.S3Dto.UserImageDto;
@@ -32,6 +33,9 @@ public class RedisService {
 
     @Value("${cacheName.getImages}")
     private String getImages;
+
+    @Value("${cacheName.getFCM}")
+    private String getFCM;
 
     public String getNickname(String email) {
         String nickname = cacheManager.getCache(byEmail).get(email, String.class);
@@ -72,5 +76,13 @@ public class RedisService {
             cacheManager.getCache(getImages).put(reviewId, dtos);
         }
         return dtos;
+    }
+
+    public String getFcmToken(String email) {
+        return cacheManager.getCache(getFCM).get(email, String.class);
+    }
+
+    public void saveFcmToken(FcmDto fcmDto) {
+        cacheManager.getCache(getFCM).put(fcmDto.getEmail(), fcmDto.getFcmToken());
     }
 }
