@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
         return UserResponseDto.builder()
                 .email(email)
-                .responseCode("201_CREATED")
+                .responseCode("201_CREATED")    // 회원가입 필요
                 .build();
     }
 
@@ -85,14 +85,14 @@ public class UserServiceImpl implements UserService {
 
         S3ResponseDto responseDto = s3Service.viewUserFile(user.getEmail());
 
-        if (responseDto == null) {
+        if (responseDto == null) {  // 등록한 사진이 없을 때
             return UserMyPageDto.builder()
                     .nickname(user.getNickname())
                     .email(user.getEmail())
                     .age(user.getAge())
                     .birth(user.getBirth())
                     .build();
-        } else {
+        } else {                    // 등록한 사진이 있을 때
             return UserMyPageDto.builder()
                     .nickname(user.getNickname())
                     .email(user.getEmail())
