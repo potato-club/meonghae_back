@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.meonghae.profileservice.repository.ScheduleRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +30,7 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 public class PetService {
   private final PetRepository petRepository;
+  private final ScheduleRepository scheduleRepository;
   private final FeignService feignService;
   private final S3ServiceClient s3ServiceClient;
 
@@ -141,7 +144,7 @@ public class PetService {
       //사진 받아오기
       S3ResponseDto s3ResponseDto = s3ServiceClient.viewPetFile(new S3RequestDto(updatedPet.getId(),"PET"));
       // 기존 사진 삭제처리
-      S3UpdateDto s3UpdateDto = new S3UpdateDto(s3ResponseDto);
+      S3UpdateDto s3UpdateDto = new S3UpdateDto(s3ResponseDto,updatedPet.getId());
 
       List<MultipartFile> imageList = new ArrayList<>();
       imageList.add(petDto.getImage());
@@ -163,6 +166,7 @@ public class PetService {
   }
   @Transactional
   public void deleteByUserEmail(String userEmail){
-    petRepository.deleteByUserEmail(userEmail);
+    scheduleRepository.deleteAllByUserEmail(userEmail);
+    petRepository.deleteAllByUserEmail(userEmail);
   }
 }

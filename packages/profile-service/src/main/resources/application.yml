@@ -67,6 +67,9 @@ management:
     web:
       exposure:
         include: health, beans, refresh, busrefresh, info, metrics, prometheus
+subnet:
+  allowed: ENC(aMJqBPeWj4gQbVP0wvJFkXe9leTsbhGv)
+
 
 jasypt:
   encryptor:
