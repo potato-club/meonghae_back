@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/fcm")
 @RequiredArgsConstructor
 public class FcmController {
-    private RedisService redisService;
+    private final RedisService redisService;
 
     @PostMapping("")
     public String saveFcmToken(@RequestBody FcmDto fcmDto) {
