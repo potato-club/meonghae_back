@@ -79,10 +79,16 @@ public class RedisService {
     }
 
     public String getFcmToken(String email) {
-        return cacheManager.getCache(getFCM).get(email, String.class);
-    }
-
-    public void saveFcmToken(FcmDto fcmDto) {
-        cacheManager.getCache(getFCM).put(fcmDto.getEmail(), fcmDto.getFcmToken());
+        String fcm = cacheManager.getCache(getFCM).get(email, String.class);
+        if(fcm == null) {
+            log.info("=========== User Feign 호출 ===========");
+            FcmDto fcmDto = userService.getFCMToken(email);
+            if(fcmDto == null) {
+                return null;
+            }
+            fcm = fcmDto.getFCMToken();
+            cacheManager.getCache(getFCM).put(fcmDto.getEmail(), fcmDto.getFCMToken());
+        }
+        return fcm;
     }
 }
