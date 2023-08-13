@@ -40,6 +40,12 @@ public class UserController {
         return userService.sendNickname(email);
     }
 
+    @Operation(summary = "Feign Client 전송용 API - FCMToken")
+    @GetMapping("/send/token")
+    public FCMResponseDto sendFCMToken(@RequestParam String email) {
+        return userService.sendFCMToken(email);
+    }
+
     @Operation(summary = "회원가입 API")
     @PostMapping(value = "/signup")
     public ResponseEntity<String> signUp(UserRequestDto userDto,

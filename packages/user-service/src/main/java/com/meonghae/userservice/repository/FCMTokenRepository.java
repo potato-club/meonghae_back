@@ -7,5 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
 
+    FCMToken findByEmail(String email);
+
     void deleteByEmail(String email);
 }
