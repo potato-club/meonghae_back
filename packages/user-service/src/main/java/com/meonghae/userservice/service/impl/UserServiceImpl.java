@@ -1,17 +1,17 @@
 package com.meonghae.userservice.service.impl;
 
 import com.meonghae.userservice.client.S3ServiceClient;
+import com.meonghae.userservice.dto.*;
 import com.meonghae.userservice.dto.S3Dto.S3RequestDto;
 import com.meonghae.userservice.dto.S3Dto.S3ResponseDto;
 import com.meonghae.userservice.dto.S3Dto.S3UpdateDto;
-import com.meonghae.userservice.dto.UserMyPageDto;
-import com.meonghae.userservice.dto.UserRequestDto;
-import com.meonghae.userservice.dto.UserResponseDto;
-import com.meonghae.userservice.dto.UserUpdateDto;
+import com.meonghae.userservice.entity.FCMToken;
 import com.meonghae.userservice.entity.User;
 import com.meonghae.userservice.enums.UserRole;
+import com.meonghae.userservice.error.ErrorCode;
 import com.meonghae.userservice.error.exception.UnAuthorizedException;
 import com.meonghae.userservice.jwt.JwtTokenProvider;
+import com.meonghae.userservice.repository.FCMTokenRepository;
 import com.meonghae.userservice.repository.UserRepository;
 import com.meonghae.userservice.service.Jwt.RedisService;
 import com.meonghae.userservice.service.Interface.UserService;
@@ -38,6 +38,7 @@ import static com.meonghae.userservice.error.ErrorCode.*;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final FCMTokenRepository fcmTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
     private final S3ServiceClient s3Service;
@@ -58,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
         return UserResponseDto.builder()
                 .email(email)
-                .responseCode("201_CREATED")
+                .responseCode("201_CREATED")    // 회원가입 필요
                 .build();
     }
 
@@ -74,6 +75,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public FCMResponseDto sendFCMToken(String email) {
+        FCMToken fcmToken = fcmTokenRepository.findByEmail(email);
+        if (fcmToken == null) {
+            throw new UnAuthorizedException("Not Found", ACCESS_DENIED_EXCEPTION);
+        }
+
+        return FCMResponseDto.builder()
+                .email(email)
+                .FCMToken(fcmToken.getToken())
+                .build();
+    }
+
+    @Override
     public UserMyPageDto viewMyPage(HttpServletRequest request) {
         String email = this.findByEmailFromAccessToken(request);
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
@@ -82,14 +96,14 @@ public class UserServiceImpl implements UserService {
 
         S3ResponseDto responseDto = s3Service.viewUserFile(user.getEmail());
 
-        if (responseDto == null) {
+        if (responseDto == null) {  // 등록한 사진이 없을 때
             return UserMyPageDto.builder()
                     .nickname(user.getNickname())
                     .email(user.getEmail())
                     .age(user.getAge())
                     .birth(user.getBirth())
                     .build();
-        } else {
+        } else {                    // 등록한 사진이 있을 때
             return UserMyPageDto.builder()
                     .nickname(user.getNickname())
                     .email(user.getEmail())
@@ -152,8 +166,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void logout(HttpServletRequest request) {
-        redisService.delValues(jwtTokenProvider.resolveRefreshToken(request), this.findByEmailFromAccessToken(request));
+        String email = this.findByEmailFromAccessToken(request);
+        redisService.delValues(jwtTokenProvider.resolveRefreshToken(request), email);
         jwtTokenProvider.expireToken(jwtTokenProvider.resolveAccessToken(request));
+        fcmTokenRepository.deleteByEmail(email);
     }
 
     @Override
@@ -211,21 +227,33 @@ public class UserServiceImpl implements UserService {
 
     private void createToken(UserRole userRole, String email, HttpServletRequest request, HttpServletResponse response) {
         String androidId = request.getHeader("androidId");
+        String fcm = request.getHeader("FCMToken");
 
         Map<String, String> refreshTokenData = redisService.getValues(email);
 
-        if (refreshTokenData != null) {
+        if (refreshTokenData != null) { // 중복 로그인 시 먼저 로그인 한 기기의 토큰 정보 삭제 (로그아웃)
             String existingRefreshToken = refreshTokenData.get("refreshToken");
             redisService.delValues(existingRefreshToken, email);
             jwtTokenProvider.expireToken(refreshTokenData.get("accessToken"));
+            fcmTokenRepository.deleteByEmail(email);
         }
 
+        FCMToken fcmToken = FCMToken.builder()  // FCM 토큰 저장 준비
+                .token(fcm)
+                .email(email)
+                .build();
+
+        fcmTokenRepository.save(fcmToken);      // 저장
+
+        // 토큰 발급
         String accessToken = jwtTokenProvider.createAccessToken(email, userRole, androidId);
         String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole, androidId);
 
+        // 발급한 토큰을 헤더에 삽입
         jwtTokenProvider.setHeaderAccessToken(response, accessToken);
         jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
 
+        // redis에 토큰 정보 저장
         redisService.setValues(refreshToken, email, androidId);
         redisService.setValues(email, androidId, accessToken, refreshToken);
     }
