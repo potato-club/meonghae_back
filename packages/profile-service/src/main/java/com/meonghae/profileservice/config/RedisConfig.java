@@ -26,7 +26,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     @Value("${spring.redis.timeout}")
     private int timeout;
 
-    @Bean
+    @Bean(name = "redisConnectionFactory")
     public RedisConnectionFactory connectionFactory() {
         return new LettuceConnectionFactory(host, port);
     }

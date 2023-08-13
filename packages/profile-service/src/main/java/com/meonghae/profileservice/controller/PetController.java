@@ -7,6 +7,7 @@ import com.meonghae.profileservice.service.PetService;
 
 import java.util.List;
 
+import com.meonghae.profileservice.service.RedisService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class PetController {
   private final PetService petService;
+  private final RedisService redisService;
   @Value("${subnet.allowed}")
   private String allowedSubnet;
 
@@ -84,5 +86,10 @@ public class PetController {
     }
     SubnetUtils utils = new SubnetUtils(subnet);
     return utils.getInfo().isInRange(ipAddress);
+  }
+  @Operation(summary = "Feign용 Fcm토큰 변경시 사용")
+  @GetMapping("/exchange/token")
+  public void getReviseFcmToken(@RequestPart String userEmail, @RequestPart String fcmToken) {
+    redisService.updateFcm(userEmail,fcmToken);
   }
 }
