@@ -36,6 +36,8 @@ public class Schedule extends BaseTimeEntity{
   private int cycle;
   @Column(nullable = false)
   private LocalDateTime scheduleTime;
+  @Column(nullable = false)
+  private boolean hasAlarm;
   @Column
   private LocalDateTime alarmTime;
   @Column
@@ -52,6 +54,7 @@ public class Schedule extends BaseTimeEntity{
     this.cycleCount = scheduleRequestDTO.getCycleCount();
     this.cycle = scheduleRequestDTO.getCycle();
     this.scheduleTime = scheduleRequestDTO.getScheduleTime();
+    this.hasAlarm = scheduleRequestDTO.isHasAlarm();
     this.alarmTime = scheduleRequestDTO.getAlarmTime();
     this.scheduleEndTime = scheduleEndTime;
     this.text = scheduleRequestDTO.getText();
@@ -65,6 +68,7 @@ public class Schedule extends BaseTimeEntity{
     this.cycleType = scheduleRequestDTO.getCycleType();
     this.cycle = scheduleRequestDTO.getCycle();
     this.scheduleTime = scheduleRequestDTO.getScheduleTime();
+    this.hasAlarm = scheduleRequestDTO.isHasAlarm();
     this.alarmTime = scheduleRequestDTO.getAlarmTime();
     this.scheduleEndTime = scheduleEndTime;
     this.text = scheduleRequestDTO.getText();

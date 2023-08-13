@@ -27,6 +27,14 @@ spring:
     username: ENC(3ScsqIY17k94LPHscMoQmw==)
     password: ENC(8wd6uRVvx434DIRHIHiRLf9505m8UwEl)
 
+  cache:
+    type: redis
+
+  redis:
+    host: Redis-server
+    port: 6379
+    timeout: 8
+
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
@@ -70,6 +78,8 @@ management:
 subnet:
   allowed: ENC(aMJqBPeWj4gQbVP0wvJFkXe9leTsbhGv)
 
+cacheName:
+  getFCM: cacheFcmToken
 
 jasypt:
   encryptor:

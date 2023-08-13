@@ -6,6 +6,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.gson.JsonParseException;
 import com.meonghae.profileservice.dto.schedule.AlarmDto;
 import com.meonghae.profileservice.dto.fcm.FcmMessage;
+import com.meonghae.profileservice.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FcmConfig {
     private final ObjectMapper objectMapper;
+    private final RedisService redisService;
     private final String ApiUrl = "https://fcm.googleapis.com/v1/projects/meonghae-b9c8b/messages:send";
     @Value("${firebase}")
     private String firebaseJson;
@@ -45,7 +47,7 @@ public class FcmConfig {
     private String makeMessage(AlarmDto alarmDto) throws JsonParseException, JsonProcessingException {
 
         FcmMessage message = FcmMessage.builder()
-                .to(alarmDto.getToken())
+                .to(redisService.getFcmToken(alarmDto.getUserEmail()))
                 .notification(FcmMessage.Notification.builder()
                         .title("멍해")
                         .body(alarmDto.getText())

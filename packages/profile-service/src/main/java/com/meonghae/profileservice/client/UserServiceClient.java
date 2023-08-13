@@ -4,10 +4,7 @@ import com.meonghae.profileservice.config.FeignHeaderConfig;
 import com.meonghae.profileservice.dto.user.UserDTO;
 import com.meonghae.profileservice.dto.user.UserNicknameDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,4 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 public interface UserServiceClient {
   @GetMapping("/send/email")
   String getUserEmail(@RequestHeader("Authorization") String token);
+  @GetMapping("/send/token")
+  String getFCMToken(@RequestPart String email);
 }
