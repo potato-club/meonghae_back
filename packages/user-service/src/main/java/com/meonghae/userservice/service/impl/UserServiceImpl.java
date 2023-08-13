@@ -1,5 +1,6 @@
 package com.meonghae.userservice.service.impl;
 
+import com.meonghae.userservice.client.PetServiceClient;
 import com.meonghae.userservice.client.S3ServiceClient;
 import com.meonghae.userservice.dto.*;
 import com.meonghae.userservice.dto.S3Dto.S3RequestDto;
@@ -42,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
     private final S3ServiceClient s3Service;
+    private final PetServiceClient petServiceClient;
 
     @Override
     public UserResponseDto login(String email, HttpServletRequest request, HttpServletResponse response) {
@@ -235,7 +237,8 @@ public class UserServiceImpl implements UserService {
             String existingRefreshToken = refreshTokenData.get("refreshToken");
             redisService.delValues(existingRefreshToken, email);
             jwtTokenProvider.expireToken(refreshTokenData.get("accessToken"));
-            fcmTokenRepository.deleteByEmail(email);
+            fcmTokenRepository.deleteByEmail(email);    // 기존 토큰 정보 삭제
+            petServiceClient.getReviseFcmToken(email, fcm); // Pet 서비스로 새 FCM 토큰 정보 전달
         }
 
         FCMToken fcmToken = FCMToken.builder()  // FCM 토큰 저장 준비
