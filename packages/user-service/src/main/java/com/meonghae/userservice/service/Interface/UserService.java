@@ -1,9 +1,6 @@
 package com.meonghae.userservice.service.Interface;
 
-import com.meonghae.userservice.dto.UserMyPageDto;
-import com.meonghae.userservice.dto.UserRequestDto;
-import com.meonghae.userservice.dto.UserResponseDto;
-import com.meonghae.userservice.dto.UserUpdateDto;
+import com.meonghae.userservice.dto.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +13,8 @@ public interface UserService {
     String sendEmail(String token);
 
     String sendNickname(String email);
+
+    FCMResponseDto sendFCMToken(String email);
 
     UserMyPageDto viewMyPage(HttpServletRequest request);
 

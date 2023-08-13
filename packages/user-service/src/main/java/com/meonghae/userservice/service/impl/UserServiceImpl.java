@@ -1,16 +1,14 @@
 package com.meonghae.userservice.service.impl;
 
 import com.meonghae.userservice.client.S3ServiceClient;
+import com.meonghae.userservice.dto.*;
 import com.meonghae.userservice.dto.S3Dto.S3RequestDto;
 import com.meonghae.userservice.dto.S3Dto.S3ResponseDto;
 import com.meonghae.userservice.dto.S3Dto.S3UpdateDto;
-import com.meonghae.userservice.dto.UserMyPageDto;
-import com.meonghae.userservice.dto.UserRequestDto;
-import com.meonghae.userservice.dto.UserResponseDto;
-import com.meonghae.userservice.dto.UserUpdateDto;
 import com.meonghae.userservice.entity.FCMToken;
 import com.meonghae.userservice.entity.User;
 import com.meonghae.userservice.enums.UserRole;
+import com.meonghae.userservice.error.ErrorCode;
 import com.meonghae.userservice.error.exception.UnAuthorizedException;
 import com.meonghae.userservice.jwt.JwtTokenProvider;
 import com.meonghae.userservice.repository.FCMTokenRepository;
@@ -74,6 +72,19 @@ public class UserServiceImpl implements UserService {
     public String sendNickname(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
         return userOptional.map(User::getNickname).orElse(null);
+    }
+
+    @Override
+    public FCMResponseDto sendFCMToken(String email) {
+        FCMToken fcmToken = fcmTokenRepository.findByEmail(email);
+        if (fcmToken == null) {
+            throw new UnAuthorizedException("Not Found", ACCESS_DENIED_EXCEPTION);
+        }
+
+        return FCMResponseDto.builder()
+                .email(email)
+                .FCMToken(fcmToken.getToken())
+                .build();
     }
 
     @Override
@@ -155,8 +166,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void logout(HttpServletRequest request) {
-        redisService.delValues(jwtTokenProvider.resolveRefreshToken(request), this.findByEmailFromAccessToken(request));
+        String email = this.findByEmailFromAccessToken(request);
+        redisService.delValues(jwtTokenProvider.resolveRefreshToken(request), email);
         jwtTokenProvider.expireToken(jwtTokenProvider.resolveAccessToken(request));
+        fcmTokenRepository.deleteByEmail(email);
     }
 
     @Override
