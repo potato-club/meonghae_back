@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class FcmDto {
     private String email;
-    private String fcmToken;
+    private String FCMToken;
 }
