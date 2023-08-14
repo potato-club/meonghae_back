@@ -1,0 +1,176 @@
+server:
+  port: 8000
+  error:
+    include-exception: false
+    include-message: always
+    include-stacktrace: on_param
+    whitelabel.enabled: true
+
+eureka:
+  instance:
+    hostname: meonghae.site
+
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+
+spring:
+  redis:
+    host: Redis-server
+    port: 6379
+  application:
+    name: apigateway-service
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: http://zipkin-server:9411/
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  cloud:
+    gateway:
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: Spring Cloud Gateway GlobalFilter
+            preLogger: true
+            postLogger: true
+      routes:
+        # User api 라우팅
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/login/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/signup
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+
+        # 스웨거 접근 라우팅
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/v2/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/v2/api-docs/(?<path>.*), /${path}
+        - id: community-service
+          uri: lb://COMMUNITY-SERVICE
+          predicates:
+            - Path=/community-service/v2/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/community-service/v2/api-docs/(?<path>.*), /${path}
+        - id: profile-service
+          uri: lb://PROFILE-SERVICE
+          predicates:
+            - Path=/profile-service/v2/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/profile-service/v2/api-docs/(?<path>.*), /${path}
+
+        # actuator 접근 라우팅
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        - id: community-service
+          uri: lb://COMMUNITY-SERVICE
+          predicates:
+            - Path=/community-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/community-service/(?<segment>.*), /$\{segment}
+        - id: s3-file-service
+          uri: lb://S3-FILE-SERVICE
+          predicates:
+            - Path=/s3-file-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/s3-file-service/(?<segment>.*), /$\{segment}
+        - id: profile-service
+          uri: lb://PROFILE-SERVICE
+          predicates:
+            - Path=/profile-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/profile-service/(?<segment>.*), /$\{segment}
+
+        # 커뮤니티 api 접근 라우팅
+        - id: community-service
+          uri: lb://COMMUNITY-SERVICE
+          predicates:
+            - Path=/community-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/community-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+
+        # 프로필 api 접근 라우팅
+        - id: profile-service
+          uri: lb://PROFILE-SERVICE
+          predicates:
+            - Path=/profile-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/profile-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+
+        # s3 api 접근 라우팅
+        - id: s3-file-service
+          uri: lb://S3-FILE-SERVICE
+          predicates:
+            - Path=/s3-file-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/s3-file-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+
+jwt:
+  secret: ENC(x8GNvxKr5nVqTNMKE2NANP3W1uS/DLM87uDxE+QXTn1GGbnMEy1wIBcCx1aMEWuZay+2e98QkpHqxAwKVsP8M00gNrSKTDdZ/VBmCy3YyCImHEBIqNCivVVQu8gYKRIJl15Zmq4KKqATWR+g0OhNCxua1TzBMLex3RroHGAWXDGlR5YmWwE6oNxRNipEsmOVf8qNAWDkbiC06WDz6QqqhQYwfl9IZJFH)
+  accessTokenExpiration: ENC(jkBRHyoqOSkps+WX9WykyQ==)
+  refreshTokenExpiration: ENC(3/8Y9x9H4y/Q9uI0VcpwMgRBRr1UhKjD)
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, busrefresh, info, metrics, prometheus
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+

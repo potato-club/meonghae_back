@@ -1,0 +1,86 @@
+server:
+  port: 40003
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  application:
+    name: profile-service
+
+  sleuth:
+    sampler:
+      probability: 1.0
+
+#  zipkin:
+#    base-url: http://zipkin-server:9411/
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
+
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: ENC(3ScsqIY17k94LPHscMoQmw==)
+    password: ENC(8wd6uRVvx434DIRHIHiRLf9505m8UwEl)
+
+  cache:
+    type: redis
+
+  redis:
+    host: Redis-server
+    port: 6379
+    timeout: 8
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        show_sql: false
+        format_sql: true
+  datasource:
+    url: ENC(sJ/gqsMjQbAMh2bUiubUhoZ7fYilC+Q1I0nQkREt8UNsaEEi1ty8irzxmwKGovVojJ3bedhdubSDh8E+TcmTqeDbNEkBGxe+lOUKmq8BlpA3KkjD1i64CCRZ+zJ2jtOh)
+    username: ENC(akrFtN4LCfZKuIq9ICQUqw==)
+    password: ENC(oKvUEiPXVPQ5Fqx2PKQ1pixQ39vCCN1i)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+#config:
+#  import: bootstrap.yml
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    hostname: meonghae.site
+
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+
+logging:
+  level:
+    com.meonghae.userservice: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, beans, refresh, busrefresh, info, metrics, prometheus
+subnet:
+  allowed: ENC(aMJqBPeWj4gQbVP0wvJFkXe9leTsbhGv)
+
+cacheName:
+  getFCM: cacheFcmToken
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor

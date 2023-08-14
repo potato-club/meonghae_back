@@ -4,11 +4,14 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.0'
 	id 'maven-publish'
 	id 'com.diffplug.spotless' version '6.8.0'
+	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
 
 group = 'com.meonghae'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+
+apply plugin: "com.ewerk.gradle.plugins.querydsl"
 
 configurations {
 	compileOnly {
@@ -30,21 +33,26 @@ ext {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
-	implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
-//	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 //	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
-//	implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
-//	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'com.h2database:h2:1.4.200'
-	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
-	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
+	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
+	implementation 'com.querydsl:querydsl-jpa'
+	implementation 'com.querydsl:querydsl-apt'
+	implementation 'mysql:mysql-connector-java:8.0.32'
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
@@ -58,9 +66,35 @@ dependencyManagement {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	library = "com.querydsl:querydsl-apt"
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/java', querydslDir]
+		}
+	}
+}
+
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+
 springBoot {
 	buildInfo()
 }
+
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
@@ -68,6 +102,7 @@ publishing {
 		}
 	}
 }
+
 spotless {
 
 	format 'misc', {

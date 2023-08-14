@@ -1,0 +1,16 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-server
+  cloud:
+    config:
+      uri: http://localhost:40010
+      name: meonghae
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+

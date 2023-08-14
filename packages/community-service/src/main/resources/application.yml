@@ -1,0 +1,112 @@
+server:
+  port: 40004
+
+spring:
+# local 실행 시
+#  profiles:
+#    include: local
+
+  application:
+    name: community-service
+
+  sleuth:
+    sampler:
+      probability: 1.0
+
+  zipkin:
+    base-url: http://zipkin-server:9411/
+
+  cache:
+    type: redis
+
+  redis:
+    host: Redis-server
+    port: 6379
+    timeout: 6000
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+  #  zipkin:
+  #    base-url: http://127.0.0.1:9411
+  #    compression:
+  #      enabled: true
+  #
+  #  sleuth:
+  #    sampler:
+  #      probability: 1.0
+  #
+  #  rabbitmq:
+  #    host: 127.0.0.1
+  #    port: 5672
+  #    username: guest
+  #    password: guest
+
+#  h2:
+#    console:
+#      enabled: true
+##      settings:
+##        web-allow-others: true
+##      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  #  datasource:
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:tcp://localhost/~/localDB/meonghae-community
+#    username: sa
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ENC(IXDR7mZ/YjVTR5u6n6v5DA8N6d/WxIRDyomfzBvqFGCHr8NNqC8jMKznfAF7pZ9xfiT7k2vrXJQl8QDrjX3GkMI0evhfYc99uC8ROq7QVWLD7/8x5OiXwin3t5hYSDec)
+    username: ENC(UFnvA2ILke7FK/vPGEmlPg==)
+    password: ENC(9o+/ql8o/OPL7LwqjMsENqxDQRBs3Uxf)
+
+#config:
+#  import: bootstrap.yml
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    hostname: meonghae.site
+
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+    region: ap-northeast-2
+
+logging:
+  level:
+    root: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, beans, refresh, busrefresh, info, metrics, prometheus
+
+cacheName:
+  getByEmail: cacheByEmail
+  getProfile: cacheProfile
+  getImages: cacheByReview
+  getFCM: cacheFcmToken
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
