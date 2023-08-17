@@ -69,7 +69,8 @@ public class ReviewReactionService {
         }
         return reviewReactions;
     }
-//
+
+// 성능 문제로 인한 쿼리와 로직 수정
 //    public RecommendStatus getReviewReaction(Review review, String token) {
 //        String email = userService.getUserEmail(token);
 //        ReviewReaction reaction = reactionRepository.findByEmailAndReview(email, review);

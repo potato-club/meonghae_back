@@ -25,11 +25,6 @@ public class BoardController {
     private final BoardService boardService;
     private final BoardLikeService likeService;
 
-    @GetMapping("/health")
-    public String check() {
-        return "hi~";
-    }
-
     @Operation(summary = "게시글 리스트 호출 API")
     @GetMapping("")
     public ResponseEntity<Slice<BoardListDto>> getBoardList(
@@ -57,7 +52,7 @@ public class BoardController {
     @PostMapping("/{type}")
     public ResponseEntity<String> createBoard(@PathVariable(name = "type") int type,
                                               @RequestHeader("Authorization") String token,
-                                              @RequestPart BoardRequestDto requestDto) {
+                                              BoardRequestDto requestDto) {
         boardService.createBoard(type, requestDto, token);
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글 생성 완료");
     }
@@ -75,7 +70,7 @@ public class BoardController {
     @PutMapping("/{id}")
     public ResponseEntity<String> modifyBoard(@PathVariable(name = "id") Long id,
                                               @RequestHeader("Authorization") String token,
-                                              @RequestPart BoardUpdateDto updateDto) {
+                                              BoardUpdateDto updateDto) {
         boardService.modifyBoard(id, updateDto, token);
         return ResponseEntity.ok("수정 완료");
     }
