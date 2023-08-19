@@ -26,6 +26,8 @@ public class Schedule extends BaseTimeEntity{
   private Pet pet;
   @Column(nullable = false)
   private ScheduleType scheduleType;
+  @Column
+  private String customScheduleTitle;
   @Column(nullable = false)
   private boolean hasRepeat;
   @Column
@@ -49,6 +51,7 @@ public class Schedule extends BaseTimeEntity{
     this.pet = pet;
     this.userEmail = userEmail;
     this.scheduleType = scheduleRequestDTO.getScheduleType();
+    this.customScheduleTitle = scheduleRequestDTO.getCustomScheduleTitle();
     this.hasRepeat = scheduleRequestDTO.isHasRepeat();
     this.cycleType = scheduleRequestDTO.getCycleType();
     this.cycleCount = scheduleRequestDTO.getCycleCount();
@@ -64,6 +67,7 @@ public class Schedule extends BaseTimeEntity{
   public void update(ScheduleRequestDTO scheduleRequestDTO, Pet pet, LocalDateTime scheduleEndTime) {
     this.pet = pet;
     this.scheduleType = scheduleRequestDTO.getScheduleType();
+    this.customScheduleTitle = scheduleRequestDTO.getCustomScheduleTitle();
     this.hasRepeat = scheduleRequestDTO.isHasRepeat();
     this.cycleType = scheduleRequestDTO.getCycleType();
     this.cycle = scheduleRequestDTO.getCycle();

@@ -16,6 +16,8 @@ public class ScheduleRequestDTO {
   private Long petId;
   @ApiModelProperty(notes = "일정 지정 타입", example = "합의된 일정 or Custom(유저 커스텀)")
   private ScheduleType scheduleType;
+  @ApiModelProperty(notes = "커스텀 일정일때", example = "Custom일때 여기 일정 이름")
+  private String customScheduleTitle;
   @ApiModelProperty(notes = "자동 반복 여부", example = "T or F")
   private boolean hasRepeat;
   @ApiModelProperty(notes = "반복시간 타입설정", example = "Month or Day")

@@ -18,7 +18,7 @@ public class ScheduleResponseDTO {
   private String petName;
 
   private ScheduleType scheduleType;
-
+  private String customScheduleTitle;
   private boolean hasRepeat;
 
   private ScheduleCycleType cycleType;
@@ -40,6 +40,7 @@ public class ScheduleResponseDTO {
     this.id = schedule.getId();
     this.petName = schedule.getPet().getPetName();
     this.scheduleType = schedule.getScheduleType();
+    this.customScheduleTitle = schedule.getCustomScheduleTitle();
     this.hasRepeat = schedule.isHasRepeat();
     this.scheduleTime = schedule.getScheduleTime();
     this.cycleType = schedule.getCycleType();
@@ -53,6 +54,7 @@ public class ScheduleResponseDTO {
     this.id = schedule.getId();
     this.petName = schedule.getPet().getPetName();
     this.scheduleType = schedule.getScheduleType();
+    this.customScheduleTitle = schedule.getCustomScheduleTitle();
     this.hasRepeat = schedule.isHasRepeat();
     this.scheduleTime = intendedTime;
     this.cycleType = schedule.getCycleType();
