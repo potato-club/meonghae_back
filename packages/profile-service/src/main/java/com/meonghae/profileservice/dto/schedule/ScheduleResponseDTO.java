@@ -4,10 +4,8 @@ package com.meonghae.profileservice.dto.schedule;
 import com.meonghae.profileservice.entity.Schedule;
 import com.meonghae.profileservice.enumCustom.ScheduleCycleType;
 import com.meonghae.profileservice.enumCustom.ScheduleType;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -16,24 +14,15 @@ import java.time.LocalDateTime;
 public class ScheduleResponseDTO {
   private Long id;
   private String petName;
-
   private ScheduleType scheduleType;
   private String customScheduleTitle;
   private boolean hasRepeat;
-
   private ScheduleCycleType cycleType;
-
   private int cycleCount;
-
   private int cycle;
-
   private LocalDateTime scheduleTime;
-
   private boolean hasAlarm;
-
   private LocalDateTime alarmTime;
-
-
   private String text;
 
   public ScheduleResponseDTO(Schedule schedule) {
