@@ -77,7 +77,7 @@ public class AppConfig implements SchedulingConfigurer {
 
                     rabbitService.sendToRabbitMq(alarmDtoList);
                 },
-                triggerContext -> new CronTrigger("0 0 * * * *").nextExecutionTime(triggerContext) // 매일 자정에 실행
+                triggerContext -> new CronTrigger("0 0 1 1 1 *").nextExecutionTime(triggerContext) // 매일 자정에 실행
         );
     }
     private AlarmDto setIntendedAlarmTime(LocalDateTime startOfDay, Schedule schedule) {
