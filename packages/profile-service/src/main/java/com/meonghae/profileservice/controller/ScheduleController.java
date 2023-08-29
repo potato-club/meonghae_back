@@ -35,12 +35,13 @@ public class ScheduleController {
 
   @Operation(summary = "년,월 입력 시 달력 전체에 뿌려져있는 일정들의 ID를 반환")
   @GetMapping("/month")
-  public List<SimpleSchedule> getMonthSchedule(@RequestParam int year, @RequestParam int month,
+  public List<SimpleMonthSchedule> getMonthSchedule(@RequestParam int year, @RequestParam int month,
                                                @RequestHeader("Authorization") String token) {
 
-       LocalDate startOfDate = LocalDate.of(year, month, 1);
+    // 시작 달을 전 달로 설정
+    LocalDate startOfDate = LocalDate.of(year, month, 1).minusMonths(1);
 
-       return scheduleService.getMonthOfSchedule(startOfDate, token);
+    return scheduleService.getMonthOfSchedule(startOfDate, token);
   }
 
   @Operation(summary = "년,월 입력 시 달력반환, 년,월,일 입력시 하루 일정반환")

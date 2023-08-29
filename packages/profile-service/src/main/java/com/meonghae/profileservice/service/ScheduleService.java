@@ -1,9 +1,6 @@
 package com.meonghae.profileservice.service;
 
-import com.meonghae.profileservice.dto.schedule.SchedulePreviewResponseDto;
-import com.meonghae.profileservice.dto.schedule.ScheduleRequestDTO;
-import com.meonghae.profileservice.dto.schedule.ScheduleResponseDTO;
-import com.meonghae.profileservice.dto.schedule.SimpleSchedule;
+import com.meonghae.profileservice.dto.schedule.*;
 import com.meonghae.profileservice.entity.*;
 import com.meonghae.profileservice.enumCustom.ScheduleCycleType;
 import com.meonghae.profileservice.enumCustom.ScheduleType;
@@ -110,50 +107,73 @@ public class ScheduleService {
 
   // 달력 월단위 일정들 보기 위한 함수 - 같은 해 같은 월 데이터 출력
   @Transactional
-  public List<SimpleSchedule> getMonthOfSchedule(LocalDate targetDate, String token) {
+  public List<SimpleMonthSchedule> getMonthOfSchedule(LocalDate targetDate, String token) {
+  //3달치 리턴하기!!
 
     String userEmail = feignService.getUserEmail(token);
     QSchedule qSchedule = QSchedule.schedule;
     QPet qPet = QPet.pet;
+    LocalDateTime monthStartPoint = targetDate.atStartOfDay();
+    LocalDateTime monthEndPoint = targetDate.atStartOfDay().plusMonths(3) .minusDays(1);
 
-    LocalDateTime monthEndPoint = targetDate.atStartOfDay().plusMonths(1) .minusDays(1);
     List<Schedule> scheduleList = jpaQueryFactory
             .selectFrom(qSchedule)
             .leftJoin(qSchedule.pet,qPet)
             .where(qSchedule.userEmail.eq(userEmail)
-                    .and(qSchedule.scheduleEndTime.goe(targetDate.atStartOfDay()))
+                    .and(qSchedule.scheduleEndTime.goe(monthStartPoint))
                     .or(qSchedule.hasRepeat.isFalse()
-                            .and(qSchedule.scheduleTime.between(targetDate.atStartOfDay(),monthEndPoint))))
+                            .and(qSchedule.scheduleTime.between(monthStartPoint,monthEndPoint))))
             .fetch();
 
-    Map<Integer, SimpleSchedule> scheduleMap = new HashMap<>();
+    //return list에 3달치 설정해두고..
+    Map<Integer, List<SimpleSchedule>> monthToSchedulesMap = new HashMap<>();
+    monthToSchedulesMap.putIfAbsent(targetDate.getMonthValue(),new ArrayList<>());
+    monthToSchedulesMap.putIfAbsent(targetDate.plusMonths(1).getMonthValue(),new ArrayList<>());
+    monthToSchedulesMap.putIfAbsent(targetDate.plusMonths(1).getMonthValue(),new ArrayList<>());
+
 
     for (Schedule schedule : scheduleList) {
-      //일반 일정은 시작지점은 골랐으니 달 비교로 해당하는거만 넣고
-      if (!schedule.isHasRepeat() && schedule.getScheduleTime().getMonthValue() == targetDate.getMonthValue()) {
+      //일반 일정은 시작지점은 골랐으니 달 비교로 해당하는거만 넣고 3달치 뽑기
+      if (!schedule.isHasRepeat() && (schedule.getScheduleTime().getMonthValue() == targetDate.getMonthValue()
+              || schedule.getScheduleTime().getMonthValue() == targetDate.plusMonths(1).getMonthValue()
+              || schedule.getScheduleTime().getMonthValue() == targetDate.plusMonths(2).getMonthValue())) {
 
-        addSimpleSchedule(scheduleMap, schedule.getScheduleTime().getDayOfMonth(), schedule.getId().intValue());
+        addSimpleSchedule(monthToSchedulesMap, schedule.getScheduleTime(), schedule.getId().intValue());
 
       }
       //주기타입이 month 인 것
       else if (schedule.getCycleType() == ScheduleCycleType.Month) {
-        if ((targetDate.getMonthValue() - schedule.getScheduleTime().getMonthValue()) % schedule.getCycle() == 0) {
 
-          addSimpleSchedule(scheduleMap, schedule.getScheduleTime().getDayOfMonth(), schedule.getId().intValue());
+        for (int i = 0; i < 3; i++) { // 현재 달부터 2달 뒤까지 3번 반복
 
+          LocalDate repeatedDate = targetDate.plusMonths(i);
+          if ((repeatedDate.getMonthValue() - schedule.getScheduleTime().getMonthValue()) % schedule.getCycle() == 0) {
+            addSimpleSchedule(monthToSchedulesMap, repeatedDate.withDayOfMonth(schedule.getScheduleTime().getDayOfMonth()).atStartOfDay(), schedule.getId().intValue());
+          }
         }
       }
       //반복 일정 && 타입이 커스텀이면서 주기타입이 day 인 것
       else if (schedule.isHasRepeat() && schedule.getScheduleType() == ScheduleType.Custom && schedule.getCycleType() == ScheduleCycleType.Day) {
-        List<LocalDateTime> intendedTimeList = calculateRepeatedDays(schedule,targetDate);
-        for (LocalDateTime intendedTime : intendedTimeList) {
 
-          addSimpleSchedule(scheduleMap, intendedTime.getDayOfMonth(), schedule.getId().intValue());
+        List<LocalDateTime> intendedTimeList = calculateRepeatedDays(schedule,targetDate);
+
+        for (LocalDateTime intendedTime : intendedTimeList) {
+          addSimpleSchedule(monthToSchedulesMap, intendedTime, schedule.getId().intValue());
         }
       } else throw new RuntimeException();
     }
 
-    return new ArrayList<>(scheduleMap.values());
+    List<SimpleMonthSchedule> result = new ArrayList<>();
+
+    for (Map.Entry<Integer, List<SimpleSchedule>> entry : monthToSchedulesMap.entrySet()) {
+      SimpleMonthSchedule monthSchedule = new SimpleMonthSchedule();
+      monthSchedule.setMonth(entry.getKey());
+      monthSchedule.setSchedules(entry.getValue());
+      result.add(monthSchedule);
+    }
+
+    return result;
+
   }
 
 
@@ -265,14 +285,22 @@ public class ScheduleService {
 
  //=========================================================
 
-  private void addSimpleSchedule(Map<Integer, SimpleSchedule> scheduleMap, int day, int scheduleId) {
-    SimpleSchedule simpleSchedule = scheduleMap.getOrDefault(day, new SimpleSchedule());
-    simpleSchedule.setDay(day);
-    if (simpleSchedule.getScheduleIds() == null) {
-      simpleSchedule.setScheduleIds(new ArrayList<>());
+  private void addSimpleSchedule(Map<Integer, List<SimpleSchedule>> monthToSchedulesMap, LocalDateTime date, int scheduleId) {
+    //해당 달이 있는지 부터 체크하고
+    List<SimpleSchedule> scheduleList = monthToSchedulesMap.get(date.getMonthValue());
+    if (scheduleList == null) {
+      scheduleList = new ArrayList<>();
+      monthToSchedulesMap.put(date.getMonthValue(),scheduleList);
     }
-    simpleSchedule.getScheduleIds().add(scheduleId);
-    scheduleMap.put(day, simpleSchedule);
+
+    //해당 달에, 해달 일이 존재하는지 찾고 있으면 id 추가, 없으면 날짜 생성
+    Optional<SimpleSchedule> existingSchedule = scheduleList.stream().filter(s -> s.getDay() == date.getDayOfMonth()).findFirst();
+    if (existingSchedule.isPresent()) {
+      existingSchedule.get().getScheduleIds().add(scheduleId);
+    } else {
+      SimpleSchedule simpleSchedule = new SimpleSchedule(date.getDayOfMonth());
+      scheduleList.add(simpleSchedule);
+    }
   }
 
   // 날짜 관련 유틸리티 메서드
@@ -285,9 +313,11 @@ public class ScheduleService {
 
     nextScheduleTime = nextScheduleTime.plusDays(repeatCount * schedule.getCycle());
 
-    // 해당 월의 마지막 날짜까지 반복
-    while (nextScheduleTime.toLocalDate().isBefore(targetDate.plusMonths(1))) {
-      if (nextScheduleTime.getMonthValue() == targetDate.getMonthValue()) {
+    // 3개의 월의 마지막 날짜까지 반복
+    while (nextScheduleTime.toLocalDate().isBefore(targetDate.plusMonths(3))) {
+      if (nextScheduleTime.getMonthValue() == targetDate.getMonthValue()
+              || nextScheduleTime.getMonthValue() == targetDate.plusMonths(1).getMonthValue()
+              || nextScheduleTime.getMonthValue() == targetDate.plusMonths(2).getMonthValue()) {
         recurringDates.add(nextScheduleTime);
       }
       nextScheduleTime = nextScheduleTime.plusDays(schedule.getCycle());
