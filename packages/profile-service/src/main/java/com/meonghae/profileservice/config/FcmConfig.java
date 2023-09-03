@@ -8,6 +8,7 @@ import com.meonghae.profileservice.dto.schedule.AlarmDto;
 import com.meonghae.profileservice.dto.fcm.FcmMessage;
 import com.meonghae.profileservice.service.RedisService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class FcmConfig {
     private final ObjectMapper objectMapper;
@@ -32,20 +34,22 @@ public class FcmConfig {
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(message,
                 MediaType.get("application/json; charset=utf-8"));
+        log.info("http 헤더 만들기");
         Request request = new Request.Builder()
                 .url(ApiUrl)
                 .post(requestBody)
                 .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
                 .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
                 .build();
-
+        log.info("보내기 전");
+        log.info(requestBody.toString());
         Response response = client.newCall(request).execute();
-
+        log.info("보낸 후");
         System.out.println(response.body().string());
     }
 
     private String makeMessage(AlarmDto alarmDto) throws JsonParseException, JsonProcessingException {
-
+        
         FcmMessage message = FcmMessage.builder()
                 .to(redisService.getFcmToken(alarmDto.getUserEmail()))
                 .notification(FcmMessage.Notification.builder()
@@ -53,18 +57,19 @@ public class FcmConfig {
                         .body(alarmDto.getText())
                         .build())
                 .build();
-
+        log.info("메시지 만듦");
         return objectMapper.writeValueAsString(message);
     }
 
     // firebase로 부터 access token을 가져온다. -> 이 토큰은 사용자 고유식별 토큰 아님
     private String getAccessToken() throws IOException {
-
+        log.info("엑세스 토큰 받아오기");
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseJson).getInputStream())
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         googleCredentials.refreshIfExpired();
+        log.info("엑세스 토큰 받아옴");
         return googleCredentials.getAccessToken().getTokenValue();
     }
 
