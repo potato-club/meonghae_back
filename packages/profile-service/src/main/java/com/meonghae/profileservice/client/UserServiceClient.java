@@ -14,5 +14,5 @@ public interface UserServiceClient {
   @GetMapping("/send/email")
   String getUserEmail(@RequestHeader("Authorization") String token);
   @GetMapping("/send/token")
-  String getFCMToken(@RequestPart String email);
+  String getFCMToken(@RequestParam String email);
 }
