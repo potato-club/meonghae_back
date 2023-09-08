@@ -1,6 +1,7 @@
 package com.meonghae.profileservice.service;
 
 import com.meonghae.profileservice.client.UserServiceClient;
+import com.meonghae.profileservice.dto.fcm.FCMResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,8 +32,8 @@ public class RedisService {
         String fcmToken = cacheManager.getCache(getFCM).get(email, String.class);
 
         if ( fcmToken == null ) {
-            fcmToken = userFeignService.getFCMToken(email);
-            this.saveFcmToken(email, fcmToken);
+            FCMResponseDto fcmResponseDto = userFeignService.getFCMToken(email);
+            this.saveFcmToken(email, fcmResponseDto.getFCMToken());
         } else {
             //만료 시간 재설정
             String cacheKey = getFCM + "::" + email;

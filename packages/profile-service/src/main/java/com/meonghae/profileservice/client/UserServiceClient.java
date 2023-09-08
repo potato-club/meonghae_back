@@ -1,6 +1,7 @@
 package com.meonghae.profileservice.client;
 
 import com.meonghae.profileservice.config.FeignHeaderConfig;
+import com.meonghae.profileservice.dto.fcm.FCMResponseDto;
 import com.meonghae.profileservice.dto.user.UserDTO;
 import com.meonghae.profileservice.dto.user.UserNicknameDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -14,5 +15,5 @@ public interface UserServiceClient {
   @GetMapping("/send/email")
   String getUserEmail(@RequestHeader("Authorization") String token);
   @GetMapping("/send/token")
-  String getFCMToken(@RequestParam String email);
+  FCMResponseDto getFCMToken(@RequestParam String email);
 }
