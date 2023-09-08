@@ -30,11 +30,14 @@ public class RedisService {
 
     public String getFcmToken(String email) {
         String fcmToken = cacheManager.getCache(getFCM).get(email, String.class);
-
+        log.info("fcm: " + fcmToken);
         if ( fcmToken == null ) {
+            log.info("if");
             FCMResponseDto fcmResponseDto = userFeignService.getFCMToken(email);
+            log.info(fcmResponseDto.getFCMToken());
             this.saveFcmToken(email, fcmResponseDto.getFCMToken());
         } else {
+            log.info("else");
             //만료 시간 재설정
             String cacheKey = getFCM + "::" + email;
             redisTemplate.expire(cacheKey,8, TimeUnit.DAYS);
