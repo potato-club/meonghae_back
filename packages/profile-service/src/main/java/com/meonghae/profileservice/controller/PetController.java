@@ -89,7 +89,7 @@ public class PetController {
   }
   @Operation(summary = "Feign용 Fcm토큰 변경시 사용")
   @GetMapping("/exchange/token")
-  public void getReviseFcmToken(@RequestPart String userEmail, @RequestPart String fcmToken) {
-    redisService.updateFcm(userEmail,fcmToken);
+  public void getReviseFcmToken(@RequestPart String email, @RequestPart String fcmToken) {
+    redisService.updateFcm(email,fcmToken);
   }
 }
