@@ -12,6 +12,6 @@ public interface PetServiceClient {
     @DeleteMapping("/users")
     ResponseEntity<String> deletedByUserEmail(@RequestPart String email);
 
-    @GetMapping("/exchange/token")  // FCM Token 관리용
+    @GetMapping("/profile/exchange/token")  // FCM Token 관리용
     void getReviseFcmToken(@RequestPart String email, @RequestPart String fcmToken);
 }
