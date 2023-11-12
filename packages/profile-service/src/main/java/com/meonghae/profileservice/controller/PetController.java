@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 //
 import javax.servlet.http.HttpServletRequest;
@@ -72,7 +73,7 @@ public class PetController {
   }
 
   @Operation(summary = "Feign용 이메일로 데이터삭제")
-  @DeleteMapping("/users")
+  @DeleteMapping(value = "/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public void deletedByUserEmail(@RequestPart String userEmail, HttpServletRequest request){
     if (!isIpInSubnet(request.getRemoteAddr(), allowedSubnet)) {
       throw new RuntimeException();
@@ -88,7 +89,7 @@ public class PetController {
     return utils.getInfo().isInRange(ipAddress);
   }
   @Operation(summary = "Feign용 Fcm토큰 변경시 사용")
-  @PostMapping("/exchange/token")
+  @PostMapping(value = "/exchange/token", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public void getReviseFcmToken(@RequestPart String email, @RequestPart String fcmToken) {
     redisService.updateFcm(email,fcmToken);
   }
