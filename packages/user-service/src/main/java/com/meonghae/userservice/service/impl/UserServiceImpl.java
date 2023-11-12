@@ -153,8 +153,8 @@ public class UserServiceImpl implements UserService {
             S3ResponseDto s3ResponseDto = s3Service.viewUserFile(email);
 
             S3UpdateDto s3UpdateDto = S3UpdateDto.builder()
-                    .fileName(s3ResponseDto.getFileName())
-                    .fileUrl(s3ResponseDto.getFileUrl())
+                    .fileName(Optional.ofNullable(s3ResponseDto).filter(f -> !f.getFileName().isEmpty()).map(f -> f.getFileName()).orElse(null))
+                    .fileUrl(Optional.ofNullable(s3ResponseDto).filter(f -> !f.getFileUrl().isEmpty()).map(f -> f.getFileUrl()).orElse(null))
                     .entityType(s3ResponseDto.getEntityType())
                     .email(s3ResponseDto.getEmail())
                     .deleted(true)
