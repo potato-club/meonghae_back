@@ -17,6 +17,7 @@ import com.meonghae.userservice.repository.UserRepository;
 import com.meonghae.userservice.service.Jwt.RedisService;
 import com.meonghae.userservice.service.Interface.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +37,7 @@ import static com.meonghae.userservice.error.ErrorCode.*;
 @RequiredArgsConstructor
 @Transactional
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -122,6 +124,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         }
+        log.info("127Line_request_fcm: "+request.getHeader("FCMToken").toString());
 
         userRepository.save(userDto.toEntity());
         MultipartFile file = userDto.getFile();
@@ -230,24 +233,25 @@ public class UserServiceImpl implements UserService {
     private void createToken(UserRole userRole, String email, HttpServletRequest request, HttpServletResponse response) {
         String androidId = request.getHeader("androidId");
         String fcm = request.getHeader("FCMToken");
-
+        log.info(" 235line_fcm: "+fcm);
         Map<String, String> refreshTokenData = redisService.getValues(email);
 
         if (refreshTokenData != null) { // 중복 로그인 시 먼저 로그인 한 기기의 토큰 정보 삭제 (로그아웃)
+            log.info(" 239line_IsDuplicate! ");
             String existingRefreshToken = refreshTokenData.get("refreshToken");
             redisService.delValues(existingRefreshToken, email);
             jwtTokenProvider.expireToken(refreshTokenData.get("accessToken"));
             fcmTokenRepository.deleteByEmail(email);    // 기존 토큰 정보 삭제
             petServiceClient.getReviseFcmToken(email, fcm); // Pet 서비스로 새 FCM 토큰 정보 전달
         }
-
+        log.info(" 246line ");
         FCMToken fcmToken = FCMToken.builder()  // FCM 토큰 저장 준비
                 .token(fcm)
                 .email(email)
                 .build();
 
         fcmTokenRepository.save(fcmToken);      // 저장
-
+        log.info(" 253line ");
         // 토큰 발급
         String accessToken = jwtTokenProvider.createAccessToken(email, userRole, androidId);
         String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole, androidId);
