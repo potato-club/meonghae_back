@@ -146,24 +146,29 @@ public class UserServiceImpl implements UserService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate birth = LocalDate.parse(userDto.getBirth(), formatter);
 
-        if (userDto.getFile() != null) {
+        if (userDto.getFile() != null) {    // 업데이트 이미지가 있을 경우
             List<MultipartFile> fileList = new ArrayList<>();
             List<S3UpdateDto> updateList = new ArrayList<>();
 
             S3ResponseDto s3ResponseDto = s3Service.viewUserFile(email);
 
-            S3UpdateDto s3UpdateDto = S3UpdateDto.builder()
-                    .fileName(Optional.ofNullable(s3ResponseDto).filter(f -> !f.getFileName().isEmpty()).map(f -> f.getFileName()).orElse(null))
-                    .fileUrl(Optional.ofNullable(s3ResponseDto).filter(f -> !f.getFileUrl().isEmpty()).map(f -> f.getFileUrl()).orElse(null))
-                    .entityType(s3ResponseDto.getEntityType())
-                    .email(s3ResponseDto.getEmail())
-                    .deleted(true)
-                    .build();
+            if (s3ResponseDto == null) { // 원래 프로필 사진 없을 경우
+                S3RequestDto s3Dto = new S3RequestDto(user.getEmail(), "USER");
+                s3Service.uploadFileForUser(userDto.getFile(), s3Dto);
+            } else { // 원래 프로필 사진 있을 경우
+                S3UpdateDto s3UpdateDto = S3UpdateDto.builder()
+                        .fileName(s3ResponseDto.getFileName())
+                        .fileUrl(s3ResponseDto.getFileUrl())
+                        .entityType(s3ResponseDto.getEntityType())
+                        .email(s3ResponseDto.getEmail())
+                        .deleted(true)
+                        .build();
 
-            fileList.add(userDto.getFile());
-            updateList.add(s3UpdateDto);
+                fileList.add(userDto.getFile());
+                updateList.add(s3UpdateDto);
 
-            s3Service.updateImage(fileList, updateList);
+                s3Service.updateImage(fileList, updateList);
+            }
         }
 
         user.update(userDto, birth);
