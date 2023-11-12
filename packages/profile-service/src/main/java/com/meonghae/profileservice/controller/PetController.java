@@ -88,7 +88,7 @@ public class PetController {
     return utils.getInfo().isInRange(ipAddress);
   }
   @Operation(summary = "Feign용 Fcm토큰 변경시 사용")
-  @GetMapping("/exchange/token")
+  @PostMapping("/exchange/token")
   public void getReviseFcmToken(@RequestPart String email, @RequestPart String fcmToken) {
     redisService.updateFcm(email,fcmToken);
   }
