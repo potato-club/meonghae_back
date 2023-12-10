@@ -238,7 +238,6 @@ public class UserServiceImpl implements UserService {
     private void createToken(UserRole userRole, String email, HttpServletRequest request, HttpServletResponse response) {
         String androidId = request.getHeader("androidId");
         String fcm = request.getHeader("FCMToken");
-        log.info(" 235line_fcm: "+fcm);
         Map<String, String> refreshTokenData = redisService.getValues(email);
 
         if (refreshTokenData != null) { // 중복 로그인 시 먼저 로그인 한 기기의 토큰 정보 삭제 (로그아웃)
@@ -246,17 +245,22 @@ public class UserServiceImpl implements UserService {
             String existingRefreshToken = refreshTokenData.get("refreshToken");
             redisService.delValues(existingRefreshToken, email);
             jwtTokenProvider.expireToken(refreshTokenData.get("accessToken"));
-            fcmTokenRepository.deleteByEmail(email);    // 기존 토큰 정보 삭제
             petServiceClient.getReviseFcmToken(email, fcm); // Pet 서비스로 새 FCM 토큰 정보 전달
         }
-        log.info(" 246line ");
-        FCMToken fcmToken = FCMToken.builder()  // FCM 토큰 저장 준비
-                .token(fcm)
-                .email(email)
-                .build();
 
-        fcmTokenRepository.save(fcmToken);      // 저장
-        log.info(" 253line ");
+        FCMToken fcmToken = fcmTokenRepository.findByEmail(email);
+
+        if (fcmToken != null) {
+            fcmToken.update(fcm);                   // 수정
+        } else {
+            fcmToken = FCMToken.builder()           // FCM 토큰 저장 준비
+                    .token(fcm)
+                    .email(email)
+                    .build();
+
+            fcmTokenRepository.save(fcmToken);      // 저장
+        }
+
         // 토큰 발급
         String accessToken = jwtTokenProvider.createAccessToken(email, userRole, androidId);
         String refreshToken = jwtTokenProvider.createRefreshToken(email, userRole, androidId);
