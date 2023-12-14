@@ -35,10 +35,12 @@ public class ReviewListDto {
     private int dislikes;
     @ApiModelProperty("리뷰 추천 상태")
     private RecommendStatus recommendStatus;
+    @ApiModelProperty("리뷰 작성자 여부")
+    private boolean writer;
     @ApiModelProperty("리뷰 등록 날짜")
     private LocalDateTime date;
 
-    public ReviewListDto(Review review, String nickname, String url, RecommendStatus status) {
+    public ReviewListDto(Review review, String nickname, String url, RecommendStatus status, boolean isWriter) {
         this.id = review.getId();
         this.nickname = nickname;
         this.profileUrl = url;
@@ -48,6 +50,7 @@ public class ReviewListDto {
         this.likes = review.getLikes();
         this.dislikes = review.getDislikes();
         this.recommendStatus = status;
+        this.writer = isWriter;
         this.date = review.getCreatedDate();
     }
 

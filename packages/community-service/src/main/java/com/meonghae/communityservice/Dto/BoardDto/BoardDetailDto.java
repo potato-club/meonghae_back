@@ -30,10 +30,12 @@ public class BoardDetailDto {
     private int likes;
     @ApiModelProperty("좋아요 여부")
     private boolean likeStatus;
+    @ApiModelProperty("게시글 작성자 여부")
+    private boolean writer;
     @ApiModelProperty("게시글 작성 시간")
     private LocalDateTime date;
 
-    public BoardDetailDto(Board board, String url, boolean status) {
+    public BoardDetailDto(Board board, String url, boolean status, boolean isWriter) {
         this.id = board.getId();
         this.profileUrl = url;
         this.title = board.getTitle();
@@ -41,6 +43,7 @@ public class BoardDetailDto {
         this.commentSize = board.getComments().isEmpty() ? 0 : board.getComments().size();
         this.likes = board.getLikes();
         this.likeStatus = status;
+        this.writer = isWriter;
         this.date = board.getCreatedDate();
     }
 

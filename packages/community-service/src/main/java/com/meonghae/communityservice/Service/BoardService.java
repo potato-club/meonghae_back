@@ -57,8 +57,9 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
         boolean likeStatus = likeService.isLikeBoard(board, token);
+        boolean isWriter = Objects.equals(board.getEmail(), userService.getUserEmail(token));
         String url = redisService.getProfileImage(board.getEmail());
-        BoardDetailDto detailDto = new BoardDetailDto(board, url, likeStatus);
+        BoardDetailDto detailDto = new BoardDetailDto(board, url, likeStatus, isWriter);
         if(board.getHasImage()) {
             List<S3ResponseDto> images = s3Service.getImages(new S3RequestDto(board.getId(), "BOARD"));
             detailDto.setImages(images);
