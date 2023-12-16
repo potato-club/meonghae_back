@@ -7,6 +7,7 @@ import com.meonghae.communityservice.Dto.S3Dto.S3ResponseDto;
 import com.meonghae.communityservice.Dto.S3Dto.S3UpdateDto;
 import com.meonghae.communityservice.Dto.S3Dto.UserImageDto;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ import java.util.List;
 @FeignClient(name = "s3-file-service", configuration = {FeignHeaderConfig.class, FeignUploadConfig.class})
 public interface S3ServiceClient {
     @GetMapping("/files")
-    List<S3ResponseDto> getImages(S3RequestDto requestDto);
+    List<S3ResponseDto> getImages(@SpringQueryMap S3RequestDto requestDto);
 
     @GetMapping("/files/users")
     UserImageDto getUserImage(@RequestParam String email);
