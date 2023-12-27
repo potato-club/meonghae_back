@@ -93,21 +93,21 @@ public class BoardService {
         Board board = requestDto.toEntity(type, email);
         Board saveBoard = boardRepository.save(board);
         List<MultipartFile> images = requestDto.getImages();
-        if (images != null) {
-            imageCheck(saveBoard, images, 0);
+        if (!CollectionUtils.isEmpty(images)) {
+            imageCheck(saveBoard, images);
             S3RequestDto s3Dto = new S3RequestDto(saveBoard.getId(), "BOARD");
             s3Service.uploadImage(images, s3Dto);
             saveBoard.toggleHasImage();
         }
     }
 
-    // 1. 새로운 이미지 없음
-    //  1-1. 기존 이미지 삭제 -> 재사용 이미지 없으면 전체삭제 or 있으면 수정 작업
-    //  1-2. 기존 이미지 유지 -> 따로 작업 필요 없음
+    // 기존 이미지 없음
+    // 1. 새로운 이미지 있음? -> 업로드
+    // 2. 새로운 이미지 없음? -> 스킵
 
-    // 2. 새로운 이미지 추가
-    //  2-1. 기존 이미지 없음 => 그냥 추가작업 진행
-    //  2-2. 기존 이미지 있음 => 수정 작업 진행
+    // 기존 이미지 있음
+    // 1. 새로운 이미지 있음? -> 업데이트
+    // 2. 새로운 이미지 없음? -> 기존 이미지 삭제
     @Transactional
     public void modifyBoard(Long id, BoardUpdateDto updateDto, String token) {
         Board board = boardRepository.findById(id)
@@ -118,35 +118,26 @@ public class BoardService {
         }
         board.updateBoard(updateDto.getTitle(), updateDto.getContent());
 
-        int reuseSize = 0;
-        List<S3UpdateDto> deletedDto = new ArrayList<>(); // 삭제되는 기존 이미지 저장
-        if (!CollectionUtils.isEmpty(updateDto.getUpdateDto())) { // 재사용되는 이미지 사이즈 구하기
-            deletedDto = updateDto.getUpdateDto()
-                    .stream().filter(dto -> dto.isDeleted()).collect(Collectors.toList());
+        S3RequestDto requestDto = new S3RequestDto(board.getId(), "BOARD");
+        List<MultipartFile> images = updateDto.getImages(); // 새롭게 저장할 이미지 데이터
+        imageCheck(board, images); // 새로운 이미지 검증
 
-            // 재사용 이미지 = 기존 전체 이미지 - 삭제되는 이미지
-            reuseSize = updateDto.getUpdateDto().size() - deletedDto.size();
+        // 기존 이미지 없음 & 새로운 이미지 있음 -> 업로드 + 이미지 상태변경
+        if (!board.getHasImage() && !CollectionUtils.isEmpty(images)) {
+            s3Service.uploadImage(images, requestDto);
+            board.toggleHasImage();
         }
 
-        List<MultipartFile> images = updateDto.getImages();
-        if (CollectionUtils.isEmpty(images)) { // 새로운 이미지 없음
-            if (!CollectionUtils.isEmpty(deletedDto)) { // 삭제할 이미지 존재
-                if (reuseSize == 0) { // 재사용 이미지 없으면 전체 이미지 삭제
-                    s3Service.deleteImage(new S3RequestDto(board.getId(), "BOARD"));
-                    board.toggleHasImage();
-                } else { // 재사용 이미지 있으면 업데이트 진행
-                    s3Service.updateImage(updateDto.getImages(), updateDto.getUpdateDto());
-                }
-            }
-        } else { // 새로운 이미지 추가
-            imageCheck(board, images, reuseSize);
+        // 기존 이미지 있음
+        if (board.getHasImage()) {
+            List<S3ResponseDto> response = s3Service.getImages(requestDto);
+            List<S3UpdateDto> originImages = response.stream().map(S3UpdateDto::new).collect(Collectors.toList());
 
-            // 기존 이미지 없었음 => 새로운 이미지 추가만 진행
-            if (CollectionUtils.isEmpty(updateDto.getUpdateDto())) {
-                s3Service.uploadImage(images, new S3RequestDto(board.getId(), "BOARD"));
+            if (!CollectionUtils.isEmpty(images)) { // 새로운 이미지 있음 -> 업데이트
+                s3Service.updateImage(images, originImages);
+            } else { // 새로운 이미지 없음 -> 이미지 전체 삭제 + 이미지 상태 변경
+                s3Service.deleteImage(requestDto);
                 board.toggleHasImage();
-            } else { // 기존 이미지 존재 => 이미지 업데이트 진행
-                s3Service.updateImage(images, updateDto.getUpdateDto());
             }
         }
     }
@@ -169,10 +160,10 @@ public class BoardService {
         boardRepository.deleteAllByEmail(email);
     }
 
-    public void imageCheck(Board saveBoard, List<MultipartFile> images, int reuseSize) {
-        if (saveBoard.getType() == BoardType.MISSING && images.size() - reuseSize > 5) {
+    public void imageCheck(Board saveBoard, List<MultipartFile> images) {
+        if (saveBoard.getType() == BoardType.MISSING && images.size() > 5) {
             throw new BoardException(BAD_REQUEST, "실종 게시글 사진은 최대 5개까지 업로드 가능합니다.");
-        } else if (images.size() - reuseSize > 3) {
+        } else if (images.size() > 3) {
             throw new BoardException(BAD_REQUEST, "게시글 사진은 최대 3개까지 업로드 가능합니다.");
         }
     }
