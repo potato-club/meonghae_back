@@ -43,7 +43,7 @@ public class Board extends BaseTimeEntity {
         this.title = title;
         this.content = content;
     }
-    public void setHasImage() {
-        this.hasImage = true;
+    public void toggleHasImage() {
+        this.hasImage = !this.hasImage;
     }
 }

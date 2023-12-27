@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
@@ -73,16 +74,19 @@ public class FileServiceImpl implements FileService {
             fileList.addAll(dtoList);
         }
 
-        // 기존 파일 리스트와 새로 업로드한 파일 리스트를 비교하여
-        // 바뀐 파일만 업로드하고, 더이상 사용하지 않는 기존 파일은 삭제
-        List<File> list = this.existsFiles(files);
-
         for (int i = 0; i < updateDto.size(); i++) {
             if (updateDto.get(i).isDeleted()) {
                 s3Client.deleteObject(new DeleteObjectRequest(bucketName, fileList.get(i).getFileName())); // 사용하지 않는 파일 삭제
                 fileRepository.delete(fileList.get(i)); // DB에서도 해당 파일 엔티티 삭제
             }
         }
+
+        // 기존 파일 리스트와 새로 업로드한 파일 리스트를 비교하여
+        // 바뀐 파일만 업로드하고, 더이상 사용하지 않는 기존 파일은 삭제
+        // 새로 업로드 할 파일이 없다면 리턴
+        if (CollectionUtils.isEmpty(files)) return;
+
+        List<File> list = this.existsFiles(files);
 
         for (File file : list) {
             file.update(updateDto.get(0));  // 새로 추가된 파일에 엔티티 정보 추가
