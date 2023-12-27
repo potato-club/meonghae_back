@@ -180,9 +180,9 @@ public class FileServiceImpl implements FileService {
 
         for (MultipartFile file : files) {
             String key = file.getOriginalFilename();
-//            if (s3Client.doesObjectExist(bucketName, key)) {
-//                continue;
-//            }
+            if (s3Client.doesObjectExist(bucketName, key)) {
+                continue;
+            }
             String fileName = UUID.randomUUID() + "-" + key;
             InputStream inputStream = file.getInputStream();
             ObjectMetadata metadata = new ObjectMetadata();
