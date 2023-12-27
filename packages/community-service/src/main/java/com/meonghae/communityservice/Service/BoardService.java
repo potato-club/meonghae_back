@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
@@ -60,7 +61,7 @@ public class BoardService {
         boolean isWriter = Objects.equals(board.getEmail(), userService.getUserEmail(token));
         String url = redisService.getProfileImage(board.getEmail());
         BoardDetailDto detailDto = new BoardDetailDto(board, url, likeStatus, isWriter);
-        if(board.getHasImage()) {
+        if (board.getHasImage()) {
             List<S3ResponseDto> images = s3Service.getImages(new S3RequestDto(board.getId(), "BOARD"));
             detailDto.setImages(images);
         }
@@ -92,36 +93,61 @@ public class BoardService {
         Board board = requestDto.toEntity(type, email);
         Board saveBoard = boardRepository.save(board);
         List<MultipartFile> images = requestDto.getImages();
-        if(images != null) {
+        if (images != null) {
             imageCheck(saveBoard, images, 0);
             S3RequestDto s3Dto = new S3RequestDto(saveBoard.getId(), "BOARD");
             s3Service.uploadImage(images, s3Dto);
-            saveBoard.setHasImage();
+            saveBoard.toggleHasImage();
         }
     }
 
+    // 1. 새로운 이미지 없음
+    //  1-1. 기존 이미지 삭제 -> 재사용 이미지 없으면 전체삭제 or 있으면 수정 작업
+    //  1-2. 기존 이미지 유지 -> 따로 작업 필요 없음
+
+    // 2. 새로운 이미지 추가
+    //  2-1. 기존 이미지 없음 => 그냥 추가작업 진행
+    //  2-2. 기존 이미지 있음 => 수정 작업 진행
     @Transactional
     public void modifyBoard(Long id, BoardUpdateDto updateDto, String token) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
         String email = userService.getUserEmail(token);
-        if(!board.getEmail().equals(email)) {
+        if (!board.getEmail().equals(email)) {
             throw new BoardException(UNAUTHORIZED, "글 작성자만 수정 가능합니다.");
         }
-        int reuseSize = 0;
         board.updateBoard(updateDto.getTitle(), updateDto.getContent());
-        if(updateDto.getUpdateDto() != null) {
-            List<S3UpdateDto> reuseDto = updateDto.getUpdateDto()
-                    .stream().filter(dto -> !dto.isDeleted()).collect(Collectors.toList());
 
-            reuseSize = reuseDto.size();
+        int reuseSize = 0;
+        List<S3UpdateDto> deletedDto = new ArrayList<>(); // 삭제되는 기존 이미지 저장
+        if (!CollectionUtils.isEmpty(updateDto.getUpdateDto())) { // 재사용되는 이미지 사이즈 구하기
+            deletedDto = updateDto.getUpdateDto()
+                    .stream().filter(dto -> dto.isDeleted()).collect(Collectors.toList());
+
+            // 재사용 이미지 = 기존 전체 이미지 - 삭제되는 이미지
+            reuseSize = updateDto.getUpdateDto().size() - deletedDto.size();
         }
 
         List<MultipartFile> images = updateDto.getImages();
-        if(images != null) {
+        if (CollectionUtils.isEmpty(images)) { // 새로운 이미지 없음
+            if (!CollectionUtils.isEmpty(deletedDto)) { // 삭제할 이미지 존재
+                if (reuseSize == 0) { // 재사용 이미지 없으면 전체 이미지 삭제
+                    s3Service.deleteImage(new S3RequestDto(board.getId(), "BOARD"));
+                    board.toggleHasImage();
+                } else { // 재사용 이미지 있으면 업데이트 진행
+                    s3Service.updateImage(updateDto.getImages(), updateDto.getUpdateDto());
+                }
+            }
+        } else { // 새로운 이미지 추가
             imageCheck(board, images, reuseSize);
-            s3Service.updateImage(images, updateDto.getUpdateDto());
-            board.setHasImage();
+
+            // 기존 이미지 없었음 => 새로운 이미지 추가만 진행
+            if (CollectionUtils.isEmpty(updateDto.getUpdateDto())) {
+                s3Service.uploadImage(images, new S3RequestDto(board.getId(), "BOARD"));
+                board.toggleHasImage();
+            } else { // 기존 이미지 존재 => 이미지 업데이트 진행
+                s3Service.updateImage(images, updateDto.getUpdateDto());
+            }
         }
     }
 
@@ -130,7 +156,7 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(NOT_FOUND, "board is not exist"));
         String email = userService.getUserEmail(token);
-        if(!board.getEmail().equals(email)) {
+        if (!board.getEmail().equals(email)) {
             throw new BoardException(UNAUTHORIZED, "글 작성자만 삭제 가능합니다.");
         }
         S3RequestDto requestDto = new S3RequestDto(board.getId(), "BOARD");
@@ -144,9 +170,9 @@ public class BoardService {
     }
 
     public void imageCheck(Board saveBoard, List<MultipartFile> images, int reuseSize) {
-        if(saveBoard.getType() == BoardType.MISSING && images.size() - reuseSize > 5) {
+        if (saveBoard.getType() == BoardType.MISSING && images.size() - reuseSize > 5) {
             throw new BoardException(BAD_REQUEST, "실종 게시글 사진은 최대 5개까지 업로드 가능합니다.");
-        } else if(images.size() - reuseSize > 3) {
+        } else if (images.size() - reuseSize > 3) {
             throw new BoardException(BAD_REQUEST, "게시글 사진은 최대 3개까지 업로드 가능합니다.");
         }
     }
