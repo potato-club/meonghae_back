@@ -10,10 +10,11 @@ import java.util.List;
 @Setter
 public class SimpleSchedule {
     private int day;
-    private List<Integer> scheduleIds;
+    private List<Long> scheduleIds;
 
-    public SimpleSchedule (int day) {
+    public SimpleSchedule (int day,long scheduleIds) {
         this.day = day;
         this.scheduleIds = new ArrayList<>();
+        this.scheduleIds.add(scheduleIds);
     }
 }
