@@ -113,47 +113,69 @@ public class ScheduleService {
     String userEmail = feignService.getUserEmail(token);
     QSchedule qSchedule = QSchedule.schedule;
     QPet qPet = QPet.pet;
-    LocalDateTime monthStartPoint = targetDate.atStartOfDay();
-    LocalDateTime monthEndPoint = targetDate.atStartOfDay().plusMonths(3) .minusDays(1);
+    LocalDateTime monthStartPoint = targetDate.atStartOfDay().minusMonths(1);
+    LocalDateTime monthEndPoint = targetDate.atStartOfDay().plusMonths(2) .minusDays(1);
 
+    //반복이 끝나는 시점이 탐색 시작 시간 보다는 커야하며 && 반복이 시작되는 시점이 탐색 끝 시간보다는 작아야한다.
     List<Schedule> scheduleList = jpaQueryFactory
             .selectFrom(qSchedule)
             .leftJoin(qSchedule.pet,qPet)
             .where(qSchedule.userEmail.eq(userEmail)
-                    .and(qSchedule.scheduleEndTime.goe(monthStartPoint))
-                    .or(qSchedule.hasRepeat.isFalse()
-                            .and(qSchedule.scheduleTime.between(monthStartPoint,monthEndPoint))))
+                    .and(
+                            qSchedule.hasRepeat.isTrue()
+                                    .and(qSchedule.scheduleEndTime.goe(monthStartPoint)
+                                            .and(qSchedule.scheduleTime.loe(monthEndPoint)))
+                                    .or(
+                                            qSchedule.hasRepeat.isFalse()
+                                                    .and(qSchedule.scheduleTime.between(monthStartPoint,monthEndPoint))
+                                    )
+                    ))
             .fetch();
 
     //return list에 3달치 설정해두고..
     Map<Integer, List<SimpleSchedule>> monthToSchedulesMap = new HashMap<>();
-    monthToSchedulesMap.putIfAbsent(targetDate.getMonthValue(),new ArrayList<>());
-    monthToSchedulesMap.putIfAbsent(targetDate.plusMonths(1).getMonthValue(),new ArrayList<>());
-    monthToSchedulesMap.putIfAbsent(targetDate.plusMonths(1).getMonthValue(),new ArrayList<>());
+    monthToSchedulesMap.put(targetDate.minusMonths(1).getMonthValue(),new ArrayList<>());
+    monthToSchedulesMap.put(targetDate.getMonthValue(),new ArrayList<>());
+    monthToSchedulesMap.put(targetDate.plusMonths(1).getMonthValue(),new ArrayList<>());
 
 
     for (Schedule schedule : scheduleList) {
       //일반 일정은 시작지점은 골랐으니 달 비교로 해당하는거만 넣고 3달치 뽑기
       if (!schedule.isHasRepeat() && (schedule.getScheduleTime().getMonthValue() == targetDate.getMonthValue()
-              || schedule.getScheduleTime().getMonthValue() == targetDate.plusMonths(1).getMonthValue()
-              || schedule.getScheduleTime().getMonthValue() == targetDate.plusMonths(2).getMonthValue())) {
+              || schedule.getScheduleTime().getMonthValue() == targetDate.minusMonths(1).getMonthValue()
+              || schedule.getScheduleTime().getMonthValue() == targetDate.plusMonths(1).getMonthValue())) {
 
         addSimpleSchedule(monthToSchedulesMap, schedule.getScheduleTime(), schedule.getId().intValue());
 
       }
+      //반복되는 생일이나 예방접종인 경우
+      else if (schedule.isHasRepeat() && !schedule.getScheduleType().equals(ScheduleType.Custom)) {
+        //1로해서 월단위만 비교하게
+        LocalDate scheduleStartPoint = LocalDate.of(schedule.getScheduleTime().getYear(),schedule.getScheduleTime().getMonth(),1);
+        LocalDate requestedTargetPoint = LocalDate.of(targetDate.getYear(), targetDate.getMonth(),1);
+
+        //3개달 구해야하니 -1 부터 시작
+        for (int i = -1; i<= 1; i++) {
+          LocalDate checkMonth = requestedTargetPoint.plusMonths(i);
+          if (checkMonth.isBefore(requestedTargetPoint)) continue;
+          if(isEventScheduled(scheduleStartPoint, schedule.getScheduleType().getRepeatCycle(), checkMonth)){
+            addSimpleSchedule(monthToSchedulesMap, checkMonth.withDayOfMonth(schedule.getScheduleTime().getDayOfMonth()).atStartOfDay(), schedule.getId());
+          }
+        }
+      }
       //주기타입이 month 인 것
-      else if (schedule.getCycleType() == ScheduleCycleType.Month) {
+      else if (schedule.getCycleType().equals(ScheduleCycleType.Month)) {
 
         for (int i = 0; i < 3; i++) { // 현재 달부터 2달 뒤까지 3번 반복
 
           LocalDate repeatedDate = targetDate.plusMonths(i);
           if ((repeatedDate.getMonthValue() - schedule.getScheduleTime().getMonthValue()) % schedule.getCycle() == 0) {
-            addSimpleSchedule(monthToSchedulesMap, repeatedDate.withDayOfMonth(schedule.getScheduleTime().getDayOfMonth()).atStartOfDay(), schedule.getId().intValue());
+            addSimpleSchedule(monthToSchedulesMap, repeatedDate.withDayOfMonth(schedule.getScheduleTime().getDayOfMonth()).atStartOfDay(), schedule.getId());
           }
         }
       }
       //반복 일정 && 타입이 커스텀이면서 주기타입이 day 인 것
-      else if (schedule.isHasRepeat() && schedule.getScheduleType() == ScheduleType.Custom && schedule.getCycleType() == ScheduleCycleType.Day) {
+      else if (schedule.isHasRepeat() && schedule.getCycleType() == ScheduleCycleType.Day) {
 
         List<LocalDateTime> intendedTimeList = calculateRepeatedDays(schedule,targetDate);
 
@@ -176,9 +198,11 @@ public class ScheduleService {
 
   }
 
+  public static boolean isEventScheduled(LocalDate eventStartMonth, int eventCycle, LocalDate requestedMonth) {
+    long monthsBetween = ChronoUnit.MONTHS.between(eventStartMonth, requestedMonth);
+    return monthsBetween % eventCycle == 0;
+  }
 
-
-  @Transactional
   public List<ScheduleResponseDTO> getScheduleOfFindByText(String key, String token){
     String userEmail = feignService.getUserEmail(token);
 
@@ -210,16 +234,16 @@ public class ScheduleService {
       if (scheduleRequestDTO.getScheduleType().equals(ScheduleType.Custom)) {
         switch (scheduleRequestDTO.getCycleType().getKey()) {
           //0이 달 1이 일 // 무한 반복설정 or 반복주기 * 반복횟수
-          case 0 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+          case 0 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
                   : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
           break;
-          case 1 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+          case 1 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
                   : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.DAYS);
           break;
         }
 
       } else {// 무한 반복설정 or 반복주기 * 반복횟수
-        repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+        repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
                 : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getScheduleType().getRepeatCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
         scheduleRequestDTO.setCycleType(ScheduleCycleType.Month);
         scheduleRequestDTO.setCycle(scheduleRequestDTO.getScheduleType().getRepeatCycle());
@@ -256,16 +280,16 @@ public class ScheduleService {
       if (scheduleRequestDTO.getScheduleType().equals(ScheduleType.Custom)) {
         switch (scheduleRequestDTO.getCycleType().getKey()) {
           //0이 달 1이 일 // 무한 반복설정 or 반복주기 * 반복횟수
-          case 0 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+          case 0 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
                   : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
             break;
-          case 1 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+          case 1 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
                   : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.DAYS);
             break;
         }
 
       } else {// 무한 반복설정 or 반복주기 * 반복횟수
-        repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,01,01,00,00)
+        repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
                 : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getScheduleType().getRepeatCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
         scheduleRequestDTO.setCycleType(ScheduleCycleType.Month);
         scheduleRequestDTO.setCycle(scheduleRequestDTO.getScheduleType().getRepeatCycle());
@@ -285,20 +309,20 @@ public class ScheduleService {
 
  //=========================================================
 
-  private void addSimpleSchedule(Map<Integer, List<SimpleSchedule>> monthToSchedulesMap, LocalDateTime date, int scheduleId) {
+  private void addSimpleSchedule(Map<Integer, List<SimpleSchedule>> monthToSchedulesMap, LocalDateTime date, long scheduleId) {
     //해당 달이 있는지 부터 체크하고
     List<SimpleSchedule> scheduleList = monthToSchedulesMap.get(date.getMonthValue());
-    if (scheduleList == null) {
-      scheduleList = new ArrayList<>();
+    if (scheduleList.isEmpty()) {
       monthToSchedulesMap.put(date.getMonthValue(),scheduleList);
     }
 
-    //해당 달에, 해달 일이 존재하는지 찾고 있으면 id 추가, 없으면 날짜 생성
+    //해당 일이 존재하는지 찾고 있으면 id 추가,
     Optional<SimpleSchedule> existingSchedule = scheduleList.stream().filter(s -> s.getDay() == date.getDayOfMonth()).findFirst();
     if (existingSchedule.isPresent()) {
       existingSchedule.get().getScheduleIds().add(scheduleId);
-    } else {
-      SimpleSchedule simpleSchedule = new SimpleSchedule(date.getDayOfMonth());
+    }
+    else {//없으면 날짜 생성
+      SimpleSchedule simpleSchedule = new SimpleSchedule(date.getDayOfMonth(),scheduleId);
       scheduleList.add(simpleSchedule);
     }
   }

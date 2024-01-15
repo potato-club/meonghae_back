@@ -14,9 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -60,22 +60,16 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void updateFiles(List<MultipartFile> files, List<FileUpdateDto> updateDto) throws IOException {
-        List<File> fileList = new ArrayList<>();
+        // 원래 데이터 중 하나만 있어도 리스트 조회 가능
+        FileUpdateDto dto = updateDto.get(0);
 
-        for (FileUpdateDto dto : updateDto) {
-            List<File> dtoList;
-            if (dto.getEntityType().equals(EntityType.USER)) {
-                dtoList = fileRepository.findByEntityTypeAndEmail(dto.getEntityType(), dto.getEmail());
-            } else {
-                dtoList = fileRepository.findByEntityTypeAndTypeId(dto.getEntityType(), dto.getEntityId());
-            }
-
-            fileList.addAll(dtoList);
+        List<File> fileList;
+        if (dto.getEntityType().equals(EntityType.USER)) {
+            fileList = fileRepository.findByEntityTypeAndEmail(dto.getEntityType(), dto.getEmail());
+        } else {
+            fileList = fileRepository.findByEntityTypeAndTypeId(dto.getEntityType(), dto.getEntityId());
         }
 
-        // 기존 파일 리스트와 새로 업로드한 파일 리스트를 비교하여
-        // 바뀐 파일만 업로드하고, 더이상 사용하지 않는 기존 파일은 삭제
-        List<File> list = this.existsFiles(files);
 
         for (int i = 0; i < updateDto.size(); i++) {
             if (updateDto.get(i).isDeleted()) {
@@ -84,9 +78,14 @@ public class FileServiceImpl implements FileService {
             }
         }
 
+        // 기존 파일 리스트와 새로 업로드한 파일 리스트를 비교하여
+        // 바뀐 파일만 업로드하고, 더이상 사용하지 않는 기존 파일은 삭제
+        List<File> list = this.existsFiles(files);
+
         for (File file : list) {
             file.update(updateDto.get(0));  // 새로 추가된 파일에 엔티티 정보 추가
             fileRepository.save(file);  // 새 파일 DB 저장
+            log.info("============ FileName : " + file.getFileName());
         }
     }
 

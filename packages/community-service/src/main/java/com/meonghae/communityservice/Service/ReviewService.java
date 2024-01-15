@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.meonghae.communityservice.Exception.Error.ErrorCode.*;
@@ -54,7 +55,8 @@ public class ReviewService {
         List<Long> reviewIds = reviews.getContent().stream().map(Review::getId).collect(Collectors.toList());
         Map<Long, RecommendStatus> reactions = reactionService.getReviewReactions(reviewIds, token);
 
-        return reviews.map(r -> convertTypeAndAddImage(r, token, reactions.get(r.getId())));
+        String email = userService.getUserEmail(token);
+        return reviews.map(r -> convertTypeAndAddImage(r, email, reactions.get(r.getId())));
     }
     private Slice<Review> getPagingReview(int page, ReviewCatalog catalog, String keyword, ReviewSortType sort) {
         PageRequest request;
@@ -138,10 +140,11 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
-    private ReviewListDto convertTypeAndAddImage(Review review, String token, RecommendStatus status) {
+    private ReviewListDto convertTypeAndAddImage(Review review, String email, RecommendStatus status) {
         String nickname = redisService.getNickname(review.getEmail());
         String url = redisService.getProfileImage(review.getEmail());
-        ReviewListDto reviewDto = new ReviewListDto(review, nickname, url, status);
+        boolean isWriter = Objects.equals(review.getEmail(), email);
+        ReviewListDto reviewDto = new ReviewListDto(review, nickname, url, status, isWriter);
         if (review.getHasImage()) {
             List<S3ResponseDto> reviewImages = redisService.getReviewImages(review.getId());
             reviewDto.setImages(reviewImages);

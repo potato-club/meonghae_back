@@ -38,8 +38,7 @@ public class ScheduleController {
   public List<SimpleMonthSchedule> getMonthSchedule(@RequestParam int year, @RequestParam int month,
                                                @RequestHeader("Authorization") String token) {
 
-    // 시작 달을 전 달로 설정
-    LocalDate startOfDate = LocalDate.of(year, month, 1).minusMonths(1);
+    LocalDate startOfDate = LocalDate.of(year, month, 1);
 
     return scheduleService.getMonthOfSchedule(startOfDate, token);
   }
