@@ -31,22 +31,23 @@ public class FcmConfig {
 
     public void sendMessageTo(AlarmDto alarmDto) throws IOException {
         String message = makeMessage(alarmDto);
-
+        log.info("sendMessageTo: "+message);
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(message,
                 MediaType.get("application/json; charset=utf-8"));
-        log.info("http 헤더 만들기");
+
         Request request = new Request.Builder()
                 .url(ApiUrl)
                 .post(requestBody)
                 .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
                 .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
                 .build();
-        log.info("보내기 전");
-        log.info(requestBody.toString());
-        Response response = client.newCall(request).execute();
-        log.info("보낸 후");
-        System.out.println(response.body().string());
+
+        System.out.println(requestBody);
+        try (Response response = client.newCall(request).execute()) {
+
+            System.out.println(response.body().string());
+        }
     }
 
     private String makeMessage(AlarmDto alarmDto) throws JsonParseException, JsonProcessingException {
@@ -60,7 +61,7 @@ public class FcmConfig {
                                 .build())
                         .build())
                 .build();
-        
+        log.info(message.getMessage().getToken() + ",  " +message.getMessage().getNotification().getBody());
 //        FcmMessage message = FcmMessage.builder()
 //                .to(redisService.getFcmToken(alarmDto.getUserEmail()))
 //                .notification(FcmMessage.Notification.builder()
@@ -74,13 +75,13 @@ public class FcmConfig {
 
     // firebase로 부터 access token을 가져온다. -> 이 토큰은 사용자 고유식별 토큰 아님
     private String getAccessToken() throws IOException {
-        log.info("엑세스 토큰 받아오기");
+
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new FileInputStream("/app/config"))
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         googleCredentials.refreshIfExpired();
-        log.info("엑세스 토큰 받아옴");
+        log.info(googleCredentials.getAccessToken().getTokenValue());
         return googleCredentials.getAccessToken().getTokenValue();
     }
 
