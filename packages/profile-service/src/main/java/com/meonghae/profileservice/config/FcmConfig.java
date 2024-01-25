@@ -25,7 +25,7 @@ public class FcmConfig {
     private final ObjectMapper objectMapper;
     private final RedisService redisService;
     private final String ApiUrl = "https://fcm.googleapis.com/v1/projects/meonghae-b9c8b/messages:send";
-    @Value("${firebase}")
+    @Value("${firebase:/app/config}")
     private String firebaseJson;
 
     public void sendMessageTo(AlarmDto alarmDto) throws IOException {
