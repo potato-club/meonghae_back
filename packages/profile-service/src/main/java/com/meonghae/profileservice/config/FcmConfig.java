@@ -15,6 +15,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -25,8 +26,8 @@ public class FcmConfig {
     private final ObjectMapper objectMapper;
     private final RedisService redisService;
     private final String ApiUrl = "https://fcm.googleapis.com/v1/projects/meonghae-b9c8b/messages:send";
-    @Value("${firebase:/app/config}")
-    private String firebaseJson;
+//    @Value("${firebase:}")
+//    private String firebaseJson;
 
     public void sendMessageTo(AlarmDto alarmDto) throws IOException {
         String message = makeMessage(alarmDto);
@@ -65,7 +66,7 @@ public class FcmConfig {
     private String getAccessToken() throws IOException {
         log.info("엑세스 토큰 받아오기");
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(firebaseJson).getInputStream())
+                .fromStream(new FileInputStream("/app/config"))
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         googleCredentials.refreshIfExpired();
