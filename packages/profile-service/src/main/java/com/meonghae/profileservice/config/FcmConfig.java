@@ -43,7 +43,6 @@ public class FcmConfig {
                 .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
                 .build();
 
-        System.out.println(requestBody);
         try (Response response = client.newCall(request).execute()) {
 
             System.out.println(response.body().string());
