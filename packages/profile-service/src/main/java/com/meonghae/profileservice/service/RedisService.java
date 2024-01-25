@@ -35,9 +35,9 @@ public class RedisService {
         if ( fcmToken == null ) {
             log.info("if");
             FCMResponseDto fcmResponseDto = userFeignService.getFCMToken(email);
-            log.info(fcmResponseDto.getFCMToken());
+            log.info(fcmResponseDto.getFcmToken());
             log.info(fcmResponseDto.getEmail());
-            this.saveFcmToken(email, fcmResponseDto.getFCMToken());
+            this.saveFcmToken(email, fcmResponseDto.getFcmToken());
         } else {
             log.info("else");
             //만료 시간 재설정

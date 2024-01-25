@@ -8,6 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class FCMResponseDto {
     private String email;
-    @JsonProperty("FCMToken")
-    private String FCMToken;
+    @JsonProperty("fcmToken")
+    private String fcmToken;
 }

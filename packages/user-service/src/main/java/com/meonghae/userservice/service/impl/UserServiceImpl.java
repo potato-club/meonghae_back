@@ -84,10 +84,10 @@ public class UserServiceImpl implements UserService {
         if (fcmToken == null) {
             throw new UnAuthorizedException("Not Found", ACCESS_DENIED_EXCEPTION);
         }
-        log.info(fcmToken.getToken());
+
         return FCMResponseDto.builder()
                 .email(email)
-                .FCMToken(fcmToken.getToken())
+                .fcmToken(fcmToken.getToken())
                 .build();
     }
 

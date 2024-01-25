@@ -13,6 +13,6 @@ public class FCMResponseDto {
     @ApiModelProperty(value = "email")
     private String email;
 
-    @ApiModelProperty(value = "FCMToken")
-    private String FCMToken;
+    @ApiModelProperty(value = "fcmToken")
+    private String fcmToken;
 }
