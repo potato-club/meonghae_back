@@ -23,8 +23,8 @@ public class FcmMessage {
     @AllArgsConstructor
     @Getter
     public static class Notification {
-        private String title;
         private String body;
+        private String title;
     }
 }
 

@@ -55,8 +55,8 @@ public class FcmConfig {
                 .message(FcmMessage.Message.builder()
                         .token(redisService.getFcmToken(alarmDto.getUserEmail()))
                         .notification(FcmMessage.Notification.builder()
-                                .title("멍해")
                                 .body(alarmDto.getText())
+                                .title("멍해")
                                 .build())
                         .build())
                 .build();
@@ -68,7 +68,7 @@ public class FcmConfig {
 //                        .body(alarmDto.getText())
 //                        .build())
 //                .build();
-        log.info(objectMapper.writeValueAsString(message));
+        log.info(objectMapper.writeValueAsString(message).toString());
         return objectMapper.writeValueAsString(message);
     }
 
