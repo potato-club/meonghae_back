@@ -68,7 +68,7 @@ public class FcmConfig {
 //                        .body(alarmDto.getText())
 //                        .build())
 //                .build();
-        log.info("메시지 만듦");
+        log.info(objectMapper.writeValueAsString(message));
         return objectMapper.writeValueAsString(message);
     }
 
