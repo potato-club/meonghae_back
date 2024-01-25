@@ -50,14 +50,24 @@ public class FcmConfig {
     }
 
     private String makeMessage(AlarmDto alarmDto) throws JsonParseException, JsonProcessingException {
-        
+
         FcmMessage message = FcmMessage.builder()
-                .to(redisService.getFcmToken(alarmDto.getUserEmail()))
-                .notification(FcmMessage.Notification.builder()
-                        .title("멍해")
-                        .body(alarmDto.getText())
+                .message(FcmMessage.Message.builder()
+                        .token(redisService.getFcmToken(alarmDto.getUserEmail()))
+                        .notification(FcmMessage.Notification.builder()
+                                .title("멍해")
+                                .body(alarmDto.getText())
+                                .build())
                         .build())
                 .build();
+        
+//        FcmMessage message = FcmMessage.builder()
+//                .to(redisService.getFcmToken(alarmDto.getUserEmail()))
+//                .notification(FcmMessage.Notification.builder()
+//                        .title("멍해")
+//                        .body(alarmDto.getText())
+//                        .build())
+//                .build();
         log.info("메시지 만듦");
         return objectMapper.writeValueAsString(message);
     }
