@@ -31,12 +31,12 @@ public class RedisService {
     public String getFcmToken(String email) {
         String cacheKey = getFCM + "::" + email;
         String fcmToken = cacheManager.getCache(getFCM).get(cacheKey, String.class);
-        log.info("fcm: " + fcmToken);
 
         if ( fcmToken == null ) {
             log.info("if");
             FCMResponseDto fcmResponseDto = userFeignService.getFCMToken(email);
             log.info(fcmResponseDto.getFCMToken());
+            log.info(fcmResponseDto.getEmail());
             this.saveFcmToken(email, fcmResponseDto.getFCMToken());
         } else {
             log.info("else");
