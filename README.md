@@ -8,10 +8,10 @@
 - 사용자들이 쉽게 접근할 수 있는 환경을 위해 앱 개발 선택
 
 ### 프로젝트 구성도
-> ![1차 배포 구성도](https://github.com/potato-club/meonghae_back/assets/100738591/8988958e-4906-44bc-a8c0-100103b38e75)
+ ![1차 배포 구성도](https://github.com/potato-club/meonghae_back/assets/100738591/8988958e-4906-44bc-a8c0-100103b38e75)
 
 ### 구글 플레이 스토어 배포
-> ![멍해](https://github.com/potato-club/meonghae_back/assets/84797433/f71884bf-0b2f-41c0-8dd2-ba6736a9f370)
+ ![멍해](https://github.com/potato-club/meonghae_back/assets/84797433/f71884bf-0b2f-41c0-8dd2-ba6736a9f370)
 
 ## 기술 스택 및 구성도
 
