@@ -8,67 +8,68 @@
 - 사용자들이 쉽게 접근할 수 있는 환경을 위해 앱 개발 선택
 
 ### 프로젝트 구성도
-> ![1차 배포 구성도](https://github.com/potato-club/meonghae_back/assets/100738591/8988958e-4906-44bc-a8c0-100103b38e75)
+ ![1차 배포 구성도](https://github.com/potato-club/meonghae_back/assets/100738591/8988958e-4906-44bc-a8c0-100103b38e75)
 
 ### 구글 플레이 스토어 배포
-> ![멍해](https://github.com/potato-club/meonghae_back/assets/84797433/f71884bf-0b2f-41c0-8dd2-ba6736a9f370)
+ ![멍해](https://github.com/potato-club/meonghae_back/assets/84797433/f71884bf-0b2f-41c0-8dd2-ba6736a9f370)
 
-<h2>기술 스택 및 구성도</h2>
+## 기술 스택 및 구성도
 
-<br/>
+### 프론트
+[프론트엔드 리포지토리 바로가기](https://github.com/potato-club/meonghae_front)
+- **Flutter**: 프레임워크
+- **Dio**: API 통신 라이브러리
+- **Provider**: 전역 상태 관리 라이브러리
 
-> ### [프론트](https://github.com/potato-club/meonghae_front)
-> - Flutter - 프레임 워크
-> - Dio - API 통신 라이브러리
-> - Provider - 전역 상태 관리 라이브러리
-> ### 백
-> - Spring Framework
-    >    - Spring Boot - 스프링 기반 프레임워크
->    - Spring Cloud - MSA 구성 지원 프레임워크
-> - Ubuntu + Nginx - 서버 컴퓨터 환경
-> - MySQL - 기본 데이터베이스
-> - AWS RDS - 클라우드 데이터베이스
-> - Firebase ( + RabbitMQ ) - 알림 기능을 위한 데이터베이스
-> - Spring Data JPA + QueryDsl - Type ORM 기술
-> - Docker - 배포를 위한 컨테이너 가상화
-> - RabbitMQ (Message Queue) - 데이터 동기화
-> - Jenkins ( CI / CD ) - 자동화 배포
-> - 모니터링
-    >     - Prometheous + Grafana - 통계 시각화 툴
+### 백엔드
+- **Spring Framework**
+  - **Spring Boot**: 스프링 기반 프레임워크
+  - **Spring Cloud**: MSA 구성 지원 프레임워크
+- **Ubuntu + Nginx**: 서버 컴퓨터 환경
+- **MySQL**: 기본 데이터베이스
+- **AWS RDS**: 클라우드 데이터베이스
+- **Firebase (+ RabbitMQ)**: 알림 기능을 위한 데이터베이스
+- **Spring Data JPA + QueryDsl**: Type ORM 기술
+- **Docker**: 배포를 위한 컨테이너 가상화
+- **RabbitMQ (Message Queue)**: 데이터 동기화
+- **Jenkins (CI/CD)**: 자동화 배포
+- **모니터링**
+  - **Prometheus + Grafana**: 통계 시각화 툴
 
-<br/>
+### ERD 구성도
+![ERD 구성도](https://github.com/leemj123/meonghae_back/assets/100738591/385e2bf8-826d-43d7-88b2-3ecb69f8b782)
 
-- **각 서비스 역할**
->   - `Eureka Server`
-      >       - MSA 환경에서 각 서비스간의 로드밸런싱 및 각 서비스의 네임을 등록하여 Gateway에서 네이밍으로 접근이 가능하도록 해주는 미들웨어 서버
->
->   - `Gateway Service`
-      >       - 각 서비스로의 라우팅 담당 및 보안과 인증을 담당하여 접근에 대한 제어 가능
->       - Gateway Filter 로 JWT 검증과 잘못된 접근에 대한 Exception 처리를 담당함.
->
->   - `User Service`
-      >       - 유저가 각 서비스로 접근할 수 있도록 토큰 발급 & 재발급 및 유저 정보를 관리하는 서비스
->       - 유저의 정보를 저장 & 수정할 수 있고, 회원탈퇴나 로그아웃과 같은 기능도 여기서 이루어짐.
->       - Spring Scheduler 를 통해 매일 자정마다 탈퇴 후 7일동안 접속이 없으면 관련 데이터 삭제하는 로직 실행.
->       - Profile Service 의 알림 기능에 필요한 FCM 토큰을 로그인 시점에서 로그아웃 때까지 관리함.
->
->   - `Community Service`
-      >       - 게시글을 올리거나 애완용품에 대한 리뷰를 작성하는 등 각 유저간 소통을 위한 서비스
->       - 게시판은 3가지 타입으로 분류되고, 각 게시판에 대한 CRUD 가능.
->       - 리뷰는 카탈로그에 따라 생성 & 조회 & 삭제가 가능.
->       - 커뮤니티는 조회 시 페이징 처리를 통해 무한 스크롤 가능하고, 리뷰는 키워드나 사진 유무에 따른 필터링이 가능.
->       - 게시글은 좋아요와 댓글 작성 기능이 있고, 리뷰는 추천과 비추천 기능이 있음
->
->   - `Profile Service`
-      >       - 유저의 애완동물 정보 및 일정을 관리하는 서비스
->       - 펫들의 정보를 저장 & 수정 & 삭제할 수 있음.
->       - 일정관리를 위한 달력 기능을 제공합니다.
->       - 일정과 알람은 반복주기를 통해 예방접종 등의 반복되는 스케줄을 자동 일정 설정을 제공합니다.
->       - 알람은 스케줄러를 통해 Rabbimq의 delayTime 플러그인으로 설정된 알람시간에 맞춰 Firebase 의 Cloud Message(FCM) 기능을 통해 알림을 전송합니다.
->
->   - `AWS S3 Service`
-      >       - 유저가 업로드하는 모든 종류의 이미지 파일들을 AWS S3 공간에 업로드하고 관리하는 서비스 (프로필 사진, 애완동물 사진, 게시글 사진 등)
->       - Feign Client 를 통해 거의 모든 서비스들에게 사진 저장 & 삭제 및 다운로드 링크 출력 등의 서비스를 제공함.
+### 각 서비스 역할
+- **Eureka Server**
+  - MSA 환경에서 각 서비스간의 로드밸런싱 및 각 서비스의 네임을 등록하여 Gateway에서 네이밍으로 접근이 가능하도록 해주는 미들웨어 서버
+
+- **Gateway Service**
+  - 각 서비스로의 라우팅 담당 및 보안과 인증을 담당하여 접근에 대한 제어 가능
+  - Gateway Filter로 JWT 검증과 잘못된 접근에 대한 Exception 처리를 담당함
+
+- **User Service**
+  - 유저가 각 서비스로 접근할 수 있도록 토큰 발급 & 재발급 및 유저 정보를 관리하는 서비스
+  - 유저의 정보를 저장 & 수정할 수 있고, 회원탈퇴나 로그아웃과 같은 기능도 여기서 이루어짐
+  - Spring Scheduler를 통해 매일 자정마다 탈퇴 후 7일 동안 접속이 없으면 관련 데이터 삭제하는 로직 실행
+  - Profile Service의 알림 기능에 필요한 FCM 토큰을 로그인 시점에서 로그아웃 때까지 관리함
+
+- **Community Service**
+  - 게시글을 올리거나 애완용품에 대한 리뷰를 작성하는 등 각 유저간 소통을 위한 서비스
+  - 게시판은 3가지 타입으로 분류되고, 각 게시판에 대한 CRUD 가능
+  - 리뷰는 카탈로그에 따라 생성 & 조회 & 삭제가 가능
+  - 커뮤니티는 조회 시 페이징 처리를 통해 무한 스크롤 가능하고, 리뷰는 키워드나 사진 유무에 따른 필터링이 가능
+  - 게시글은 좋아요와 댓글 작성 기능이 있고, 리뷰는 추천과 비추천 기능이 있음
+
+- **Profile Service**
+  - 유저의 애완동물 정보 및 일정을 관리하는 서비스
+  - 펫들의 정보를 저장 & 수정 & 삭제할 수 있음
+  - 일정관리를 위한 달력 기능을 제공
+  - 일정과 알람은 반복주기를 통해 예방접종 등의 반복되는 스케줄을 자동 일정 설정을 제공
+  - 알람은 스케줄러를 통해 RabbitMQ의 delayTime 플러그인으로 설정된 알람시간에 맞춰 Firebase의 Cloud Message(FCM) 기능을 통해 알림을 전송
+
+- **AWS S3 Service**
+  - 유저가 업로드하는 모든 종류의 이미지 파일들을 AWS S3 공간에 업로드하고 관리하는 서비스 (프로필 사진, 애완동물 사진, 게시글 사진 등)
+  - Feign Client를 통해 거의 모든 서비스들에게 사진 저장 & 삭제 및 다운로드 링크 출력 등의 서비스를 제공함
 
 <br/>
 
