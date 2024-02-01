@@ -44,7 +44,7 @@ public class Schedule extends BaseTimeEntity{
   private LocalDateTime alarmTime;
   @Column
   private LocalDateTime scheduleEndTime;
-  @Column
+  @Column(nullable = false)
   private String text;
 
   public Schedule(Pet pet, String userEmail,LocalDateTime scheduleEndTime, ScheduleRequestDTO scheduleRequestDTO) {
