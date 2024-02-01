@@ -76,11 +76,11 @@ public class ScheduleService {
         processRepeatSchedule(resultList, schedule, unit);
       }
     }
-    // SchedulePreviewResponseDto.scheduleDate로 현재 날짜에 가까운 순으로 정렬
+    // 결과 리스트를 최신 날짜 순으로 정렬
     resultList.sort(Comparator.comparing(SchedulePreviewResponseDto::getScheduleDate));
 
     // 상위 5개만 리턴
-    return resultList.subList(0, Math.min(resultList.size(), 5));
+    return resultList.size() > 5 ? resultList.subList(0, 5) : resultList;
   }
 
 
@@ -175,7 +175,8 @@ public class ScheduleService {
         }
       }
       //반복 일정 && 타입이 커스텀이면서 주기타입이 day 인 것
-      else if (schedule.isHasRepeat() && schedule.getCycleType() == ScheduleCycleType.Day) {
+      else if (schedule.isHasRepeat() && schedule.getScheduleType().equals(ScheduleType.Custom)
+              && schedule.getCycleType() == ScheduleCycleType.Day) {
 
         List<LocalDateTime> intendedTimeList = calculateRepeatedDays(schedule,targetDate);
 
@@ -232,19 +233,21 @@ public class ScheduleService {
     if (scheduleRequestDTO.isHasRepeat()) {
       //일정 타입비교
       if (scheduleRequestDTO.getScheduleType().equals(ScheduleType.Custom)) {
+        if (scheduleRequestDTO.getText() == null)
+          scheduleRequestDTO.setText(scheduleRequestDTO.getCustomScheduleTitle());
         switch (scheduleRequestDTO.getCycleType().getKey()) {
           //0이 달 1이 일 // 무한 반복설정 or 반복주기 * 반복횟수
           case 0 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
-                  : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
+                  : scheduleRequestDTO.getScheduleTime().plusMonths((long) scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount());
           break;
           case 1 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
-                  : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.DAYS);
+                  : scheduleRequestDTO.getScheduleTime().plusDays((long) scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount());
           break;
         }
 
       } else {// 무한 반복설정 or 반복주기 * 반복횟수
         repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
-                : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getScheduleType().getRepeatCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
+                : scheduleRequestDTO.getScheduleTime().plusMonths((long) scheduleRequestDTO.getScheduleType().getRepeatCycle() * scheduleRequestDTO.getCycleCount());
         scheduleRequestDTO.setCycleType(ScheduleCycleType.Month);
         scheduleRequestDTO.setCycle(scheduleRequestDTO.getScheduleType().getRepeatCycle());
       }
@@ -278,19 +281,21 @@ public class ScheduleService {
     if (scheduleRequestDTO.isHasRepeat()) {
       //일정 타입비교
       if (scheduleRequestDTO.getScheduleType().equals(ScheduleType.Custom)) {
+        if (scheduleRequestDTO.getText() == null)
+          scheduleRequestDTO.setText(scheduleRequestDTO.getCustomScheduleTitle());
         switch (scheduleRequestDTO.getCycleType().getKey()) {
           //0이 달 1이 일 // 무한 반복설정 or 반복주기 * 반복횟수
           case 0 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
-                  : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
+                  : scheduleRequestDTO.getScheduleTime().plusMonths((long) scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount());
             break;
           case 1 : repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
-                  : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.DAYS);
+                  : scheduleRequestDTO.getScheduleTime().plusDays((long) scheduleRequestDTO.getCycle() * scheduleRequestDTO.getCycleCount());
             break;
         }
 
       } else {// 무한 반복설정 or 반복주기 * 반복횟수
         repeatEndTime = scheduleRequestDTO.getCycleCount() == 0 ? LocalDateTime.of(2100,1,1,0,0)
-                : scheduleRequestDTO.getScheduleTime().plus(scheduleRequestDTO.getScheduleType().getRepeatCycle() * scheduleRequestDTO.getCycleCount(), ChronoUnit.MONTHS);
+                : scheduleRequestDTO.getScheduleTime().plusMonths((long) scheduleRequestDTO.getScheduleType().getRepeatCycle() * scheduleRequestDTO.getCycleCount());
         scheduleRequestDTO.setCycleType(ScheduleCycleType.Month);
         scheduleRequestDTO.setCycle(scheduleRequestDTO.getScheduleType().getRepeatCycle());
       }
@@ -352,18 +357,34 @@ public class ScheduleService {
 
   private void processRepeatSchedule(List<SchedulePreviewResponseDto> resultList, Schedule schedule, ChronoUnit unit) {
     LocalDateTime nextScheduleTime = schedule.getScheduleTime();
+    //몇달을 추가해서 일정에 보여줘야하는지
     int repeatCount = (int) (unit.between(nextScheduleTime, LocalDateTime.now()) / schedule.getCycle());
+    //같은 달에 있는 일정인데 day가 이미 지났니? 지난거면 다음 반복주기로 1, 아님 0
     if (repeatCount == 0) {
       repeatCount = nextScheduleTime.isBefore(LocalDateTime.now()) ? 1 : 0;
     }
-    nextScheduleTime = nextScheduleTime.plus(repeatCount * schedule.getCycle(), unit);
+    nextScheduleTime = nextScheduleTime.plus((long) repeatCount * schedule.getCycle(), unit);
+
+    if (nextScheduleTime.isBefore(LocalDateTime.now()))
+      nextScheduleTime = nextScheduleTime.plus(schedule.getCycle(),unit);
 
     for (int i = 0; i < 5; i++) {
-      resultList.add(new SchedulePreviewResponseDto(schedule, nextScheduleTime));
-      nextScheduleTime = nextScheduleTime.plus(schedule.getCycle(), unit);
       if (schedule.getScheduleEndTime().isBefore(nextScheduleTime)) {
         break;
       }
+      if (resultList.size() >= 5) {
+        // resultList를 정렬하여 가장 늦은 일정을 확인
+        resultList.sort(Comparator.comparing(SchedulePreviewResponseDto::getScheduleDate));
+        // 가장 늦은 일정보다 현재 추가할 일정이 빠른 경우
+        if (nextScheduleTime.isBefore(resultList.get(4).getScheduleDate())) {
+          // 가장 늦은 일정을 제거하고 새 일정 추가
+          resultList.remove(4);
+          resultList.add(new SchedulePreviewResponseDto(schedule, nextScheduleTime));
+        } else break;
+      } else {
+        resultList.add(new SchedulePreviewResponseDto(schedule, nextScheduleTime));
+      }
+      nextScheduleTime = nextScheduleTime.plus(schedule.getCycle(), unit);
     }
   }
 }
