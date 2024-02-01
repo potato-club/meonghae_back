@@ -120,10 +120,10 @@ public class BoardService {
 
         S3RequestDto requestDto = new S3RequestDto(board.getId(), "BOARD");
         List<MultipartFile> images = updateDto.getImages(); // 새롭게 저장할 이미지 데이터
-        imageCheck(board, images); // 새로운 이미지 검증
 
         // 기존 이미지 없음 & 새로운 이미지 있음 -> 업로드 + 이미지 상태변경
         if (!board.getHasImage() && !CollectionUtils.isEmpty(images)) {
+            imageCheck(board, images); // 새로운 이미지 검증
             s3Service.uploadImage(images, requestDto);
             board.toggleHasImage();
         }
@@ -134,6 +134,7 @@ public class BoardService {
             List<S3UpdateDto> originImages = response.stream().map(S3UpdateDto::new).collect(Collectors.toList());
 
             if (!CollectionUtils.isEmpty(images)) { // 새로운 이미지 있음 -> 업데이트
+                imageCheck(board, images); // 새로운 이미지 검증
                 s3Service.updateImage(images, originImages);
             } else { // 새로운 이미지 없음 -> 이미지 전체 삭제 + 이미지 상태 변경
                 s3Service.deleteImage(requestDto);
