@@ -10,8 +10,6 @@ import com.meonghae.profileservice.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
@@ -61,13 +59,7 @@ public class FcmConfig {
                         .build())
                 .build();
         log.info(message.getMessage().getToken() + ",  " +message.getMessage().getNotification().getBody());
-//        FcmMessage message = FcmMessage.builder()
-//                .to(redisService.getFcmToken(alarmDto.getUserEmail()))
-//                .notification(FcmMessage.Notification.builder()
-//                        .title("멍해")
-//                        .body(alarmDto.getText())
-//                        .build())
-//                .build();
+
         log.info(objectMapper.writeValueAsString(message).toString());
         return objectMapper.writeValueAsString(message);
     }

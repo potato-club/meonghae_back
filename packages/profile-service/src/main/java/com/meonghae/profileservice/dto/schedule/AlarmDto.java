@@ -17,13 +17,10 @@ public class AlarmDto {
     private Timestamp alarmTime;
     private String userEmail;
 
-    public AlarmDto(Schedule schedule){
-        this.alarmTime = Timestamp.valueOf(schedule.getAlarmTime());
-        if (schedule.getScheduleType().getKey() < 10)
-            this.text = schedule.getUserEmail()+"님, "+ schedule.getScheduleType().getTitle();
-        else if(schedule.getScheduleType().getKey() > 10)
-            this.text = schedule.getUserEmail()+"님, 오늘은 "+ schedule.getText()+ schedule.getScheduleType().getTitle()+" 일정이 있어요";
-        this.userEmail = schedule.getUserEmail();
+    public AlarmDto(ScheduleRequestDTO scheduleRequestDTO, String userEmail){
+        this.alarmTime = Timestamp.valueOf(scheduleRequestDTO.getAlarmTime());
+        this.text = userEmail+"님, 오늘은 "+ scheduleRequestDTO.getText()+ scheduleRequestDTO.getScheduleType().getTitle()+" 일정이 있어요";
+        this.userEmail = userEmail;
     }
 
     public AlarmDto(Schedule schedule, LocalDateTime intendedAlarmTime) {

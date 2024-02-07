@@ -29,7 +29,15 @@ public class ScheduleService {
   private final ScheduleRepository scheduleRepository;
   private final JPAQueryFactory jpaQueryFactory;
   private final FeignService feignService;
+  private final RabbitService rabbitService;
 
+
+  public String fcmTest(ScheduleRequestDTO scheduleRequestDTO, String token) {
+    String userEmail = feignService.getUserEmail(token);
+    AlarmDto alarmDto = new AlarmDto(scheduleRequestDTO,userEmail);
+    rabbitService.sendToRabbitMq(alarmDto);
+    return "알람시간은 어느정도 여유를 두고 해주세요. 요청시 hasRepeat, text, ScheduleType은 Test로 필수 요소임";
+  }
   @Transactional
   public ScheduleResponseDTO getSchedule(Long id, String token) {
     String userEmail = feignService.getUserEmail(token);
