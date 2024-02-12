@@ -28,6 +28,7 @@ public class FcmConfig {
 //    private String firebaseJson;
 
     public void sendMessageTo(AlarmDto alarmDto) throws IOException {
+        log.info("line 31");
         String message = makeMessage(alarmDto);
         log.info("sendMessageTo: "+message);
         OkHttpClient client = new OkHttpClient();
@@ -48,7 +49,7 @@ public class FcmConfig {
     }
 
     private String makeMessage(AlarmDto alarmDto) throws JsonParseException, JsonProcessingException {
-
+        log.info("52line");
         FcmMessage message = FcmMessage.builder()
                 .message(FcmMessage.Message.builder()
                         .token(redisService.getFcmToken(alarmDto.getUserEmail()))
