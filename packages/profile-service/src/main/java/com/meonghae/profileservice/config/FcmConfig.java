@@ -61,7 +61,6 @@ public class FcmConfig {
                 .build();
         log.info(message.getMessage().getToken() + ",  " +message.getMessage().getNotification().getBody());
 
-        log.info(objectMapper.writeValueAsString(message).toString());
         return objectMapper.writeValueAsString(message);
     }
 

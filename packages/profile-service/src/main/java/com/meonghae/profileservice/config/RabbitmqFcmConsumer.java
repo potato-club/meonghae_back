@@ -18,6 +18,7 @@ public class RabbitmqFcmConsumer {
     public void receive(AlarmDto alarmDto) throws IOException {
         log.info(alarmDto.getText());
         log.info(alarmDto.getAlarmTime().toString());
+        log.info(alarmDto.getUserEmail());
 
         fcmConfig.sendMessageTo(alarmDto);
     }
