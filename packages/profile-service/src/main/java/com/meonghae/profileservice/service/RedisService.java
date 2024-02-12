@@ -31,9 +31,10 @@ public class RedisService {
     public String getFcmToken(String email) {
         String cacheKey = getFCM + "::" + email;
         String fcmToken = cacheManager.getCache(getFCM).get(cacheKey, String.class);
-
+        log.info("redis-34: "+fcmToken);
         if ( fcmToken == null ) {
             FCMResponseDto fcmResponseDto = userFeignService.getFCMToken(email);
+            log.info("redis-37: "+fcmResponseDto.getFcmToken());
             this.saveFcmToken(email, fcmResponseDto.getFcmToken());
             return fcmResponseDto.getFcmToken();
         } else {
@@ -44,6 +45,7 @@ public class RedisService {
     }
 
     private void saveFcmToken(String email, String fcmToken) {
+        log.info("redis-48");
         cacheManager.getCache(getFCM).put(email, fcmToken);
     }
     public void updateFcm(String email, String fcmToken) {
