@@ -115,8 +115,8 @@ public class JwtTokenProvider {
     // Request의 Header에서 RefreshToken 값을 가져옵니다. "refreshToken" : "token"
     // Gateway 서비스에서 이미 Substring(7)을 했기 때문에 헤더에서 바로 가져온다.
     public String resolveRefreshToken(HttpServletRequest request) {
-        if(request.getHeader("refreshToken") != null )
-            return request.getHeader("refreshToken");
+        if(request.getHeader("RefreshToken") != null )
+            return request.getHeader("RefreshToken");
         return null;
     }
 
@@ -165,6 +165,6 @@ public class JwtTokenProvider {
 
     // 리프레시 토큰 헤더 설정
     public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
-        response.setHeader("refreshToken", "Bearer "+ refreshToken);
+        response.setHeader("RefreshToken", "Bearer "+ refreshToken);
     }
 }

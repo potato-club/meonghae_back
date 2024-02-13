@@ -54,7 +54,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                     return chain.filter(exchange.mutate().request(
                             request.mutate()
                                     .header("androidId", androidId)
-                                    .header("refreshToken", refreshToken)
+                                    .header("RefreshToken", refreshToken)
                                     .build()).build());
                 }
             } else {
@@ -66,7 +66,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             return chain.filter(exchange.mutate().request(
                     request.mutate()
                             .header(HttpHeaders.AUTHORIZATION, accessToken)
-                            .header("refreshToken", refreshToken)
+                            .header("RefreshToken", refreshToken)
                             .build()).build());
         });
     }
