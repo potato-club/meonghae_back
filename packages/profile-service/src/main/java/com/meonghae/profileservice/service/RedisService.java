@@ -33,10 +33,14 @@ public class RedisService {
         String fcmToken = cacheManager.getCache(getFCM).get(cacheKey, String.class);
         log.info("redis-34: "+fcmToken);
         if ( fcmToken == null ) {
-            FCMResponseDto fcmResponseDto = userFeignService.getFCMToken(email);
-            log.info("redis-37: "+fcmResponseDto.getFcmToken());
-            this.saveFcmToken(email, fcmResponseDto.getFcmToken());
-            return fcmResponseDto.getFcmToken();
+            try {
+                FCMResponseDto fcmResponseDto = userFeignService.getFCMToken(email);
+                log.info("redis-37: "+fcmResponseDto.getFcmToken());
+                this.saveFcmToken(email, fcmResponseDto.getFcmToken());
+                return fcmResponseDto.getFcmToken();
+            } catch (RuntimeException e) {
+                System.out.println(e.getMessage() + "\n\n" + e.getCause());
+            }
         } else {
             //만료 시간 재설정
             redisTemplate.expire(cacheKey,8, TimeUnit.DAYS);

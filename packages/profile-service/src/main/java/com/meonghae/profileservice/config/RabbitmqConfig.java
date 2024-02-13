@@ -84,6 +84,9 @@ public class RabbitmqConfig {
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(messageConverter);
         factory.setAdviceChain(retryAdvice());
+
+        factory.setConcurrentConsumers(1); //동시에 활성화될 소비자 수를 1로 설정
+        factory.setPrefetchCount(1); //한 번에 처리할 메시지 수를 1로 설정
         return factory;
     }
     @Bean
