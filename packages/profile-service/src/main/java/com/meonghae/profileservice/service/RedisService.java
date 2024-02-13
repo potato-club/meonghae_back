@@ -46,7 +46,8 @@ public class RedisService {
 
     private void saveFcmToken(String email, String fcmToken) {
         log.info("redis-48");
-        cacheManager.getCache(getFCM).put(email, fcmToken);
+        String cacheKey = getFCM+"::"+email;
+        cacheManager.getCache(getFCM).put(cacheKey, fcmToken);
     }
     public void updateFcm(String email, String fcmToken) {
         //redis에 존재하면 교체
