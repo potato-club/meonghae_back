@@ -75,7 +75,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         return path.startsWith("/health") || path.endsWith("/prometheus") ||
                 path.contains("/signup") || path.contains("/login") ||
                 path.contains("/swagger-ui/index.html") || path.startsWith("/user-service/users") ||
-                path.contains("/cancel") || path.contains("/check")
-                || path.contains("/send/token");
+                path.contains("/cancel") || path.contains("/check");
     }
 }
