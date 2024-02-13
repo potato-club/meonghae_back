@@ -75,8 +75,8 @@ public class JwtTokenProvider {
 
     // Request의 Header에서 RefreshToken 값을 가져옵니다. "refreshToken" : "token"
     public String resolveRefreshToken(ServerHttpRequest request) {
-        if(request.getHeaders().containsKey("refreshToken"))
-            return request.getHeaders().get("refreshToken").get(0).substring(7);
+        if(request.getHeaders().containsKey("RefreshToken"))
+            return request.getHeaders().get("RefreshToken").get(0).substring(7);
         return null;
     }
 

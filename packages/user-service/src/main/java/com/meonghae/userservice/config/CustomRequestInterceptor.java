@@ -10,6 +10,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class CustomRequestInterceptor implements RequestInterceptor {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String REFRESH_HEADER = "RefreshToken";
+
     @Override
     public void apply(RequestTemplate template) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

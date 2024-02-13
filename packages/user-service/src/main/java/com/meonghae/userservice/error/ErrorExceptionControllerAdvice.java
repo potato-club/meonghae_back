@@ -7,14 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.servlet.http.HttpServletRequest;
-
 @RequiredArgsConstructor
 @RestControllerAdvice
 public class ErrorExceptionControllerAdvice {
 
     @ExceptionHandler({BadRequestException.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final BadRequestException e) {
+    public ResponseEntity<ErrorEntity> exceptionHandler(final BadRequestException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()
@@ -24,7 +22,7 @@ public class ErrorExceptionControllerAdvice {
     }
 
     @ExceptionHandler({UnAuthorizedException.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final UnAuthorizedException e) {
+    public ResponseEntity<ErrorEntity> exceptionHandler(final UnAuthorizedException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()
@@ -34,7 +32,7 @@ public class ErrorExceptionControllerAdvice {
     }
 
     @ExceptionHandler({NotFoundException.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final NotFoundException e) {
+    public ResponseEntity<ErrorEntity> exceptionHandler(final NotFoundException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()
@@ -44,7 +42,7 @@ public class ErrorExceptionControllerAdvice {
     }
 
     @ExceptionHandler({DuplicateException.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final DuplicateException e) {
+    public ResponseEntity<ErrorEntity> exceptionHandler(final DuplicateException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()
@@ -54,7 +52,7 @@ public class ErrorExceptionControllerAdvice {
     }
 
     @ExceptionHandler({InvalidTokenException.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final InvalidTokenException e) {
+    public ResponseEntity<ErrorEntity> exceptionHandler(final InvalidTokenException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()
@@ -64,7 +62,7 @@ public class ErrorExceptionControllerAdvice {
     }
 
     @ExceptionHandler({S3Exception.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final S3Exception e) {
+    public ResponseEntity<ErrorEntity> exceptionHandler(final S3Exception e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()
@@ -74,7 +72,7 @@ public class ErrorExceptionControllerAdvice {
     }
 
     @ExceptionHandler({IllegalArgumentException.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final IllegalArgumentException e) {
+    public ResponseEntity<ErrorEntity> exceptionHandler(final IllegalArgumentException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()
@@ -84,7 +82,7 @@ public class ErrorExceptionControllerAdvice {
     }
 
     @ExceptionHandler({JwtExpiredException.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final JwtExpiredException e) {
+    public ResponseEntity<ErrorEntity> exceptionHandler(final JwtExpiredException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()
@@ -94,7 +92,7 @@ public class ErrorExceptionControllerAdvice {
     }
 
     @ExceptionHandler({SignatureException.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final SignatureException e) {
+    public ResponseEntity<ErrorEntity> exceptionHandler(final SignatureException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()
@@ -104,7 +102,7 @@ public class ErrorExceptionControllerAdvice {
     }
 
     @ExceptionHandler({UnsupportedJwtException.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final UnsupportedJwtException e) {
+    public ResponseEntity<ErrorEntity> exceptionHandler(final UnsupportedJwtException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()
