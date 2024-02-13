@@ -39,7 +39,9 @@ public class RedisService {
                 this.saveFcmToken(email, fcmResponseDto.getFcmToken());
                 return fcmResponseDto.getFcmToken();
             } catch (RuntimeException e) {
-                System.out.println(e.getMessage() + "\n\n" + e.getCause());
+                log.info("*".repeat(20));
+                e.printStackTrace();
+                log.info("*".repeat(20));
             }
         } else {
             //만료 시간 재설정
