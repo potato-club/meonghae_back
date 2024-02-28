@@ -45,12 +45,12 @@ public class ScheduleService {
     QSchedule qSchedule = QSchedule.schedule;
     QPet qPet = QPet.pet;
 
-    Schedule schedule = (Schedule) jpaQueryFactory
+    Schedule schedule = jpaQueryFactory
             .selectFrom(qSchedule)
             .leftJoin(qSchedule.pet,qPet)
             .where(qSchedule.userEmail.eq(userEmail)
                     .and(qSchedule.id.eq(id)))
-            .fetch();
+            .fetchOne();
 
     return new ScheduleResponseDTO(schedule);
   }
