@@ -8,21 +8,21 @@ import java.util.List;
 
 public interface FileService {
 
-    void uploadImages(List<MultipartFile> files, FileRequestDto requestDto) throws IOException;
+    void uploadImages(List<MultipartFile> files, FileRequest requestDto) throws IOException;
 
-    void uploadFileForUser(MultipartFile file, FileUserDto userDto) throws IOException;
+    void uploadFileForUser(MultipartFile file, FileUser userDto) throws IOException;
 
-    void updateFiles(List<MultipartFile> files, List<FileUpdateDto> requestDto) throws IOException;
+    void updateFiles(List<MultipartFile> files, List<FileUpdate> requestDto) throws IOException;
 
-    List<FileResponseDto> viewFileList(FileRequestDto requestDto);
+    List<FileResponse> viewFileList(FileRequest requestDto);
 
-    FileUserResponseDto viewUserProfile(String email);
+    FileUserResponse viewUserProfile(String email);
 
-    FileUserResponseDto viewPetProfile(FileRequestDto requestDto);
+    FileUserResponse viewPetProfile(FileRequest requestDto);
 
-    void deleteFiles(FileRequestDto requestDto);
+    void deleteFiles(FileRequest requestDto);
 
-    void deleteFileForUser(FileUserDto userDto);
+    void deleteFileForUser(FileUser userDto);
 
     byte[] downloadImage(String key) throws IOException;
 }

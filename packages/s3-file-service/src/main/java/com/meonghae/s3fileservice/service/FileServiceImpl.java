@@ -3,15 +3,11 @@ package com.meonghae.s3fileservice.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
+import com.meonghae.s3fileservice.domain.File;
 import com.meonghae.s3fileservice.dto.*;
-import com.meonghae.s3fileservice.entity.File;
-import com.meonghae.s3fileservice.entity.QFile;
-import com.meonghae.s3fileservice.enums.EntityType;
-import com.meonghae.s3fileservice.repository.FileRepository;
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.meonghae.s3fileservice.domain.enums.EntityType;
+import com.meonghae.s3fileservice.service.port.FileRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,46 +20,48 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Slf4j
 public class FileServiceImpl implements FileService {
 
     private final AmazonS3Client s3Client;
     private final FileRepository fileRepository;
-    private final JPAQueryFactory jpaQueryFactory;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
     @Override
-    public void uploadImages(List<MultipartFile> files, FileRequestDto requestDto) throws IOException {
+    @Transactional
+    public void uploadImages(List<MultipartFile> files, FileRequest request) throws IOException {
         List<File> list = this.existsFiles(files);
 
         for (File file : list) {
-            file.setEntityData(requestDto);
+            file.updateForData(request);
             fileRepository.save(file);
         }
     }
 
     @Override
-    public void uploadFileForUser(MultipartFile file, FileUserDto userDto) throws IOException {
+    @Transactional
+    public void uploadFileForUser(MultipartFile file, FileUser user) throws IOException {
         List<MultipartFile> files = new ArrayList<>();
         files.add(file);
 
         List<File> list = this.existsFiles(files);
         for (File image : list) {
-            image.setEntityDataForUser(userDto);
+            image.updateForUser(user);
             fileRepository.save(image);
         }
     }
 
     @Override
-    public void updateFiles(List<MultipartFile> files, List<FileUpdateDto> updateDto) throws IOException {
+    @Transactional
+    public void updateFiles(List<MultipartFile> files, List<FileUpdate> update) throws IOException {
         // 원래 데이터 중 하나만 있어도 리스트 조회 가능
-        FileUpdateDto dto = updateDto.get(0);
+        FileUpdate dto = update.get(0);
 
         List<File> fileList;
+
         if (dto.getEntityType().equals(EntityType.USER)) {
             fileList = fileRepository.findByEntityTypeAndEmail(dto.getEntityType(), dto.getEmail());
         } else {
@@ -71,8 +69,8 @@ public class FileServiceImpl implements FileService {
         }
 
 
-        for (int i = 0; i < updateDto.size(); i++) {
-            if (updateDto.get(i).isDeleted()) {
+        for (int i = 0; i < update.size(); i++) {
+            if (update.get(i).isDeleted()) {
                 s3Client.deleteObject(new DeleteObjectRequest(bucketName, fileList.get(i).getFileName())); // 사용하지 않는 파일 삭제
                 fileRepository.delete(fileList.get(i)); // DB에서도 해당 파일 엔티티 삭제
             }
@@ -83,68 +81,30 @@ public class FileServiceImpl implements FileService {
         List<File> list = this.existsFiles(files);
 
         for (File file : list) {
-            file.update(updateDto.get(0));  // 새로 추가된 파일에 엔티티 정보 추가
+            file.update(update.get(0));  // 새로 추가된 파일에 엔티티 정보 추가
             fileRepository.save(file);  // 새 파일 DB 저장
         }
     }
 
     @Override
-    public List<FileResponseDto> viewFileList(FileRequestDto requestDto) {
-        return jpaQueryFactory
-                .select(
-                        Projections.constructor(
-                                FileResponseDto.class,
-                                QFile.file.fileName,
-                                QFile.file.fileUrl,
-                                QFile.file.entityType,
-                                QFile.file.typeId
-                        )
-                )
-                .from(QFile.file)
-                .where(QFile.file.entityType.eq(requestDto.getEntityType())
-                        .and(QFile.file.typeId.eq(requestDto.getEntityId())))
-                .orderBy(QFile.file.id.asc())
-                .fetch();
+    public List<FileResponse> viewFileList(FileRequest request) {
+        return fileRepository.getFileList(request);
     }
 
     @Override
-    public FileUserResponseDto viewUserProfile(String email) {
-        return jpaQueryFactory
-                .select(
-                        Projections.constructor(
-                                FileUserResponseDto.class,
-                                QFile.file.fileName,
-                                QFile.file.fileUrl,
-                                QFile.file.entityType,
-                                QFile.file.email
-                        )
-                )
-                .from(QFile.file)
-                .where(QFile.file.email.eq(email))
-                .fetchOne();
+    public FileUserResponse viewUserProfile(String email) {
+        return fileRepository.getUserProfile(email);
     }
 
     @Override
-    public FileUserResponseDto viewPetProfile(FileRequestDto requestDto) {
-        return jpaQueryFactory
-                .select(
-                        Projections.constructor(
-                                FileUserResponseDto.class,
-                                QFile.file.fileName,
-                                QFile.file.fileUrl,
-                                QFile.file.entityType,
-                                QFile.file.email
-                        )
-                )
-                .from(QFile.file)
-                .where(QFile.file.entityType.eq(requestDto.getEntityType())
-                        .and(QFile.file.typeId.eq(requestDto.getEntityId())))
-                .fetchOne();
+    public FileUserResponse viewPetProfile(FileRequest request) {
+        return fileRepository.getPetProfile(request);
     }
 
     @Override
-    public void deleteFiles(FileRequestDto requestDto) {
-        List<File> files = fileRepository.findByEntityTypeAndTypeId(requestDto.getEntityType(), requestDto.getEntityId());
+    @Transactional
+    public void deleteFiles(FileRequest request) {
+        List<File> files = fileRepository.findByEntityTypeAndTypeId(request.getEntityType(), request.getEntityId());
         for (File file : files) {
             s3Client.deleteObject(new DeleteObjectRequest(bucketName, file.getFileName()));
             fileRepository.delete(file);
@@ -152,8 +112,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void deleteFileForUser(FileUserDto userDto) {
-        List<File> files = fileRepository.findByEntityTypeAndEmail(userDto.getEntityType(), userDto.getEmail());
+    @Transactional
+    public void deleteFileForUser(FileUser user) {
+        List<File> files = fileRepository.findByEntityTypeAndEmail(user.getEntityType(), user.getEmail());
         for (File file : files) {
             s3Client.deleteObject(new DeleteObjectRequest(bucketName, file.getFileName()));
             fileRepository.delete(file);
