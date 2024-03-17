@@ -46,6 +46,7 @@ public class UserServiceImpl implements UserService {
     private final PetServiceClient petServiceClient;
 
     @Override
+    @Transactional
     public UserResponse login(String email, HttpServletRequest request, HttpServletResponse response) {
 
         if (userRepository.existsByEmailAndDeleted(email, false)) {
@@ -125,6 +126,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void signUp(UserRequest userDto, HttpServletRequest request, HttpServletResponse response) {
 
         if (userRepository.existsByEmail(userDto.getEmail())) {
@@ -150,6 +152,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void update(UserUpdate userDto, HttpServletRequest request) {
         String email = this.findByEmailFromAccessToken(request);
         User user = userRepository.findByEmail(email).orElseThrow();
@@ -187,6 +190,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void logout(HttpServletRequest request) {
         String email = this.findByEmailFromAccessToken(request);
 
@@ -197,6 +201,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void withdrawalMembership(HttpServletRequest request) {
         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
         User user = userRepository.findByEmail(email).orElseThrow();
@@ -208,6 +213,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void cancelWithdrawal(String email, boolean agreement) {
         if (userRepository.existsByEmailAndDeleted(email, true) && agreement) {
             User user = userRepository.findByEmail(email).orElseThrow(() -> {
@@ -223,6 +229,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void reissueToken(HttpServletRequest request, HttpServletResponse response) {
 
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
