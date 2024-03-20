@@ -30,8 +30,8 @@ public class User {
         this.deleted = deleted;
     }
 
-    public void update(UserUpdate userDto, LocalDate birth) {
-        User.builder()
+    public User update(UserUpdate userDto, LocalDate birth) {
+        return User.builder()
                 .uid(uid)
                 .email(email)
                 .age(userDto.getAge())
@@ -42,8 +42,8 @@ public class User {
                 .build();
     }
 
-    public void delete(boolean deleted) {
-        User.builder()
+    public User delete(boolean deleted) {
+        return User.builder()
                 .uid(uid)
                 .email(email)
                 .age(age)

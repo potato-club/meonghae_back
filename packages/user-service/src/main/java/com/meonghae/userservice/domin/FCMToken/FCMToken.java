@@ -19,8 +19,8 @@ public class FCMToken {
         this.token = token;
     }
 
-    public void update(String token) {
-        FCMToken.builder()
+    public FCMToken update(String token) {
+        return FCMToken.builder()
                 .id(id)
                 .email(email)
                 .token(token)

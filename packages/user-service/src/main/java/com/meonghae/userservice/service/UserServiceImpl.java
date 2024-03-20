@@ -135,20 +135,12 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(userDto.toDomain());
 
-        MultipartFile file = userDto.getFile();
-
-        if (file != null) {
+        if (userDto.getFile() != null) {
             S3Request s3Dto = new S3Request(userDto.getEmail(), "USER");
-            s3Service.uploadFileForUser(file, s3Dto);
+            s3Service.uploadFileForUser(userDto.getFile(), s3Dto);
         }
 
-        Optional<User> user = userRepository.findByEmail(userDto.getEmail());
-
-        if (user.isEmpty()) {
-            throw new NotFoundException("Not Found User", NOT_FOUND_EXCEPTION);
-        }
-
-        this.createToken(user.get().getUserRole(), userDto.getEmail(), request, response);
+        this.createToken(UserRole.USER, userDto.getEmail(), request, response);
     }
 
     @Override
