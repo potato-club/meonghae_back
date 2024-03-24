@@ -1,5 +1,6 @@
 package com.meonghae.userservice.infra.repository;
 
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisService {
 
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     // RefreshToken, email 설정
     public void setValues(String token, String email, String androidId) {
@@ -39,7 +40,7 @@ public class RedisService {
     public Map<String, String> getValues(String token) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         Object object = operations.get(token);
-        if (object != null && object instanceof Map) {
+        if (object instanceof Map) {
             return (Map<String, String>) object;
         }
         return null;
@@ -47,7 +48,7 @@ public class RedisService {
 
     public void addTokenToBlacklist(String token, long expiration) {
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set(token, true, expiration, TimeUnit.MILLISECONDS);
+        valueOperations.set(token, Boolean.TRUE, expiration, TimeUnit.MILLISECONDS);
     }
 
     // RefreshToken, Android-Id 삭제

@@ -227,20 +227,8 @@ public class UserServiceImpl implements UserService {
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
         String androidId = request.getHeader("androidId");
 
-        String email = jwtTokenProvider.getUserEmail(refreshToken);
-        User user = userRepository.findByEmail(email).orElseThrow(() -> {
-            throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
-        });
-
-        String newAccessToken = jwtTokenProvider.createAccessToken(email, user.getUserRole(), androidId);
-        String newRefreshToken = jwtTokenProvider.createRefreshToken(email, user.getUserRole(), androidId);
-
-        // Redis에서 기존 리프레시 토큰과 Android-Id를 삭제한다.
-        redisService.delValues(refreshToken, email);
-
-        // Redis에 새로운 리프레시 토큰과 Android-Id를 저장한다.
-        redisService.setValues(newRefreshToken, email, androidId);
-        redisService.setValues(email, androidId, newAccessToken, newRefreshToken);
+        String newAccessToken = jwtTokenProvider.reissueAccessToken(refreshToken, androidId);
+        String newRefreshToken = jwtTokenProvider.reissueRefreshToken(refreshToken, newAccessToken, androidId);
 
         // 헤더에 토큰들을 넣는다.
         jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);

@@ -1,22 +1,22 @@
 package com.meonghae.userservice.core.jwt;
 
+import com.meonghae.userservice.core.exception.impl.*;
+import com.meonghae.userservice.core.exception.impl.IllegalArgumentException;
+import com.meonghae.userservice.core.exception.impl.JwtExpiredException;
+import com.meonghae.userservice.core.exception.impl.SignatureException;
+import com.meonghae.userservice.core.exception.impl.UnsupportedJwtException;
+import com.meonghae.userservice.domin.user.User;
 import com.meonghae.userservice.domin.user.enums.UserRole;
 import com.meonghae.userservice.core.exception.ErrorCode;
-import com.meonghae.userservice.core.exception.impl.InvalidTokenException;
-import com.meonghae.userservice.core.exception.impl.JwtExpiredException;
-import com.meonghae.userservice.core.exception.impl.IllegalArgumentException;
-import com.meonghae.userservice.core.exception.impl.UnsupportedJwtException;
-import com.meonghae.userservice.core.exception.impl.SignatureException;
 import com.meonghae.userservice.infra.repository.RedisService;
+import com.meonghae.userservice.service.port.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -24,12 +24,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.Key;
 import java.util.*;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
-@Transactional
 public class JwtTokenProvider {
 
+    private final UserRepository userRepository;
     private final RedisService redisService;
     private final CustomUserDetailService customUserDetailService;
 
@@ -119,18 +118,62 @@ public class JwtTokenProvider {
         return null;
     }
 
+    public String reissueAccessToken(String refreshToken, String androidId) {
+        String email = redisService.getValues(refreshToken).get("email");
+        if (Objects.isNull(email)) {
+            throw new ForbiddenException("401", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        }
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isPresent()) {
+            return createAccessToken(email, user.get().getUserRole(), androidId);
+        } else {
+            throw new NotFoundException("Not Found User", ErrorCode.NOT_FOUND_EXCEPTION);
+        }
+    }
+
+    public String reissueRefreshToken(String refreshToken, String accessToken, String androidId) {
+        String email = redisService.getValues(refreshToken).get("email");
+
+        if (Objects.isNull(email)) {
+            throw new UnAuthorizedException("Unauthorized User", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        }
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty()) {
+            throw new NotFoundException("Not Found User", ErrorCode.NOT_FOUND_EXCEPTION);
+        }
+
+        String newRefreshToken = createRefreshToken(email, user.get().getUserRole(), androidId);
+
+        // Redis에서 기존 리프레시 토큰과 Android-Id를 삭제한다.
+        redisService.delValues(refreshToken, email);
+
+        // Redis에 새로운 리프레시 토큰과 Android-Id를 저장한다.
+        redisService.setValues(newRefreshToken, email, androidId);
+        redisService.setValues(email, androidId, accessToken, newRefreshToken);
+
+        return newRefreshToken;
+    }
+
     // Expire Token
     public void expireToken(String token) {
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        Date expiration = claims.getExpiration();
-        Date now = new Date();
-        if (now.after(expiration)) {
-            redisService.addTokenToBlacklist(token, expiration.getTime() - now.getTime());
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            Date expiration = claims.getExpiration();
+            Date now = new Date();
+            if (now.after(expiration)) {
+                redisService.addTokenToBlacklist(token, expiration.getTime() - now.getTime());
+            }
+        } catch (ExpiredJwtException e) {
+            redisService.addTokenToBlacklist(token, e.getClaims().getExpiration().getTime() - e.getClaims().getIssuedAt().getTime());
         }
     }
 
