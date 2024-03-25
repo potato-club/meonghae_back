@@ -16,11 +16,9 @@ public class FakeRedisService {
         values.put(token, Boolean.TRUE);
     }
 
-    public boolean isTokenInBlacklist(String token) {
+    public void isTokenInBlacklist(String token) {
         if (Boolean.TRUE.equals(values.get(token))) {
             throw new MalformedJwtException("Invalid JWT token");
         }
-
-        return false;
     }
 }
