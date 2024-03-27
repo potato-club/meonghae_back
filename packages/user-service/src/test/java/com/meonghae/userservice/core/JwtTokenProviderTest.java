@@ -1,10 +1,10 @@
 package com.meonghae.userservice.core;
 
-import com.meonghae.userservice.core.jwt.JwtTokenProvider;
+import com.meonghae.userservice.core.jwt.JwtTokenProviderImpl;
 import com.meonghae.userservice.domin.user.User;
 import com.meonghae.userservice.domin.user.enums.UserRole;
-import com.meonghae.userservice.infra.repository.RedisService;
 import com.meonghae.userservice.mock.FakeRedisService;
+import com.meonghae.userservice.service.port.RedisService;
 import com.meonghae.userservice.service.port.UserRepository;
 import io.jsonwebtoken.MalformedJwtException;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class JwtTokenProviderTest {
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtTokenProviderImpl jwtTokenProvider;
 
     @Autowired
     private UserRepository userRepository;
@@ -91,7 +91,7 @@ public class JwtTokenProviderTest {
         FakeRedisService fakeRedisService = new FakeRedisService(map);
 
         // when
-        fakeRedisService.addTokenToBlacklist(accessToken);
+        fakeRedisService.addTokenToBlacklist(accessToken, 1800L);   // 1800L은 더미 값
 
         // then
         assertThatThrownBy(() -> {

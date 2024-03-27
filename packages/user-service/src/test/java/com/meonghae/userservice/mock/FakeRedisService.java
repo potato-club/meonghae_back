@@ -1,10 +1,13 @@
 package com.meonghae.userservice.mock;
 
+import com.meonghae.userservice.service.port.RedisService;
 import io.jsonwebtoken.MalformedJwtException;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Map;
 
-public class FakeRedisService {
+@Qualifier("fakeRedisService")
+public class FakeRedisService implements RedisService {
 
     private final Map<String, Object> values;
 
@@ -12,7 +15,8 @@ public class FakeRedisService {
         this.values = values;
     }
 
-    public void addTokenToBlacklist(String token) {
+    @Override
+    public void addTokenToBlacklist(String token, long expiration) {
         values.put(token, Boolean.TRUE);
     }
 
@@ -20,5 +24,25 @@ public class FakeRedisService {
         if (Boolean.TRUE.equals(values.get(token))) {
             throw new MalformedJwtException("Invalid JWT token");
         }
+    }
+
+    @Override
+    public void setValues(String token, String email, String androidId) {
+
+    }
+
+    @Override
+    public void setValues(String email, String androidId, String accessToken, String refreshToken) {
+
+    }
+
+    @Override
+    public Map<String, String> getValues(String token) {
+        return null;
+    }
+
+    @Override
+    public void delValues(String token, String email) {
+
     }
 }

@@ -8,7 +8,8 @@ import com.meonghae.userservice.core.exception.impl.UnsupportedJwtException;
 import com.meonghae.userservice.domin.user.User;
 import com.meonghae.userservice.domin.user.enums.UserRole;
 import com.meonghae.userservice.core.exception.ErrorCode;
-import com.meonghae.userservice.infra.repository.RedisService;
+import com.meonghae.userservice.service.jwt.JwtTokenProvider;
+import com.meonghae.userservice.service.port.RedisService;
 import com.meonghae.userservice.service.port.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -26,7 +27,7 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class JwtTokenProvider {
+public class JwtTokenProviderImpl implements JwtTokenProvider {
 
     private final UserRepository userRepository;
     private final RedisService redisService;
@@ -50,17 +51,19 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성.
+    @Override
     public String createAccessToken(String email, UserRole userRole, String androidId) {
         return this.createToken(email, userRole, accessTokenValidTime, androidId);
     }
 
     // Refresh Token 생성.
+    @Override
     public String createRefreshToken(String email, UserRole userRole, String androidId) {
         return this.createToken(email, userRole, refreshTokenValidTime, androidId);
     }
 
     // Create token
-    public String createToken(String email, UserRole userRole, long tokenValid, String androidId) {
+    private String createToken(String email, UserRole userRole, long tokenValid, String androidId) {
         Claims claims = Jwts.claims().setSubject(email); // claims 생성 및 payload 설정
         List<String> roles = new ArrayList<>();
         roles.add(userRole.toString());
@@ -79,21 +82,14 @@ public class JwtTokenProvider {
     }
 
     // JWT 토큰에서 인증 정보 조회
+    @Override
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {
         UserDetails userDetails = customUserDetailService.loadUserByUsername(this.getUserEmail(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    // 토큰에서 AndroidId 정보 추출
-    public String getAndroidIdFromToken(String token) {
-        JwtParser jwtParser = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
-                .build();
-
-        return (String) jwtParser.parseClaimsJws(token).getBody().get("androidId");
-    }
-
     // 토큰에서 회원 정보 추출
+    @Override
     public String getUserEmail(String token) {
         JwtParser jwtParser = Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
@@ -104,6 +100,7 @@ public class JwtTokenProvider {
 
     // Request의 Header에서 AccessToken 값을 가져옵니다. "authorization" : "token"
     // Gateway 서비스에서 이미 Substring(7)을 했기 때문에 헤더에서 바로 가져온다.
+    @Override
     public String resolveAccessToken(HttpServletRequest request) {
         if(request.getHeader("Authorization") != null )
             return request.getHeader("Authorization");
@@ -112,12 +109,14 @@ public class JwtTokenProvider {
 
     // Request의 Header에서 RefreshToken 값을 가져옵니다. "refreshToken" : "token"
     // Gateway 서비스에서 이미 Substring(7)을 했기 때문에 헤더에서 바로 가져온다.
+    @Override
     public String resolveRefreshToken(HttpServletRequest request) {
         if(request.getHeader("RefreshToken") != null )
             return request.getHeader("RefreshToken");
         return null;
     }
 
+    @Override
     public String reissueAccessToken(String refreshToken, String androidId) {
         String email = redisService.getValues(refreshToken).get("email");
         if (Objects.isNull(email)) {
@@ -133,6 +132,7 @@ public class JwtTokenProvider {
         }
     }
 
+    @Override
     public String reissueRefreshToken(String refreshToken, String accessToken, String androidId) {
         String email = redisService.getValues(refreshToken).get("email");
 
@@ -159,6 +159,7 @@ public class JwtTokenProvider {
     }
 
     // Expire Token
+    @Override
     public void expireToken(String token) {
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
         try {
@@ -177,7 +178,8 @@ public class JwtTokenProvider {
         }
     }
 
-    // 토큰의 유효성 + 만료일자 확인
+    // 토큰의 유효성 확인
+    @Override
     public boolean validateToken(String jwtToken) {
         try {
             Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
@@ -201,11 +203,13 @@ public class JwtTokenProvider {
     }
 
     // 어세스 토큰 헤더 설정
+    @Override
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
         response.setHeader("Authorization", "Bearer "+ accessToken);
     }
 
     // 리프레시 토큰 헤더 설정
+    @Override
     public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
         response.setHeader("RefreshToken", "Bearer "+ refreshToken);
     }

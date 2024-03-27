@@ -1,6 +1,6 @@
 package com.meonghae.userservice.infra.repository;
 
-import io.jsonwebtoken.MalformedJwtException;
+import com.meonghae.userservice.service.port.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -13,11 +13,12 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-public class RedisService {
+public class RedisServiceImpl implements RedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
     // RefreshToken, email 설정
+    @Override
     public void setValues(String token, String email, String androidId) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         Map<String, String> map = new HashMap<>();
@@ -27,6 +28,7 @@ public class RedisService {
     }
 
     // RefreshToken, Android-Id 설정
+    @Override
     public void setValues(String email, String androidId, String accessToken, String refreshToken) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         Map<String, String> map = new HashMap<>();
@@ -37,6 +39,7 @@ public class RedisService {
     }
 
     // 키값으로 벨류 가져오기
+    @Override
     public Map<String, String> getValues(String token) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         Object object = operations.get(token);
@@ -46,12 +49,14 @@ public class RedisService {
         return null;
     }
 
+    @Override
     public void addTokenToBlacklist(String token, long expiration) {
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(token, Boolean.TRUE, expiration, TimeUnit.MILLISECONDS);
     }
 
     // RefreshToken, Android-Id 삭제
+    @Override
     public void delValues(String token, String email) {
         redisTemplate.delete(token);
         redisTemplate.delete(email);

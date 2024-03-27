@@ -1,4 +1,4 @@
-package com.meonghae.userservice.service;
+package com.meonghae.userservice.service.user;
 
 import com.meonghae.userservice.dto.fcmtoken.FCMResponse;
 import com.meonghae.userservice.dto.user.*;

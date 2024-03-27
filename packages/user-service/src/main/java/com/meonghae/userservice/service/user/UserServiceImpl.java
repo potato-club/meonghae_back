@@ -1,10 +1,12 @@
-package com.meonghae.userservice.service;
+package com.meonghae.userservice.service.user;
 
 import com.meonghae.userservice.core.exception.impl.NotFoundException;
 import com.meonghae.userservice.domin.FCMToken.FCMToken;
 import com.meonghae.userservice.domin.user.User;
 import com.meonghae.userservice.dto.fcmtoken.FCMResponse;
+import com.meonghae.userservice.service.jwt.JwtTokenProvider;
 import com.meonghae.userservice.service.port.FCMTokenRepository;
+import com.meonghae.userservice.service.port.RedisService;
 import com.meonghae.userservice.service.port.UserRepository;
 import com.meonghae.userservice.service.client.feign.PetServiceClient;
 import com.meonghae.userservice.service.client.feign.S3ServiceClient;
@@ -14,8 +16,7 @@ import com.meonghae.userservice.dto.file.S3Update;
 import com.meonghae.userservice.dto.user.*;
 import com.meonghae.userservice.domin.user.enums.UserRole;
 import com.meonghae.userservice.core.exception.impl.UnAuthorizedException;
-import com.meonghae.userservice.core.jwt.JwtTokenProvider;
-import com.meonghae.userservice.infra.repository.RedisService;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ import static com.meonghae.userservice.core.exception.ErrorCode.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
+@Builder
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;

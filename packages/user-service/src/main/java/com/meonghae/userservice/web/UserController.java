@@ -4,7 +4,7 @@ import com.meonghae.userservice.dto.fcmtoken.FCMResponse;
 import com.meonghae.userservice.dto.user.*;
 import com.meonghae.userservice.infra.entity.UserEntity;
 import com.meonghae.userservice.infra.repository.user.UserJpaRepository;
-import com.meonghae.userservice.service.UserService;
+import com.meonghae.userservice.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
