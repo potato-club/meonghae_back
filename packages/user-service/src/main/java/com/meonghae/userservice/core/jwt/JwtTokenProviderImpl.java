@@ -8,12 +8,13 @@ import com.meonghae.userservice.core.exception.impl.UnsupportedJwtException;
 import com.meonghae.userservice.domin.user.User;
 import com.meonghae.userservice.domin.user.enums.UserRole;
 import com.meonghae.userservice.core.exception.ErrorCode;
+import com.meonghae.userservice.service.jwt.CustomUserDetailService;
 import com.meonghae.userservice.service.jwt.JwtTokenProvider;
 import com.meonghae.userservice.service.port.RedisService;
 import com.meonghae.userservice.service.port.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
+import lombok.Builder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,23 +27,37 @@ import java.security.Key;
 import java.util.*;
 
 @Component
-@RequiredArgsConstructor
+@Builder
 public class JwtTokenProviderImpl implements JwtTokenProvider {
 
     private final UserRepository userRepository;
+
     private final RedisService redisService;
+
     private final CustomUserDetailService customUserDetailService;
 
     // 키
-    @Value("${jwt.secret}")
     private String secretKey;
 
     // 액세스 토큰 유효시간 | 1h
-    @Value("${jwt.accessTokenExpiration}")
     private long accessTokenValidTime;
+
     // 리프레시 토큰 유효시간 | 7d
-    @Value("${jwt.refreshTokenExpiration}")
     private long refreshTokenValidTime;
+
+    public JwtTokenProviderImpl(UserRepository userRepository, RedisService redisService,
+                                CustomUserDetailService customUserDetailService,
+                                @Value("${jwt.secret}") String secretKey,
+                                @Value("${jwt.accessTokenExpiration}") long accessTokenValidTime,
+                                @Value("${jwt.refreshTokenExpiration}") long refreshTokenValidTime) {
+        this.userRepository = userRepository;
+        this.redisService = redisService;
+        this.customUserDetailService = customUserDetailService;
+        this.secretKey = secretKey;
+        this.accessTokenValidTime = accessTokenValidTime;
+        this.refreshTokenValidTime = refreshTokenValidTime;
+    }
+
 
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
     @PostConstruct // 의존성 주입 후, 초기화를 수행

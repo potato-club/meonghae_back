@@ -15,10 +15,6 @@ import java.util.List;
 public class UserDetailsImpl implements UserDetails {
     private final UserEntity userEntity;
 
-    public UserEntity getUserEntity() {
-        return userEntity;
-    }
-
     @Override
     public String getPassword() {
         return userEntity.getEmail();

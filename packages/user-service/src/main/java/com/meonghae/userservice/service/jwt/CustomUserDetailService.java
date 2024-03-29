@@ -1,5 +1,6 @@
-package com.meonghae.userservice.core.jwt;
+package com.meonghae.userservice.service.jwt;
 
+import com.meonghae.userservice.core.jwt.UserDetailsImpl;
 import com.meonghae.userservice.infra.repository.user.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

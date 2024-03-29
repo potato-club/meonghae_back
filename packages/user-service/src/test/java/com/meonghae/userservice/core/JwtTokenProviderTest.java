@@ -4,15 +4,10 @@ import com.meonghae.userservice.core.jwt.JwtTokenProviderImpl;
 import com.meonghae.userservice.domin.user.User;
 import com.meonghae.userservice.domin.user.enums.UserRole;
 import com.meonghae.userservice.mock.FakeRedisService;
-import com.meonghae.userservice.service.port.RedisService;
-import com.meonghae.userservice.service.port.UserRepository;
+import com.meonghae.userservice.mock.FakeUserRepository;
 import io.jsonwebtoken.MalformedJwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -21,22 +16,26 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest
-@Transactional
-@TestPropertySource(properties = {"spring.config.location = classpath:application-test-user.yml"})
 public class JwtTokenProviderTest {
 
-    @Autowired
     private JwtTokenProviderImpl jwtTokenProvider;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RedisService redisService;
+    private FakeRedisService redisService;
 
     @BeforeEach
     void init() {
+
+        Map<String, Object> map = new HashMap<>();
+        FakeUserRepository userRepository = new FakeUserRepository();
+
+        this.redisService = new FakeRedisService(map);
+        this.jwtTokenProvider = JwtTokenProviderImpl.builder()
+                .userRepository(new FakeUserRepository())
+                .redisService(this.redisService)
+                .secretKey("aaaaaaaaaaa-aaaaaaaaaaaaaaaaaaaaa-aaaaaaaaaaaaaaaa-aaaaaaaaaaaaaa")
+                .accessTokenValidTime(180000L)
+                .refreshTokenValidTime(180000L)
+                .build();
+
         User user = User.builder()
                 .uid("123-456-789")
                 .email("test@test.com")
@@ -87,15 +86,12 @@ public class JwtTokenProviderTest {
 
         String accessToken = jwtTokenProvider.createAccessToken(email, userRole, androidId);
 
-        Map<String, Object> map = new HashMap<>();
-        FakeRedisService fakeRedisService = new FakeRedisService(map);
-
         // when
-        fakeRedisService.addTokenToBlacklist(accessToken, 1800L);   // 1800L은 더미 값
+        redisService.addTokenToBlacklist(accessToken, 1800L);   // 1800L은 더미 값
 
         // then
         assertThatThrownBy(() -> {
-            fakeRedisService.isTokenInBlacklist(accessToken);
+            redisService.isTokenInBlacklist(accessToken);
         }).isInstanceOf(MalformedJwtException.class)
                 .hasMessage("Invalid JWT token");
     }
