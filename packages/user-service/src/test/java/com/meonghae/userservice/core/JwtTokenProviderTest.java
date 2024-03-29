@@ -29,7 +29,7 @@ public class JwtTokenProviderTest {
 
         this.redisService = new FakeRedisService(map);
         this.jwtTokenProvider = JwtTokenProviderImpl.builder()
-                .userRepository(new FakeUserRepository())
+                .userRepository(userRepository)
                 .redisService(this.redisService)
                 .secretKey("aaaaaaaaaaa-aaaaaaaaaaaaaaaaaaaaa-aaaaaaaaaaaaaaaa-aaaaaaaaaaaaaa")
                 .accessTokenValidTime(180000L)
@@ -87,7 +87,7 @@ public class JwtTokenProviderTest {
         String accessToken = jwtTokenProvider.createAccessToken(email, userRole, androidId);
 
         // when
-        redisService.addTokenToBlacklist(accessToken, 1800L);   // 1800L은 더미 값
+        redisService.addTokenToBlacklist(accessToken, 180000L);   // 1800000L은 더미 값
 
         // then
         assertThatThrownBy(() -> {
