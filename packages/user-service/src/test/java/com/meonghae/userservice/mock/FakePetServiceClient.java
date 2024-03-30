@@ -7,7 +7,7 @@ public class FakePetServiceClient implements PetServiceClient {
 
     @Override
     public ResponseEntity<String> deletedByUserEmail(String email) {
-        return null;
+        return ResponseEntity.ok("토큰 삭제 완료");
     }
 
     @Override
