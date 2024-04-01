@@ -59,7 +59,7 @@ spring:
 
 jwt:
   secret: ENC(j8sywLK8XrevBeAEriBL4luyhTxP/mLqrRWIWx/nODY0JFWpPNHffp3YgPx9B13XbLxPqCdWpO7UR5Kzm/Amp7vCJ+UiJ3inDtORX4+jRQ7bFeNV6NtuxwtxIeF73q91y4pzmcAXP4hX6WpSU0IDWmCoZaS6xCFhqWSGbCboKrNXMf8BFT9fMmpPx2NbCeJDzofmg8h4SbHJw/iy2isMQs14Awkc1ZPw)
-  accessTokenExpiration: ENC(AU4AHsLmmSx/HgcKEdwDlA==)
+  accessTokenExpiration: ENC(cwLYRulU3JGGTXve+Abq1A==)
   refreshTokenExpiration: ENC(uPhaFjWIZsHwnSRe9gpDcHInKKHi/Z//)
 
 eureka:
