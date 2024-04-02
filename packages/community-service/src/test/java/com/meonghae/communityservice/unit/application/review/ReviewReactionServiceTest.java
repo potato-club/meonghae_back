@@ -2,6 +2,7 @@ package com.meonghae.communityservice.unit.application.review;
 
 import com.meonghae.communityservice.application.review.ReviewReactionService;
 import com.meonghae.communityservice.application.review.ReviewService;
+import com.meonghae.communityservice.domain.review.RecommendStatus;
 import com.meonghae.communityservice.domain.review.Review;
 import com.meonghae.communityservice.dto.review.ReviewReactionType;
 import com.meonghae.communityservice.dto.review.ReviewRequest;
@@ -9,11 +10,14 @@ import com.meonghae.communityservice.mock.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReviewReactionServiceTest {
-    
+
     private ReviewService reviewService;
     private ReviewReactionService reactionService;
 
@@ -36,7 +40,7 @@ class ReviewReactionServiceTest {
                 .redisService(new FakeRedis())
                 .build();
     }
-    
+
     @Test
     public void 리뷰에_추천을_할_수_있다() throws Exception {
         //given
@@ -159,6 +163,42 @@ class ReviewReactionServiceTest {
         assertThat(res).isEqualTo("추천 완료");
         assertThat(review.getLikes()).isEqualTo(1);
         assertThat(review.getDislikes()).isZero();
+    }
+
+    @Test
+    public void 유저가_추천이나_비추천한_리뷰_정보를_가져온다() throws Exception {
+        //given
+        Review review = createReview();
+        Review review_2 = createReview();
+        Review review_3 = createReview();
+
+        String token = "tester";
+
+        reactionService.toggleRecommendedReview(review.getId(), token, ReviewReactionType.builder()
+                .isLike(true)
+                .build());
+
+        reactionService.toggleRecommendedReview(review_2.getId(), token, ReviewReactionType.builder()
+                .isLike(false)
+                .build());
+
+        reactionService.toggleRecommendedReview(review_3.getId(), token, ReviewReactionType.builder()
+                .isLike(true)
+                .build());
+
+        reactionService.toggleRecommendedReview(review_3.getId(), token, ReviewReactionType.builder()
+                .isLike(true)
+                .build());
+
+        //when
+        Map<Long, RecommendStatus> reactions =
+                reactionService.getReviewReactions(List.of(review.getId(), review_2.getId(), review_3.getId()), token);
+
+        //then
+        assertThat(reactions.keySet()).hasSize(3);
+        assertThat(reactions.get(review.getId())).isEqualByComparingTo(RecommendStatus.TRUE);
+        assertThat(reactions.get(review_2.getId())).isEqualByComparingTo(RecommendStatus.FALSE);
+        assertThat(reactions.get(review_3.getId())).isEqualByComparingTo(RecommendStatus.NONE);
     }
 
     Review createReview() {

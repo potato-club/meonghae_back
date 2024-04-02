@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class FakeReactionRepo implements ReactionRepository {
 
@@ -22,7 +23,9 @@ public class FakeReactionRepo implements ReactionRepository {
 
     @Override
     public List<ReviewReaction> findByEmailAndReviewEntityIdIn(String email, List<Long> reviewIds) {
-        return null;
+        return data.stream()
+                .filter(data -> data.getEmail().equals(email) && reviewIds.contains(data.getReview().getId()))
+                .collect(Collectors.toList());
     }
 
     @Override
