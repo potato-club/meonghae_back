@@ -32,22 +32,23 @@ public class BoardLikeService {
         String email = userService.getUserEmail(token);
         BoardLike like = likeRepository.findByEmailAndBoardEntity_Id(email, id);
         // 좋아요
-        if (like == null) {
-            BoardLike newLike = BoardLike.create(email, board);
-
-            boardRepository.save(board);
-            likeRepository.save(newLike);
-            return "추천 완료";
-        } else if (like.getStatus()) {
+        if (like != null && like.getStatus()) {
             like.cancelLike();
             boardRepository.save(board);
             likeRepository.save(like);
             return "추천 취소";
-        } else {
-            like.addLike();
-            boardRepository.save(board);
-            likeRepository.save(like);
         }
+
+        if (like != null) {
+            like.addLike();
+        }
+
+        if (like == null) {
+            like = BoardLike.create(email, board);
+        }
+
+        boardRepository.save(board);
+        likeRepository.save(like);
         return "추천 완료";
     }
 }
