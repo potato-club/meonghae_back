@@ -323,11 +323,11 @@ public class ScheduleService {
  //=========================================================
 
   private void addSimpleSchedule(Map<Integer, List<SimpleSchedule>> monthToSchedulesMap, LocalDateTime date, long scheduleId) {
-    //해당 달이 있는지 부터 체크하고
+    //해당 달이 있는지 부터 체크하고, 없으면 체크할 범위 아님
 
     List<SimpleSchedule> scheduleList = monthToSchedulesMap.get(date.getMonthValue());
-    if (scheduleList.isEmpty()) {
-      monthToSchedulesMap.put(date.getMonthValue(),scheduleList);
+    if (scheduleList == null) {
+      return;
     }
 
     //해당 일이 존재하는지 찾고 있으면 id 추가,
