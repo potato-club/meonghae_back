@@ -83,6 +83,25 @@ class BoardLikeServiceTest {
         assertThat(board.getLikes()).isZero();
     }
 
+    @Test
+    public void 좋아요를_취소했던_상태에서_다시_누를_경우_좋아요가_반영된다() throws Exception {
+        //given
+        Board board = createBoard();
+        String token = "test token 2";
+        likeService.addLike(board.getId(), token);
+        String res = likeService.addLike(board.getId(), token);
+
+        assertThat(res).isEqualTo("추천 취소");
+        assertThat(board.getLikes()).isZero();
+
+        //when
+        String res2 = likeService.addLike(board.getId(), token);
+
+        //then
+        assertThat(res2).isEqualTo("추천 완료");
+        assertThat(board.getLikes()).isEqualTo(1);
+    }
+    
     public Board createBoard() {
         int typeKey = 1;
         BoardRequest request = BoardRequest.builder()
