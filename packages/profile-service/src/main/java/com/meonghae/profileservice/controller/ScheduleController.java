@@ -1,5 +1,6 @@
 package com.meonghae.profileservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.meonghae.profileservice.dto.schedule.*;
 import com.meonghae.profileservice.enumCustom.ScheduleType;
 import com.meonghae.profileservice.error.ErrorCode;
@@ -37,7 +38,7 @@ public class ScheduleController {
   @Operation(summary = "년,월 입력 시 달력 전체에 뿌려져있는 일정들의 ID를 반환")
   @GetMapping("/month")
   public List<SimpleMonthSchedule> getMonthSchedule(@RequestParam int year, @RequestParam int month,
-                                               @RequestHeader("Authorization") String token) {
+                                               @RequestHeader("Authorization") String token) throws JsonProcessingException {
 
     LocalDate startOfDate = LocalDate.of(year, month, 1);
 
