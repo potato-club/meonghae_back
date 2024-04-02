@@ -59,9 +59,8 @@ public class ScheduleService {
             .selectFrom(qSchedule)
             .leftJoin(qSchedule.pet,qPet)
             .where(qSchedule.userEmail.eq(userEmail)
-                    .and(qSchedule.scheduleEndTime.goe(LocalDateTime.now()))
-                    .or(qSchedule.hasRepeat.isFalse()
-                            .and(qSchedule.scheduleTime.goe(LocalDateTime.now()))))
+                    .and(qSchedule.scheduleEndTime.goe(LocalDateTime.now())
+                            .or(qSchedule.hasRepeat.isFalse().and(qSchedule.scheduleTime.goe(LocalDateTime.now())))))
             .fetch();
 
     List<SchedulePreviewResponseDto> resultList = new ArrayList<>();
