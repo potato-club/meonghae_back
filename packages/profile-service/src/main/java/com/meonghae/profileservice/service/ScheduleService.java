@@ -1,5 +1,7 @@
 package com.meonghae.profileservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meonghae.profileservice.dto.schedule.*;
 import com.meonghae.profileservice.entity.*;
 import com.meonghae.profileservice.enumCustom.ScheduleCycleType;
@@ -114,7 +116,7 @@ public class ScheduleService {
 
   // 달력 월단위 일정들 보기 위한 함수 - 같은 해 같은 월 데이터 출력
   @Transactional
-  public List<SimpleMonthSchedule> getMonthOfSchedule(LocalDate targetDate, String token) {
+  public List<SimpleMonthSchedule> getMonthOfSchedule(LocalDate targetDate, String token) throws JsonProcessingException {
   //3달치 리턴하기!!
 
     String userEmail = feignService.getUserEmail(token);
@@ -174,7 +176,6 @@ public class ScheduleService {
       else if (schedule.isHasRepeat() && schedule.getCycleType().equals(ScheduleCycleType.Month)) {
 
         for (int i = 0; i < 3; i++) { // 현재 달부터 2달 뒤까지 3번 반복
-          log.info("line 169");
           LocalDate repeatedDate = targetDate.plusMonths(i);
           if ((repeatedDate.getMonthValue() - schedule.getScheduleTime().getMonthValue()) % schedule.getCycle() == 0) {
             addSimpleSchedule(monthToSchedulesMap, repeatedDate.withDayOfMonth(schedule.getScheduleTime().getDayOfMonth()).atStartOfDay(), schedule.getId());
@@ -184,20 +185,17 @@ public class ScheduleService {
       //반복 일정 && 타입이 커스텀이면서 주기타입이 day 인 것
       else if (schedule.isHasRepeat()
               && schedule.getCycleType() == ScheduleCycleType.Day) {
-        log.info("line 179");
         List<LocalDateTime> intendedTimeList = calculateRepeatedDays(schedule,targetDate);
 
         for (LocalDateTime intendedTime : intendedTimeList) {
-          log.info("line 183");
-          log.info(intendedTime.toString());
-          log.info(schedule.getId().toString());
           addSimpleSchedule(monthToSchedulesMap, intendedTime, schedule.getId());
         }
       } else throw new RuntimeException();
     }
-
+    ObjectMapper objectMapper = new ObjectMapper();
+    String json = objectMapper.writeValueAsString(monthToSchedulesMap);
+    log.info(json);
     List<SimpleMonthSchedule> result = new ArrayList<>();
-
     for (Map.Entry<Integer, List<SimpleSchedule>> entry : monthToSchedulesMap.entrySet()) {
       SimpleMonthSchedule monthSchedule = new SimpleMonthSchedule();
       monthSchedule.setMonth(entry.getKey());
@@ -335,12 +333,9 @@ public class ScheduleService {
     //해당 일이 존재하는지 찾고 있으면 id 추가,
     Optional<SimpleSchedule> existingSchedule = scheduleList.stream().filter(s -> s.getDay() == date.getDayOfMonth()).findFirst();
     if (existingSchedule.isPresent()) {
-      log.info("line 327");
-      log.info(String.valueOf(scheduleId));
       existingSchedule.get().getScheduleIds().add(scheduleId);
     }
     else {//없으면 날짜 생성
-      log.info("line 332");
       SimpleSchedule simpleSchedule = new SimpleSchedule(date.getDayOfMonth(),scheduleId);
       scheduleList.add(simpleSchedule);
     }
