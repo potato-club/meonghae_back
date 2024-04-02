@@ -31,11 +31,18 @@ public class RedisService {
     public String getFcmToken(String email) {
         String cacheKey = getFCM + "::" + email;
         String fcmToken = cacheManager.getCache(getFCM).get(cacheKey, String.class);
-
+        log.info("redis-34: "+fcmToken);
         if ( fcmToken == null ) {
-            FCMResponseDto fcmResponseDto = userFeignService.getFCMToken(email);
-            this.saveFcmToken(email, fcmResponseDto.getFcmToken());
-            return fcmResponseDto.getFcmToken();
+            try {
+                FCMResponseDto fcmResponseDto = userFeignService.getFCMToken(email);
+                log.info("redis-37: "+fcmResponseDto.getFcmToken());
+                this.saveFcmToken(email, fcmResponseDto.getFcmToken());
+                return fcmResponseDto.getFcmToken();
+            } catch (RuntimeException e) {
+                log.info("*".repeat(20));
+                e.printStackTrace();
+                log.info("*".repeat(20));
+            }
         } else {
             //만료 시간 재설정
             redisTemplate.expire(cacheKey,8, TimeUnit.DAYS);
@@ -44,7 +51,9 @@ public class RedisService {
     }
 
     private void saveFcmToken(String email, String fcmToken) {
-        cacheManager.getCache(getFCM).put(email, fcmToken);
+        log.info("redis-48");
+        String cacheKey = getFCM+"::"+email;
+        cacheManager.getCache(getFCM).put(cacheKey, fcmToken);
     }
     public void updateFcm(String email, String fcmToken) {
         //redis에 존재하면 교체

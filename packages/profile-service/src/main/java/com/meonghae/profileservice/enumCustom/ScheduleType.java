@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ScheduleType {
+    Test(-1,"테스트 일정",0),
     Custom(0,"커스텀 일정",0),
     //유저
     BirthDay(1,"특별한 날인 오늘, 생일 축하드려요!",12),

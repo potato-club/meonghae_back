@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 public class ScheduleResponseDTO {
   private Long id;
   private String petName;
-  private ScheduleType scheduleType;
+  private Long petId;
+  private String scheduleType;
   private String customScheduleTitle;
   private boolean hasRepeat;
   private ScheduleCycleType cycleType;
@@ -28,7 +29,8 @@ public class ScheduleResponseDTO {
   public ScheduleResponseDTO(Schedule schedule) {
     this.id = schedule.getId();
     this.petName = schedule.getPet().getPetName();
-    this.scheduleType = schedule.getScheduleType();
+    this.petId = schedule.getPet().getId();
+    this.scheduleType = schedule.getScheduleType().getTitle();
     this.customScheduleTitle = schedule.getCustomScheduleTitle();
     this.hasRepeat = schedule.isHasRepeat();
     this.scheduleTime = schedule.getScheduleTime();
@@ -42,7 +44,8 @@ public class ScheduleResponseDTO {
   public ScheduleResponseDTO(Schedule schedule, LocalDateTime intendedTime) {
     this.id = schedule.getId();
     this.petName = schedule.getPet().getPetName();
-    this.scheduleType = schedule.getScheduleType();
+    this.petId = schedule.getPet().getId();
+    this.scheduleType = schedule.getScheduleType().getTitle();
     this.customScheduleTitle = schedule.getCustomScheduleTitle();
     this.hasRepeat = schedule.isHasRepeat();
     this.scheduleTime = intendedTime;

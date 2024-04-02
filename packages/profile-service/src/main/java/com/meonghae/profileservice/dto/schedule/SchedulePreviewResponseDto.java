@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class SchedulePreviewResponseDto {
     private Long id;
     private LocalDateTime scheduleDate;
-    private String scheduleText;
+    private String scheduleTitle;
     private String petName;
 
     public SchedulePreviewResponseDto (Schedule schedule, LocalDateTime intendedTime) {
@@ -29,9 +29,9 @@ public class SchedulePreviewResponseDto {
     }
     private void setScheduleText(Schedule schedule){
         if (schedule.getScheduleType() != ScheduleType.Custom) {
-            this.scheduleText = schedule.getScheduleType().getTitle();
+            this.scheduleTitle = schedule.getScheduleType().getTitle();
         } else if (schedule.getScheduleType() == ScheduleType.Custom) {
-            this.scheduleText = schedule.getText();
+            this.scheduleTitle = schedule.getCustomScheduleTitle();
         }
     }
 }
