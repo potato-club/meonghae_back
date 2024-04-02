@@ -120,6 +120,32 @@ class BoardServiceTest {
     }
 
     @Test
+    public void 작성자가_아닐_경우_게시글_수정_시_예외가_던져진다() throws Exception {
+        //given
+        int typeKey = 1;
+
+        BoardRequest request = BoardRequest.builder()
+                .title("test title")
+                .content("test content")
+                .build();
+        String token = "test token";
+        String token_2 = "unknown token";
+
+        Board board = boardService.createBoard(typeKey, request, token);
+
+        BoardUpdate update = BoardUpdate.builder()
+                .title("new title")
+                .content("new content")
+                .build();
+
+        //when
+        //then
+        assertThatThrownBy(() -> boardService.modifyBoard(board.getId(), update, token_2))
+                .isInstanceOf(BoardException.class)
+                .hasFieldOrPropertyWithValue("errorMessage", "글 작성자만 수정 가능합니다.");
+    }
+
+    @Test
     public void 게시글을_삭제할_수_있다() throws Exception {
         //given
         int typeKey = 1;
