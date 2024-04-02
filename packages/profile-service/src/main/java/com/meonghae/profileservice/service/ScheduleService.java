@@ -163,10 +163,10 @@ public class ScheduleService {
         }
       }
       //주기타입이 month 인 것
-      else if (schedule.getCycleType().equals(ScheduleCycleType.Month)) {
+      else if (schedule.isHasRepeat() && schedule.getCycleType().equals(ScheduleCycleType.Month)) {
 
         for (int i = 0; i < 3; i++) { // 현재 달부터 2달 뒤까지 3번 반복
-
+          log.info("line 169");
           LocalDate repeatedDate = targetDate.plusMonths(i);
           if ((repeatedDate.getMonthValue() - schedule.getScheduleTime().getMonthValue()) % schedule.getCycle() == 0) {
             addSimpleSchedule(monthToSchedulesMap, repeatedDate.withDayOfMonth(schedule.getScheduleTime().getDayOfMonth()).atStartOfDay(), schedule.getId());
@@ -174,13 +174,16 @@ public class ScheduleService {
         }
       }
       //반복 일정 && 타입이 커스텀이면서 주기타입이 day 인 것
-      else if (schedule.isHasRepeat() && schedule.getScheduleType().equals(ScheduleType.Custom)
+      else if (schedule.isHasRepeat()
               && schedule.getCycleType() == ScheduleCycleType.Day) {
-
+        log.info("line 179");
         List<LocalDateTime> intendedTimeList = calculateRepeatedDays(schedule,targetDate);
 
         for (LocalDateTime intendedTime : intendedTimeList) {
-          addSimpleSchedule(monthToSchedulesMap, intendedTime, schedule.getId().intValue());
+          log.info("line 183");
+          log.info(intendedTime.toString());
+          log.info(schedule.getId().toString());
+          addSimpleSchedule(monthToSchedulesMap, intendedTime, schedule.getId());
         }
       } else throw new RuntimeException();
     }
@@ -315,6 +318,7 @@ public class ScheduleService {
 
   private void addSimpleSchedule(Map<Integer, List<SimpleSchedule>> monthToSchedulesMap, LocalDateTime date, long scheduleId) {
     //해당 달이 있는지 부터 체크하고
+
     List<SimpleSchedule> scheduleList = monthToSchedulesMap.get(date.getMonthValue());
     if (scheduleList.isEmpty()) {
       monthToSchedulesMap.put(date.getMonthValue(),scheduleList);
@@ -323,9 +327,12 @@ public class ScheduleService {
     //해당 일이 존재하는지 찾고 있으면 id 추가,
     Optional<SimpleSchedule> existingSchedule = scheduleList.stream().filter(s -> s.getDay() == date.getDayOfMonth()).findFirst();
     if (existingSchedule.isPresent()) {
+      log.info("line 327");
+      log.info(String.valueOf(scheduleId));
       existingSchedule.get().getScheduleIds().add(scheduleId);
     }
     else {//없으면 날짜 생성
+      log.info("line 332");
       SimpleSchedule simpleSchedule = new SimpleSchedule(date.getDayOfMonth(),scheduleId);
       scheduleList.add(simpleSchedule);
     }
