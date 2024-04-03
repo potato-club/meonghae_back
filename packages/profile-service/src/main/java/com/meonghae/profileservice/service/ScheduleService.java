@@ -10,6 +10,7 @@ import com.meonghae.profileservice.error.ErrorCode;
 import com.meonghae.profileservice.error.exception.NotFoundException;
 import com.meonghae.profileservice.repository.ScheduleRepository;
 import com.meonghae.profileservice.repository.PetRepository;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.time.LocalDate;
@@ -218,12 +219,25 @@ public class ScheduleService {
     QSchedule qSchedule = QSchedule.schedule;
     QPet qPet = QPet.pet;
 
+//검색 키워드를 포함하는 ScheduleType
+    List<ScheduleType> matchingKeys = Arrays.stream(ScheduleType.values())
+            .filter(type -> type.getTitle().contains(key))
+            .collect(Collectors.toList());
+
+    BooleanExpression condition = null;
+    if (!matchingKeys.isEmpty() ) {
+      condition = qSchedule.scheduleType.in(matchingKeys);
+    }
+
     List<Schedule> scheduleList = jpaQueryFactory
             .selectFrom(qSchedule)
             .innerJoin(qSchedule.pet, qPet).fetchJoin()
             .where(qSchedule.userEmail.eq(userEmail)
                     .and((qSchedule.text.like("%"+key+"%")
-                            .or(qPet.petName.like("%"+key+"%")))))
+                            .or(qSchedule.customScheduleTitle.like("%"+key+"%"))
+                            .or(condition)
+                            .or(qPet.petName.like("%"+key+"%"))
+                    )))
             .orderBy(qSchedule.scheduleTime.asc())
             .fetch();
 
