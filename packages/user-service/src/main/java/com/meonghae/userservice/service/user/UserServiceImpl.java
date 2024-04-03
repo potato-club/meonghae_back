@@ -1,6 +1,5 @@
 package com.meonghae.userservice.service.user;
 
-import com.meonghae.userservice.core.exception.ErrorCode;
 import com.meonghae.userservice.core.exception.impl.NotFoundException;
 import com.meonghae.userservice.domin.FCMToken.FCMToken;
 import com.meonghae.userservice.domin.user.User;
@@ -133,7 +132,7 @@ public class UserServiceImpl implements UserService {
     public void signUp(UserRequest userDto, HttpServletRequest request, HttpServletResponse response) {
 
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new UnAuthorizedException("이미 회원이거나 탈퇴 대기 중인 유저입니다.", ACCESS_DENIED_EXCEPTION);
+            throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         }
 
         userRepository.save(userDto.toDomain());
@@ -212,14 +211,14 @@ public class UserServiceImpl implements UserService {
     public void cancelWithdrawal(String email, boolean agreement) {
         if (userRepository.existsByEmailAndDeleted(email, true) && agreement) {
             User user = userRepository.findByEmail(email).orElseThrow(() -> {
-                throw new NotFoundException("해당하는 유저가 없습니다.", NOT_FOUND_EXCEPTION);
+                throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
             });
 
             user.delete(false);
             userRepository.save(user);
 
         } else {
-            throw new NotFoundException("해당하는 유저가 없습니다.", NOT_FOUND_EXCEPTION);
+            throw new UnAuthorizedException("401_NOT_ALLOW", NOT_ALLOW_WRITE_EXCEPTION);
         }
     }
 
