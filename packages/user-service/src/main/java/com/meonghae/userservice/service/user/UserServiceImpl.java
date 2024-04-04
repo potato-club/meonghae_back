@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate birth = LocalDate.parse(userDto.getBirth(), formatter);
 
-        if (userDto.getFile() != null) {    // 업데이트 이미지가 있을 경우
+        if (userDto.getFile().getSize() != 0) {    // 업데이트 이미지가 있을 경우
             List<MultipartFile> fileList = new ArrayList<>();
             List<S3Update> updateList = new ArrayList<>();
 
@@ -196,7 +196,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void withdrawalMembership(HttpServletRequest request) {
+    public void withDrawlMembership(HttpServletRequest request) {
         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
         User user = userRepository.findByEmail(email).orElseThrow();
 

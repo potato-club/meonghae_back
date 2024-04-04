@@ -53,10 +53,13 @@ public class FakeUserRepository implements UserRepository {
     public boolean existsByEmailAndDeleted(String email, boolean deleted) {
         Optional<User> value = data.stream()
                 .filter(user -> user.getEmail().equals(email))
-                .filter(user -> user.isDeleted() == deleted)
-                .findAny();
+                .findFirst();
 
-        return value.isPresent();
+        if (value.isEmpty()) {
+            return false;
+        }
+
+        return value.get().isDeleted() == deleted;
     }
 
     @Override

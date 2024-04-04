@@ -85,7 +85,7 @@ public class UserController {
     @Operation(summary = "회원탈퇴 API")
     @PutMapping("/withdrawal")
     public ResponseEntity<String> withdrawalMembership(HttpServletRequest request) {
-        userService.withdrawalMembership(request);
+        userService.withDrawlMembership(request);
         return ResponseEntity.ok("회원탈퇴 처리 되었습니다");
     }
 
