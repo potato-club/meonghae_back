@@ -33,7 +33,7 @@ public class FakeUserRepository implements UserRepository {
             data.add(newUser);
             timeData.put(newUser, LocalDateTime.now());
         } else {
-            data.removeIf(item -> Objects.equals(item.getUid(), user.getUid()));
+            data.removeIf(item -> Objects.equals(item.getEmail(), user.getEmail()));
 
             data.add(user);
             timeData.put(user, LocalDateTime.now());

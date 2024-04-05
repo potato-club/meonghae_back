@@ -12,11 +12,11 @@ public class User {
 
     private final String uid;
     private final String email;
-    private final int age;
-    private final LocalDate birth;
-    private final String nickname;
+    private int age;
+    private LocalDate birth;
+    private String nickname;
     private final UserRole userRole;
-    private final boolean deleted;
+    private boolean deleted;
 
     @Builder
     public User(String uid, String email, int age, LocalDate birth, String nickname,
@@ -30,27 +30,13 @@ public class User {
         this.deleted = deleted;
     }
 
-    public User update(UserUpdate userDto, LocalDate birth) {
-        return User.builder()
-                .uid(uid)
-                .email(email)
-                .age(userDto.getAge())
-                .birth(birth)
-                .nickname(userDto.getNickname())
-                .userRole(userRole)
-                .deleted(deleted)
-                .build();
+    public void update(UserUpdate userDto, LocalDate birth) {
+        this.age = userDto.getAge();
+        this.birth = birth;
+        this.nickname = userDto.getNickname();
     }
 
-    public User delete(boolean deleted) {
-        return User.builder()
-                .uid(uid)
-                .email(email)
-                .age(age)
-                .birth(birth)
-                .nickname(nickname)
-                .userRole(userRole)
-                .deleted(deleted)
-                .build();
+    public void delete(boolean deleted) {
+        this.deleted = deleted;
     }
 }

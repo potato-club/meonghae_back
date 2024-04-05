@@ -34,7 +34,6 @@ public class UserServiceTest {
     private UserServiceImpl userService;
     private FakeUserRepository fakeUserRepository;
     private FakeRedisService fakeRedisService;
-    private JwtTokenProviderImpl jwtTokenProvider;
 
     @BeforeEach
     void init() {
@@ -43,12 +42,12 @@ public class UserServiceTest {
         fakeUserRepository = new FakeUserRepository();
         fakeRedisService = new FakeRedisService(map);
 
-        jwtTokenProvider = JwtTokenProviderImpl.builder()
+        JwtTokenProviderImpl jwtTokenProvider = JwtTokenProviderImpl.builder()
                 .userRepository(fakeUserRepository)
                 .redisService(fakeRedisService)
                 .secretKey("aaaaaaaaaaa-aaaaaaaaaaaaaaaaaaaaa-aaaaaaaaaaaaaaaa-aaaaaaaaaaaaaa")
-                .accessTokenValidTime(180000L)
-                .refreshTokenValidTime(180000L)
+                .accessTokenValidTime(1800000L)
+                .refreshTokenValidTime(1800000L)
                 .build();
 
         this.userService = UserServiceImpl.builder()
@@ -61,7 +60,6 @@ public class UserServiceTest {
                 .build();
 
         User user = User.builder()
-                .uid("123-456-789")
                 .email("test@test.com")
                 .age(25)
                 .birth(LocalDate.of(2000, 1, 1))

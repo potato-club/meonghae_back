@@ -55,7 +55,7 @@ public class UserTest {
                 .build();
 
         // when
-        user = user.update(userUpdate, LocalDate.of(2001, 1, 1));
+        user.update(userUpdate, LocalDate.of(2001, 1, 1));
 
         // then
         assertThat(user.getUid()).isEqualTo("1e420e42-93d7-47c2-90e2-61f939933350");
@@ -81,7 +81,7 @@ public class UserTest {
                 .build();
 
         // when
-        user = user.delete(true);
+        user.delete(true);
 
         // then
         assertThat(user.getUid()).isEqualTo("1e420e42-93d7-47c2-90e2-61f939933350");

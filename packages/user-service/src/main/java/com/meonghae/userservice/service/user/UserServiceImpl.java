@@ -1,5 +1,6 @@
 package com.meonghae.userservice.service.user;
 
+import com.meonghae.userservice.core.exception.ErrorCode;
 import com.meonghae.userservice.core.exception.impl.NotFoundException;
 import com.meonghae.userservice.domin.FCMToken.FCMToken;
 import com.meonghae.userservice.domin.user.User;
@@ -198,7 +199,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void withDrawlMembership(HttpServletRequest request) {
         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotFoundException("일치하는 유저 없음.", ErrorCode.NOT_FOUND_EXCEPTION);
+        });
 
         user.delete(true);
         userRepository.save(user);
