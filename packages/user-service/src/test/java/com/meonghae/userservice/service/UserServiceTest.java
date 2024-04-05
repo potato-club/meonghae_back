@@ -46,7 +46,7 @@ public class UserServiceTest {
                 .userRepository(fakeUserRepository)
                 .redisService(fakeRedisService)
                 .secretKey("aaaaaaaaaaa-aaaaaaaaaaaaaaaaaaaaa-aaaaaaaaaaaaaaaa-aaaaaaaaaaaaaa")
-                .accessTokenValidTime(1800000L)
+                .accessTokenValidTime(180000L)
                 .refreshTokenValidTime(1800000L)
                 .build();
 
@@ -170,7 +170,10 @@ public class UserServiceTest {
         // then
         String token = Objects.requireNonNull(request.getHeader("Authorization"));
 
-        fakeRedisService.isTokenInBlacklist(token);
+        assertThatThrownBy(() -> {
+            fakeRedisService.isTokenInBlacklist(token);
+        }).isInstanceOf(MalformedJwtException.class)
+                .hasMessage("Invalid JWT token");
     }
 
     @Test
@@ -248,10 +251,11 @@ public class UserServiceTest {
 
         userService.login(email, request, response);
 
-        request.addHeader("Authorization",
-                Objects.requireNonNull(response.getHeader("Authorization")).substring(7));
-        request.addHeader("RefreshToken",
-                Objects.requireNonNull(response.getHeader("RefreshToken")).substring(7));
+        String accessToken = Objects.requireNonNull(response.getHeader("Authorization")).substring(7);
+        String refreshToken = Objects.requireNonNull(response.getHeader("RefreshToken")).substring(7);
+
+        request.addHeader("Authorization", accessToken);
+        request.addHeader("RefreshToken", refreshToken);
 
         // when
         userService.withDrawlMembership(request);
@@ -262,9 +266,9 @@ public class UserServiceTest {
         });
 
         assertThat(user.isDeleted()).isTrue();
-        assertThat(fakeRedisService.getValues(request.getHeader("RefreshToken"))).isNull();
+        assertThat(fakeRedisService.getValues(refreshToken)).isNull();
         assertThatThrownBy(() -> {
-            fakeRedisService.isTokenInBlacklist(request.getHeader("Authorization"));
+            fakeRedisService.isTokenInBlacklist(accessToken);
         }).isInstanceOf(MalformedJwtException.class)
                 .hasMessage("Invalid JWT token");
     }

@@ -6,8 +6,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -43,6 +41,7 @@ public class RedisService {
         if (Boolean.TRUE.equals(redisTemplate.hasKey(token))) {
             throw new MalformedJwtException("Invalid JWT token");
         }
+
         return false;
     }
 }

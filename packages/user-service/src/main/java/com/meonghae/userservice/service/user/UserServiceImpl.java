@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService {
     public void signUp(UserRequest userDto, HttpServletRequest request, HttpServletResponse response) {
 
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
+            throw new UnAuthorizedException("이미 회원이거나 탈퇴 대기 중인 유저입니다.", ACCESS_DENIED_EXCEPTION);
         }
 
         userRepository.save(userDto.toDomain());

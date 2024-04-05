@@ -183,11 +183,11 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
+
             Date expiration = claims.getExpiration();
             Date now = new Date();
-            if (now.after(expiration)) {
-                redisService.addTokenToBlacklist(token, expiration.getTime() - now.getTime());
-            }
+
+            redisService.addTokenToBlacklist(token, expiration.getTime() - now.getTime());
         } catch (ExpiredJwtException e) {
             redisService.addTokenToBlacklist(token, e.getClaims().getExpiration().getTime() - e.getClaims().getIssuedAt().getTime());
         }
