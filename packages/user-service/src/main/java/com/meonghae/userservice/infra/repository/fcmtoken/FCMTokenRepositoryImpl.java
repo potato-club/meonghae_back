@@ -14,7 +14,13 @@ public class FCMTokenRepositoryImpl implements FCMTokenRepository {
 
     @Override
     public FCMToken findByEmail(String email) {
-        return fcmTokenRepository.findByEmail(email).toModel();
+        FCMTokenEntity fcmToken = fcmTokenRepository.findByEmail(email);
+
+        if (fcmToken == null) {
+            return null;
+        }
+
+        return fcmToken.toModel();
     }
 
     @Override

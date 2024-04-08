@@ -17,7 +17,7 @@ public class FCMTokenEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String token;
 
-    @Column(unique = true,nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     public static FCMTokenEntity from(FCMToken fcmToken) {
