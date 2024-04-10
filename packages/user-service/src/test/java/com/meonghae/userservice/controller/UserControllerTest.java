@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meonghae.userservice.dto.user.UserRequest;
 import com.meonghae.userservice.mock.FakePetServiceClient;
 import com.meonghae.userservice.mock.FakeS3ServiceClient;
+import com.meonghae.userservice.service.user.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -15,6 +16,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -34,6 +37,9 @@ public class UserControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean(UserServiceImpl.class)
+    private UserServiceImpl userService;
 
     @MockBean(FakePetServiceClient.class)
     private FakePetServiceClient fakePetServiceClient;
@@ -104,5 +110,51 @@ public class UserControllerTest {
             .andExpect(status().isOk())
             .andExpect(header().exists("Authorization"))
             .andExpect(header().exists("RefreshToken"));
+    }
+
+    @Test
+    void 내_정보를_확인할_수_있다() throws Exception {
+        // given
+        String email = "test@test.com";
+        String androidId = "test-android-123-456-789";
+        String fcmToken = "test-FCMToken-123-456-789";
+
+        UserRequest request = UserRequest.builder()
+                .email(email)
+                .nickname("Test-User")
+                .age(25)
+                .birth("20000101")
+                .build();
+
+        // when
+        // then
+
+        MvcResult result = mockMvc.perform(
+                        get("/login")
+                                .queryParam("email", email)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("androidId", androidId)
+                                .header("FCMToken", fcmToken)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").isEmpty())
+                .andExpect(jsonPath("$.responseCode").value("200_OK"))
+                .andExpect(header().exists("Authorization"))
+                .andExpect(header().exists("RefreshToken"))
+                .andReturn();
+
+        String accessToken = result.getResponse().getHeader("Authorization");
+        String refreshToken = result.getResponse().getHeader("RefreshToken");
+
+        mockMvc.perform(
+                        get("/mypage")
+                                .header("Authorization", accessToken)
+                                .header("RefreshToken", refreshToken)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.nickname").value(request.getNickname()))
+                .andExpect(jsonPath("$.age").value(request.getAge()))
+                .andExpect(jsonPath("$.birth").value(request.getBirth()));
     }
 }
