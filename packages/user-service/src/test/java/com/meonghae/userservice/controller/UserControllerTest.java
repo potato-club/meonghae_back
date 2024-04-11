@@ -1,10 +1,8 @@
 package com.meonghae.userservice.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meonghae.userservice.dto.user.UserRequest;
 import com.meonghae.userservice.mock.FakePetServiceClient;
 import com.meonghae.userservice.mock.FakeS3ServiceClient;
-import com.meonghae.userservice.service.user.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -16,7 +14,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.Objects;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,16 +34,10 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean(UserServiceImpl.class)
-    private UserServiceImpl userService;
-
-    @MockBean(FakePetServiceClient.class)
+    @MockBean
     private FakePetServiceClient fakePetServiceClient;
 
-    @MockBean(FakeS3ServiceClient.class)
+    @MockBean
     private FakeS3ServiceClient fakeS3ServiceClient;
 
     @Test
@@ -128,8 +121,7 @@ public class UserControllerTest {
 
         // when
         // then
-
-        MvcResult result = mockMvc.perform(
+        mockMvc.perform(
                         get("/login")
                                 .queryParam("email", email)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -137,24 +129,23 @@ public class UserControllerTest {
                                 .header("FCMToken", fcmToken)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").isEmpty())
                 .andExpect(jsonPath("$.responseCode").value("200_OK"))
                 .andExpect(header().exists("Authorization"))
                 .andExpect(header().exists("RefreshToken"))
-                .andReturn();
+                .andDo(result -> {
+                    String accessToken = Objects.requireNonNull(result.getResponse().getHeader("Authorization")).substring(7);
+                    String refreshToken = Objects.requireNonNull(result.getResponse().getHeader("RefreshToken")).substring(7);
 
-        String accessToken = result.getResponse().getHeader("Authorization");
-        String refreshToken = result.getResponse().getHeader("RefreshToken");
-
-        mockMvc.perform(
-                        get("/mypage")
-                                .header("Authorization", accessToken)
-                                .header("RefreshToken", refreshToken)
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value(email))
-                .andExpect(jsonPath("$.nickname").value(request.getNickname()))
-                .andExpect(jsonPath("$.age").value(request.getAge()))
-                .andExpect(jsonPath("$.birth").value(request.getBirth()));
+                    mockMvc.perform(
+                                    get("/mypage")
+                                            .header("Authorization", accessToken)
+                                            .header("RefreshToken", refreshToken)
+                            )
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.email").value(email))
+                            .andExpect(jsonPath("$.nickname").value(request.getNickname()))
+                            .andExpect(jsonPath("$.age").value(request.getAge()))
+                            .andExpect(jsonPath("$.birth").value(request.getBirth()));
+                });
     }
 }
