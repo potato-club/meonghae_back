@@ -25,9 +25,16 @@ class BoardServiceTest {
 
     private BoardService boardService;
 
-    private final MockMultipartFile multipartFile = new MockMultipartFile(
-            "testFile",
-            "originTestFile",
+    private final MockMultipartFile multipartFile_1 = new MockMultipartFile(
+            "testFile_1",
+            "originTestFile_1",
+            "testType",
+            "content".getBytes()
+    );
+
+    private final MockMultipartFile multipartFile_2 = new MockMultipartFile(
+            "testFile_2",
+            "originTestFile_2",
             "testType",
             "content".getBytes()
     );
@@ -70,7 +77,7 @@ class BoardServiceTest {
         //given
         int typeKey = 1;
         List<MultipartFile> images = new ArrayList<>();
-        images.add(multipartFile);
+        images.add(multipartFile_1);
 
         BoardRequest request = BoardRequest.builder()
                 .title("test title")
@@ -117,6 +124,105 @@ class BoardServiceTest {
         assertThat(modifyBoard.getType()).isEqualByComparingTo(BoardType.SHOW);
         assertThat(modifyBoard.getEmail()).isEqualTo(token + "@test.com");
         assertThat(modifyBoard.getHasImage()).isFalse();
+    }
+
+    @Test
+    public void 기존_이미지가_없고_새로운_이미지를_추가하면서_게시글을_수정할_수_있다() throws Exception {
+        //given
+        int typeKey = 1;
+        List<MultipartFile> images = new ArrayList<>();
+        images.add(multipartFile_1);
+
+        BoardRequest request = BoardRequest.builder()
+                .title("test title")
+                .content("test content")
+                .build();
+        String token = "test token";
+
+        Board board = boardService.createBoard(typeKey, request, token);
+
+        BoardUpdate update = BoardUpdate.builder()
+                .title("new title")
+                .content("new content")
+                .images(images)
+                .build();
+
+        //when
+        Board modifyBoard = boardService.modifyBoard(board.getId(), update, token);
+
+        //then
+        assertThat(modifyBoard.getTitle()).isEqualTo("new title");
+        assertThat(modifyBoard.getContent()).isEqualTo("new content");
+        assertThat(modifyBoard.getType()).isEqualByComparingTo(BoardType.SHOW);
+        assertThat(modifyBoard.getEmail()).isEqualTo(token + "@test.com");
+        assertThat(modifyBoard.getHasImage()).isTrue();
+    }
+
+    @Test
+    public void 기존_이미지를_전부_삭제하면서_게시글을_수정할_수_있다() throws Exception {
+        //given
+        int typeKey = 1;
+        List<MultipartFile> images = new ArrayList<>();
+        images.add(multipartFile_1);
+
+        BoardRequest request = BoardRequest.builder()
+                .title("test title")
+                .content("test content")
+                .images(images)
+                .build();
+        String token = "test token";
+
+        Board board = boardService.createBoard(typeKey, request, token);
+
+        BoardUpdate update = BoardUpdate.builder()
+                .title("new title")
+                .content("new content")
+                .build();
+
+        //when
+        Board modifyBoard = boardService.modifyBoard(board.getId(), update, token);
+
+        //then
+        assertThat(modifyBoard.getTitle()).isEqualTo("new title");
+        assertThat(modifyBoard.getContent()).isEqualTo("new content");
+        assertThat(modifyBoard.getType()).isEqualByComparingTo(BoardType.SHOW);
+        assertThat(modifyBoard.getEmail()).isEqualTo(token + "@test.com");
+        assertThat(modifyBoard.getHasImage()).isFalse();
+    }
+
+    @Test
+    public void 게시글_수정_시_이미지를_업데이간할_수_있다() throws Exception {
+        //given
+
+        int typeKey = 1;
+        List<MultipartFile> images = new ArrayList<>();
+        images.add(multipartFile_1);
+
+        BoardRequest request = BoardRequest.builder()
+                .title("test title")
+                .content("test content")
+                .images(images)
+                .build();
+        String token = "test token";
+
+        Board board = boardService.createBoard(typeKey, request, token);
+
+        images.add(multipartFile_2);
+        BoardUpdate update = BoardUpdate.builder()
+                .title("new title")
+                .content("new content")
+                .images(images)
+                .build();
+
+        //when
+        Board modifyBoard = boardService.modifyBoard(board.getId(), update, token);
+
+        //then
+        assertThat(modifyBoard.getTitle()).isEqualTo("new title");
+        assertThat(modifyBoard.getContent()).isEqualTo("new content");
+        assertThat(modifyBoard.getType()).isEqualByComparingTo(BoardType.SHOW);
+        assertThat(modifyBoard.getEmail()).isEqualTo(token + "@test.com");
+        assertThat(modifyBoard.getHasImage()).isTrue();
     }
 
     @Test
