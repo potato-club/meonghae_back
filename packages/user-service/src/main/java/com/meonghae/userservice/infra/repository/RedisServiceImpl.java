@@ -1,6 +1,7 @@
 package com.meonghae.userservice.infra.repository;
 
 import com.meonghae.userservice.service.port.RedisService;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -55,6 +56,16 @@ public class RedisServiceImpl implements RedisService {
     public void addTokenToBlacklist(String token, long expiration) {
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(token, Boolean.TRUE, expiration, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public void isTokenInBlacklist(String token) {
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+        Boolean isBlacklisted = (Boolean) valueOperations.get(token);
+
+        if (isBlacklisted != null && isBlacklisted.equals(Boolean.TRUE)) {
+            throw new MalformedJwtException("Invalid JWT token");
+        }
     }
 
     // RefreshToken, Android-Id 삭제

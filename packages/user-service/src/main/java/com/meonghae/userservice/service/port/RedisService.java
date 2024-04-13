@@ -12,5 +12,7 @@ public interface RedisService {
 
     void addTokenToBlacklist(String token, long expiration);
 
+    void isTokenInBlacklist(String token);
+
     void delValues(String token, String email);
 }
