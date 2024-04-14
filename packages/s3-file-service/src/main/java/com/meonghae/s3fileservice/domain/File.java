@@ -16,11 +16,11 @@ public class File {
 
     private final String fileUrl;
 
-    private final EntityType entityType;
+    private EntityType entityType;
 
-    private final Long typeId;
+    private Long typeId;
 
-    private final String email;
+    private String email;
 
     @Builder
     public File(Long id, String fileName, String fileUrl,
@@ -33,33 +33,19 @@ public class File {
         this.email = email;
     }
 
-    public void updateForData(FileRequest request) {
-        File.builder()
-                .id(id)
-                .fileName(fileName)
-                .fileUrl(fileUrl)
-                .entityType(request.getEntityType())
-                .typeId(request.getEntityId())
-                .email(email);
+    public void uploadForData(FileRequest request) {
+        this.entityType = request.getEntityType();
+        this.typeId = request.getEntityId();
     }
 
-    public void updateForUser(FileUser user) {
-        File.builder()
-                .id(id)
-                .fileName(fileName)
-                .fileUrl(fileUrl)
-                .entityType(user.getEntityType())
-                .typeId(typeId)
-                .email(user.getEmail());
+    public void uploadForUser(FileUser user) {
+        this.entityType = user.getEntityType();
+        this.email = user.getEmail();
     }
 
     public void update(FileUpdate update) {
-        File.builder()
-                .id(id)
-                .fileName(fileName)
-                .fileUrl(fileUrl)
-                .entityType(update.getEntityType())
-                .typeId(update.getEntityId())
-                .email(update.getEmail());
+        this.entityType = update.getEntityType();
+        this.typeId = update.getEntityId();
+        this.email = update.getEmail();
     }
 }

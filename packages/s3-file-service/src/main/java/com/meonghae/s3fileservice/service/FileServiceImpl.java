@@ -36,7 +36,7 @@ public class FileServiceImpl implements FileService {
         List<File> list = this.existsFiles(files);
 
         for (File file : list) {
-            file.updateForData(request);
+            file.uploadForData(request);
             fileRepository.save(file);
         }
     }
@@ -49,7 +49,7 @@ public class FileServiceImpl implements FileService {
 
         List<File> list = this.existsFiles(files);
         for (File image : list) {
-            image.updateForUser(user);
+            image.uploadForUser(user);
             fileRepository.save(image);
         }
     }
