@@ -1,6 +1,11 @@
 package com.meonghae.communityservice.unit.application.board;
 
 import com.meonghae.communityservice.application.board.BoardService;
+import com.meonghae.communityservice.application.board.port.BoardLikeRepository;
+import com.meonghae.communityservice.application.board.port.BoardRepository;
+import com.meonghae.communityservice.application.port.RedisPort;
+import com.meonghae.communityservice.application.port.S3ServicePort;
+import com.meonghae.communityservice.application.port.UserServicePort;
 import com.meonghae.communityservice.domain.board.Board;
 import com.meonghae.communityservice.domain.board.BoardType;
 import com.meonghae.communityservice.dto.board.BoardDetail;
@@ -29,15 +34,15 @@ public class BoardServiceTestWithMockito {
 
     private BoardService boardService;
 
-    private FakeBoardRepo boardRepository = mock(FakeBoardRepo.class);
+    private BoardRepository boardRepository = mock(FakeBoardRepo.class);
 
-    private FakeRedis redisPort = mock(FakeRedis.class);
+    private RedisPort redisPort = mock(FakeRedis.class);
 
-    private FakeS3Service s3Service = mock(FakeS3Service.class);
+    private S3ServicePort s3Service = mock(FakeS3Service.class);
 
-    private FakeUserService userService = mock(FakeUserService.class);
+    private UserServicePort userService = mock(FakeUserService.class);
 
-    private FakeBoardLikeRepo likeRepository = mock(FakeBoardLikeRepo.class);
+    private BoardLikeRepository likeRepository = mock(FakeBoardLikeRepo.class);
 
     @BeforeEach
     void init() {
