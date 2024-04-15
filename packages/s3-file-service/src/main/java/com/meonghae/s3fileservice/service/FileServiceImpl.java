@@ -7,7 +7,7 @@ import com.meonghae.s3fileservice.domain.File;
 import com.meonghae.s3fileservice.dto.*;
 import com.meonghae.s3fileservice.domain.enums.EntityType;
 import com.meonghae.s3fileservice.service.port.FileRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.Builder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,15 +20,20 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Builder
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
     private final AmazonS3Client s3Client;
     private final FileRepository fileRepository;
-
-    @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
+
+    public FileServiceImpl(AmazonS3Client amazonS3Client, FileRepository fileRepository,
+                           @Value("${cloud.aws.s3.bucket}") String bucketName) {
+        this.s3Client = amazonS3Client;
+        this.fileRepository = fileRepository;
+        this.bucketName = bucketName;
+    }
 
     @Override
     @Transactional

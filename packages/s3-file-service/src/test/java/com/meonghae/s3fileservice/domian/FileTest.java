@@ -19,7 +19,7 @@ public class FileTest {
         // given
         File file = File.builder()
                 .fileName("test-picture-123-456")
-                .fileUrl("aws.s3.com?test-user=123-456")
+                .fileUrl("https://s3.ap-northeast-2.amazonaws.com/test/image/example1.png")
                 .build();
 
         FileUser request = FileUser.builder()
@@ -41,7 +41,7 @@ public class FileTest {
         // given
         File file = File.builder()
                 .fileName("test-picture-pet-123-456")
-                .fileUrl("aws.s3.com?test-pet=123-456")
+                .fileUrl("https://s3.ap-northeast-2.amazonaws.com/test/image/example2.png")
                 .build();
 
         FileRequest request = FileRequest.builder()
@@ -63,7 +63,7 @@ public class FileTest {
         // given
         File file = File.builder()
                 .fileName("test-picture-user-987-654")
-                .fileUrl("aws.s3.com?test-user=987-654")
+                .fileUrl("https://s3.ap-northeast-2.amazonaws.com/test/image/example3.png")
                 .build();
 
         FileUpdate request = FileUpdate.builder()
@@ -91,12 +91,12 @@ public class FileTest {
         for (int i = 0; i < 3; i++) {
             File file = File.builder()
                     .fileName("test-picture-pet-123-456/" + i)
-                    .fileUrl("aws.s3.com?test-pet=123-456/" + i)
+                    .fileUrl("https://s3.ap-northeast-2.amazonaws.com/test/image/" + i + "/example.png")
                     .build();
 
             FileUpdate update = FileUpdate.builder()
                     .entityType(EntityType.BOARD)
-                    .entityId(Long.parseLong(String.valueOf(i + 1)))
+                    .entityId(1L)
                     .build();
 
             files.add(file);
