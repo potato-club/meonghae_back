@@ -1,7 +1,10 @@
 package com.meonghae.communityservice.unit.application.board;
 
 import com.meonghae.communityservice.application.board.BoardCommentService;
-import com.meonghae.communityservice.application.board.BoardService;
+import com.meonghae.communityservice.application.board.port.BoardRepository;
+import com.meonghae.communityservice.application.board.port.CommentRepository;
+import com.meonghae.communityservice.application.port.RedisPort;
+import com.meonghae.communityservice.application.port.UserServicePort;
 import com.meonghae.communityservice.domain.board.Board;
 import com.meonghae.communityservice.domain.board.BoardComment;
 import com.meonghae.communityservice.domain.board.BoardType;
@@ -30,19 +33,13 @@ public class BoardCommentServiceWithMockito {
 
     private BoardCommentService commentService;
 
-    private BoardService boardService;
+    private CommentRepository commentRepository = mock(FakeCommentRepo.class);
 
-    private FakeCommentRepo commentRepository = mock(FakeCommentRepo.class);
+    private BoardRepository boardRepository = mock(FakeBoardRepo.class);
 
-    private FakeBoardRepo boardRepository = mock(FakeBoardRepo.class);
+    private RedisPort redisPort = mock(FakeRedis.class);
 
-    private FakeRedis redisPort = mock(FakeRedis.class);
-
-    private FakeS3Service s3Service = mock(FakeS3Service.class);
-
-    private FakeUserService userService = mock(FakeUserService.class);
-
-    private FakeBoardLikeRepo likeRepository = mock(FakeBoardLikeRepo.class);
+    private UserServicePort userService = mock(FakeUserService.class);
 
     @BeforeEach
     void init() {
@@ -51,14 +48,6 @@ public class BoardCommentServiceWithMockito {
                 .commentRepository(commentRepository)
                 .redisService(redisPort)
                 .userService(userService)
-                .build();
-
-        this.boardService = BoardService.builder()
-                .userService(userService)
-                .s3Service(s3Service)
-                .boardRepository(boardRepository)
-                .likeRepository(likeRepository)
-                .redisService(redisPort)
                 .build();
     }
 
