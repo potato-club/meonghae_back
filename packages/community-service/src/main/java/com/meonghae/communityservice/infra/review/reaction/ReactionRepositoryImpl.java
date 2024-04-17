@@ -16,8 +16,9 @@ public class ReactionRepositoryImpl implements ReactionRepository {
 
     @Override
     public ReviewReaction findByEmailAndReviewEntity_Id(String email, Long reviewId) {
-        return reactionJpaRepository.findByEmailAndReviewEntity_Id(email, reviewId)
-                .toModel();
+        ReactionEntity entity = reactionJpaRepository.findByEmailAndReviewEntity_Id(email, reviewId);
+
+        return entity != null ? entity.toModel() : null;
     }
 
     @Override

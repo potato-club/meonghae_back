@@ -42,6 +42,7 @@ public class ReviewReactionService {
         if (reaction == null) {
             ReviewReaction newReaction = ReviewReaction.create(email, review, isLikes);
             reactionRepository.save(newReaction);
+            reviewRepository.save(review);
             if (isLikes) {
                 return "추천 완료";
             } else {
@@ -50,7 +51,9 @@ public class ReviewReactionService {
         } else {
             String res = getMessageForReactionChange(reaction, isLikes);
             reaction.updateStatus(isLikes);
+            review = reaction.getReview();
             reactionRepository.save(reaction);
+            reviewRepository.save(review);
             return res;
         }
     }

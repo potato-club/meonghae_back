@@ -3,14 +3,12 @@ package com.meonghae.communityservice.dto.review;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
 public class ReviewRequest {
 
     @ApiModelProperty("리뷰 제목")
