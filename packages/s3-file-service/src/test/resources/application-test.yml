@@ -1,0 +1,72 @@
+server:
+  port: 40005
+
+spring:
+  application:
+    name: s3-file-service
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: http://zipkin-server:9411/
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+  datasource:
+    url: ENC(9PfL1V27LDaNPLBD4XBXvkWU0B7+qSxY33AJnDiR7lGX1rek91eV9mhJxGIwruSmITCtvfAtJPtpForipy2wMzAXWET15dirwbyeg3o+1Yqs03Vu8snF4cyKu2g+2FYV)
+    username: ENC(4d7BMWbeTcHgNa4Cmvsikw==)
+    password: ENC(4UgvBUNHRaveoEXRRHL2UDqyZ4kSwG0y)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  profiles:
+    active: test
+
+cloud:
+  aws:
+    s3:
+      bucket: ENC(QbwSj0N4/47TWdnHJedJ92YjyAb59dRI)
+    region:
+      auto: false
+      static: ap-northeast-2
+    credentials:
+      accessKey: ENC(uQYp4PiTIpGw0FX/FbCkhC8WFTkhOVSue6AP7uJrWOk=)
+      secretKey: ENC(b1YCtsGBBKYGmK+jRevCADl/5q3mIbXDHyNqGH1UlBeRSJadxefSxa+qvdtRmwPxbzbzsNWnBg4=)
+    stack:
+      auto: false
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    hostname: meonghae.site
+
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+
+logging:
+  level:
+    com.meonghae.s3-file-service: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, beans, refresh, busrefresh, info, metrics, prometheus
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
