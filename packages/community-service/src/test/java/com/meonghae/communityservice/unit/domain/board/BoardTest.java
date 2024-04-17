@@ -27,7 +27,6 @@ class BoardTest {
         assertThat(board.getEmail()).isEqualTo("abcabc@naver.com");
         assertThat(board.getLikes()).isEqualTo(0);
         assertThat(board.getHasImage()).isFalse();
-        assertThat(board.getComments()).isEmpty();
         assertThat(board.getCreatedDate()).isNull();
         assertThat(board.getModifiedDate()).isNull();
     }

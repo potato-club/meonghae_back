@@ -5,11 +5,8 @@ import com.meonghae.communityservice.domain.board.BoardComment;
 import com.meonghae.communityservice.dto.board.BoardRequest;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static com.meonghae.communityservice.domain.board.BoardType.SHOW;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class BoardCommentTest {
 

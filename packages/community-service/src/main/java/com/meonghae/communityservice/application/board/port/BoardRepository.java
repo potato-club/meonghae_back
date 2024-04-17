@@ -13,8 +13,6 @@ public interface BoardRepository {
     Optional<Board> findById(Long id);
     Slice<Board> findByType(BoardType type, Pageable pageable);
     List<Board> findBoardListForMain(LocalDateTime now);
-    void deleteAllByEmail(String email);
     Board save(Board board);
-
-    void delete(Board board);
+    void delete(Long id);
 }

@@ -3,6 +3,7 @@ package com.meonghae.communityservice.unit.application.board;
 import com.meonghae.communityservice.application.board.BoardService;
 import com.meonghae.communityservice.application.board.port.BoardLikeRepository;
 import com.meonghae.communityservice.application.board.port.BoardRepository;
+import com.meonghae.communityservice.application.board.port.CommentRepository;
 import com.meonghae.communityservice.application.port.RedisPort;
 import com.meonghae.communityservice.application.port.S3ServicePort;
 import com.meonghae.communityservice.application.port.UserServicePort;
@@ -19,14 +20,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +33,8 @@ public class BoardServiceTestWithMockito {
 
     private BoardRepository boardRepository = mock(FakeBoardRepo.class);
 
+    private CommentRepository commentRepository = mock(FakeCommentRepo.class);
+
     private RedisPort redisPort = mock(FakeRedis.class);
 
     private S3ServicePort s3Service = mock(FakeS3Service.class);
@@ -44,15 +43,20 @@ public class BoardServiceTestWithMockito {
 
     private BoardLikeRepository likeRepository = mock(FakeBoardLikeRepo.class);
 
+    private final HashMap<Long, Long> map = new HashMap<>();
+
     @BeforeEach
     void init() {
         this.boardService = BoardService.builder()
+                .commentRepository(commentRepository)
                 .userService(userService)
                 .s3Service(s3Service)
                 .boardRepository(boardRepository)
                 .likeRepository(likeRepository)
                 .redisService(redisPort)
                 .build();
+
+        map.clear();
     }
 
     @Test
@@ -64,12 +68,16 @@ public class BoardServiceTestWithMockito {
                 .build();
         String token = "test token";
 
-        Board board = Board.create(request, BoardType.SHOW, token);
+        Board board = createBoard(1L, request, BoardType.SHOW, token);
         board.toggleHasImage();
         Slice<Board> mockSlice = new PageImpl<>(Collections.singletonList(board));
 
         when(boardRepository.findByType(any(), any(PageRequest.class)))
                 .thenReturn(mockSlice);
+
+        map.put(1L, 0L);
+        when(commentRepository.findCommentCountByBoardIds(anyList()))
+                .thenReturn(map);
 
         when(redisPort.getProfileImage(anyString()))
                 .thenReturn("testImage.jpg");
@@ -103,6 +111,9 @@ public class BoardServiceTestWithMockito {
         when(boardRepository.findById(any()))
                 .thenReturn(Optional.of(board));
 
+        when(commentRepository.countByBoardId(anyLong()))
+                .thenReturn(0);
+
         when(likeRepository.findByEmailAndBoardEntity_Id(anyString(), any()))
                 .thenReturn(null);
 
@@ -133,17 +144,36 @@ public class BoardServiceTestWithMockito {
                 .build();
         String token = "test token";
 
-        Board board1 = Board.create(request, BoardType.SHOW, token);
-        Board board2 = Board.create(request, BoardType.FUN, token);
-        Board board3 = Board.create(request, BoardType.MISSING, token);
+        Board board1 = createBoard(1L, request, BoardType.SHOW, token);
+        Board board2 = createBoard(2L, request, BoardType.FUN, token);
+        Board board3 = createBoard(3L, request, BoardType.MISSING, token);
 
-        //when
         when(boardRepository.findBoardListForMain(any()))
                 .thenReturn((List.of(board1, board2, board3)));
 
-        //then
+        map.put(1L, 0L);
+        map.put(2L, 0L);
+        map.put(3L, 1L);
+        when(commentRepository.findCommentCountByBoardIds(anyList()))
+                .thenReturn(map);
+
+        //when
         List<BoardMain> mainBoard = boardService.getMainBoard();
 
+        //then
+
         assertThat(mainBoard).hasSize(3);
+    }
+
+    private Board createBoard(Long id, BoardRequest request, BoardType type, String email) {
+        return Board.builder()
+                .id(id)
+                .email(email)
+                .likes(0)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .type(type)
+                .hasImage(false)
+                .build();
     }
 }

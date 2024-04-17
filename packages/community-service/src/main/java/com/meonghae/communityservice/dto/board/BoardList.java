@@ -1,7 +1,6 @@
 package com.meonghae.communityservice.dto.board;
 
 import com.meonghae.communityservice.domain.board.Board;
-import com.meonghae.communityservice.infra.board.board.BoardEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,13 +27,13 @@ public class BoardList {
     @ApiModelProperty("게시글 작성 시간")
     private LocalDateTime date;
 
-    public BoardList(Board board, String profileUrl) {
+    public BoardList(Board board, String profileUrl, int commentSize) {
         this.id = board.getId();
         this.profileUrl = profileUrl;
         this.title = board.getTitle();
         this.content = board.getContent();
         this.likes = board.getLikes();
-        this.commentSize = board.getComments().isEmpty() ? 0 : board.getComments().size();
+        this.commentSize = commentSize;
         this.hasImage = board.getHasImage();
         this.date = board.getCreatedDate();
     }

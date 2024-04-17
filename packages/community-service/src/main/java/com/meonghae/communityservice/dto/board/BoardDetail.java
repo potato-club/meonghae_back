@@ -3,7 +3,6 @@ package com.meonghae.communityservice.dto.board;
 import com.meonghae.communityservice.domain.board.Board;
 import com.meonghae.communityservice.dto.s3.ImageList;
 import com.meonghae.communityservice.dto.s3.S3Response;
-import com.meonghae.communityservice.infra.board.board.BoardEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,12 +35,12 @@ public class BoardDetail {
     @ApiModelProperty("게시글 작성 시간")
     private LocalDateTime date;
 
-    public BoardDetail(Board board, String url, boolean status, boolean isWriter) {
+    public BoardDetail(Board board, String url, boolean status, boolean isWriter, int commentCount) {
         this.id = board.getId();
         this.profileUrl = url;
         this.title = board.getTitle();
         this.content = board.getContent();
-        this.commentSize = board.getComments().isEmpty() ? 0 : board.getComments().size();
+        this.commentSize = commentCount;
         this.likes = board.getLikes();
         this.likeStatus = status;
         this.writer = isWriter;

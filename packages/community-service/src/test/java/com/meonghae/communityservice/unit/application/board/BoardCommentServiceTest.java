@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class BoardCommentServiceTest {
     private BoardCommentService commentService;
@@ -55,9 +54,8 @@ class BoardCommentServiceTest {
 
         //then
         assertThat(comment.getComment()).isEqualTo(request.getComment());
-        assertThat(comment.getBoard()).isEqualTo(board);
+        assertThat(comment.getBoard().getId()).isEqualTo(board.getId());
         assertThat(comment.getEmail()).isEqualTo(token + "@test.com");
-        assertThat(board.getComments()).hasSize(1);
     }
 
     @Test
@@ -82,11 +80,8 @@ class BoardCommentServiceTest {
 
         //then
         assertThat(childComment.getParent()).isEqualTo(parentComment);
-        assertThat(childComment.getBoard()).isEqualTo(board);
+        assertThat(childComment.getBoard().getId()).isEqualTo(board.getId());
         assertThat(parentComment.getReplies()).hasSize(1);
-        assertThat(board.getComments()).hasSize(2);
-        assertThat(board.getComments().get(0).getId()).isNotNull();
-        assertThat(board.getComments().get(1).getId()).isNotNull();
     }
 
     @Test
@@ -143,7 +138,6 @@ class BoardCommentServiceTest {
         //then
         assertThat(updateComment.getUpdated()).isTrue();
         assertThat(updateComment.getComment()).isEqualTo(update.getComment());
-        assertThat(board.getComments()).hasSize(1);
     }
 
     @Test

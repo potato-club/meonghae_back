@@ -4,6 +4,8 @@ import com.meonghae.communityservice.domain.board.BoardComment;
 import com.meonghae.communityservice.infra.BaseTimeEntity;
 import com.meonghae.communityservice.infra.board.board.BoardEntity;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
@@ -30,6 +32,7 @@ public class CommentEntity extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private BoardEntity board;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,7 +51,6 @@ public class CommentEntity extends BaseTimeEntity {
         entity.comment = comment.getComment();
         entity.email = comment.getEmail();
         entity.board = BoardEntity.fromModel(comment.getBoard());
-        entity.parent = comment.getParent() == null ? null : fromModel(comment.getParent());
         entity.replies = CollectionUtils.isEmpty(comment.getReplies()) ?
                 new ArrayList<>() : comment.getReplies().stream()
                 .map(CommentEntity::fromModel).collect(Collectors.toList());
@@ -58,13 +60,23 @@ public class CommentEntity extends BaseTimeEntity {
 
     public BoardComment toModel() {
         return BoardComment.builder()
-                .id(this.id)
-                .email(this.email)
-                .comment(this.comment)
-                .updated(this.updated)
-                .board(this.board.toModel())
-                .parent(this.parent.toModel())
-                .replies(this.replies.stream().map(CommentEntity::toModel).collect(Collectors.toList()))
+                .id(this.getId())
+                .email(this.getEmail())
+                .comment(this.getComment())
+                .updated(this.getUpdated())
+                .board(this.getBoard().toModel())
+                .replies(CollectionUtils.isEmpty(this.getReplies()) ?
+                        new ArrayList<>() : this.getReplies().stream()
+                        .map(CommentEntity::toModel).collect(Collectors.toList()))
+                .createdDate(this.getCreatedDate())
                 .build();
+    }
+
+    public void setParent(CommentEntity parent) {
+        this.parent = parent;
+    }
+
+    public void addReply(CommentEntity child) {
+        this.getReplies().add(child);
     }
 }

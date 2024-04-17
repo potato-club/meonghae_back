@@ -44,7 +44,6 @@ public class BoardComment {
 
     public void addReply(BoardComment reply) {
         this.replies.add(reply);
-        this.board.addComment(reply);
     }
 
     public boolean isParent() {

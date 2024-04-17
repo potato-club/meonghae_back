@@ -19,7 +19,6 @@ public class BoardLike {
     }
 
     public static BoardLike create(String email, Board board) {
-        board.incrementLikes();
         return BoardLike.builder()
                 .email(email)
                 .board(board)
@@ -27,13 +26,7 @@ public class BoardLike {
                 .build();
     }
 
-    public void cancelLike() {
-        this.board.decrementLikes();
-        this.status = !this.status;
-    }
-
-    public void addLike() {
-        this.board.incrementLikes();
+    public void toggleLike() {
         this.status = !this.status;
     }
 }

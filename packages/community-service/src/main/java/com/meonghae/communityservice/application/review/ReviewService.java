@@ -11,7 +11,6 @@ import com.meonghae.communityservice.dto.s3.S3Request;
 import com.meonghae.communityservice.dto.s3.S3Response;
 import com.meonghae.communityservice.domain.review.RecommendStatus;
 import com.meonghae.communityservice.domain.review.ReviewCatalog;
-import com.meonghae.communityservice.exception.custom.BoardException;
 import com.meonghae.communityservice.exception.custom.ReviewException;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;

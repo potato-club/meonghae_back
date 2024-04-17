@@ -34,9 +34,10 @@ public class BoardController {
 
     @Operation(summary = "특정 게시글 호출 API")
     @GetMapping("/{id}")
-    public BoardDetail getBoard(@PathVariable(name = "id") Long id,
-                                @RequestHeader("Authorization") String token) {
-        return boardService.getBoard(id, token);
+    public ResponseEntity<BoardDetail> getBoard(@PathVariable(name = "id") Long id,
+                                                @RequestHeader("Authorization") String token) {
+        BoardDetail board = boardService.getBoard(id, token);
+        return ResponseEntity.ok(board);
     }
 
     @Operation(summary = "메인 페이지 인기게시글 호출 API")
@@ -59,7 +60,7 @@ public class BoardController {
     @PostMapping("/{id}/like")
     public ResponseEntity<String> addLike(@PathVariable(name = "id") Long id,
                                           @RequestHeader("Authorization") String token) {
-        String result = likeService.addLike(id, token);
+        String result = likeService.toggleLike(id, token);
         return ResponseEntity.ok(result);
     }
 
@@ -78,12 +79,5 @@ public class BoardController {
                                               @RequestHeader("Authorization") String token) {
         boardService.deleteBoard(id, token);
         return ResponseEntity.ok("삭제 완료");
-    }
-
-    @Operation(summary = "유저의 게시글 삭제 API")
-    @DeleteMapping("/users")
-    public String deleteUserBoard(@RequestParam(name = "email") String email) {
-        boardService.deleteBoardByEmail(email);
-        return "삭제 완료";
     }
 }

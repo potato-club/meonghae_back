@@ -1,6 +1,7 @@
 package com.meonghae.communityservice.application.board;
 
 import com.meonghae.communityservice.application.board.port.BoardLikeRepository;
+import com.meonghae.communityservice.application.board.port.CommentRepository;
 import com.meonghae.communityservice.application.port.RedisPort;
 import com.meonghae.communityservice.application.board.port.BoardRepository;
 import com.meonghae.communityservice.application.port.S3ServicePort;
@@ -38,6 +39,7 @@ import static com.meonghae.communityservice.exception.error.ErrorCode.*;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardLikeRepository likeRepository;
+    private final CommentRepository commentRepository;
     private final RedisPort redisService;
     private final UserServicePort userService;
     private final S3ServicePort s3Service;
@@ -47,9 +49,15 @@ public class BoardService {
         PageRequest request = PageRequest.of(page - 1, 20,
                 Sort.by(Sort.Direction.DESC, "createdDate"));
         Slice<Board> list = boardRepository.findByType(type, request);
+
+        List<Long> boardIds = list.getContent().stream().map(Board::getId).collect(Collectors.toList());
+
+        Map<Long, Long> commentCount = commentRepository.findCommentCountByBoardIds(boardIds);
+
         return list.map(board -> {
             String url = redisService.getProfileImage(board.getEmail());
-            return new BoardList(board, url);
+            int commentSize = commentCount.getOrDefault(board.getId(), 0L).intValue();
+            return new BoardList(board, url, commentSize);
         });
     }
 
@@ -57,12 +65,14 @@ public class BoardService {
         String userEmail = userService.getUserEmail(token);
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
+
         BoardLike like = likeRepository.findByEmailAndBoardEntity_Id(userEmail, id);
+        int commentCount = commentRepository.countByBoardId(board.getId());
 
         boolean likeStatus = like != null ? like.getStatus() : false;
         boolean isWriter = Objects.equals(board.getEmail(), userEmail);
         String url = redisService.getProfileImage(board.getEmail());
-        BoardDetail detailDto = new BoardDetail(board, url, likeStatus, isWriter);
+        BoardDetail detailDto = new BoardDetail(board, url, likeStatus, isWriter, commentCount);
 
         if (board.getHasImage()) {
             List<S3Response> images = s3Service.getImages(new S3Request(board.getId(), "BOARD"));
@@ -76,22 +86,30 @@ public class BoardService {
         LocalDateTime now = LocalDateTime.now();
         List<Board> boardList = boardRepository.findBoardListForMain(now);
 
-        return boardList.stream().map(BoardMain::new).collect(Collectors.toList());
+        Map<Long, Long> commentCount = commentRepository.findCommentCountByBoardIds(boardList.stream()
+                .map(Board::getId).collect(Collectors.toList()));
+
+        return boardList.stream().map(board -> new BoardMain(board,
+                        commentCount.getOrDefault(board.getId(), 0L).intValue()))
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public Board createBoard(int typeKey, BoardRequest requestDto, String token) {
         BoardType type = BoardType.findWithKey(typeKey);
         String email = userService.getUserEmail(token);
+
         Board board = Board.create(requestDto, type, email);
         Board savedBoard = boardRepository.save(board);
+
         List<MultipartFile> images = requestDto.getImages();
         if (!CollectionUtils.isEmpty(images)) {
             imageCheck(savedBoard, images);
             S3Request s3Dto = new S3Request(savedBoard.getId(), "BOARD");
             s3Service.uploadImage(images, s3Dto);
             savedBoard.toggleHasImage();
-            boardRepository.save(savedBoard);
+
+            savedBoard = boardRepository.save(savedBoard);
         }
         return savedBoard;
     }
@@ -151,12 +169,7 @@ public class BoardService {
         }
         S3Request requestDto = new S3Request(board.getId(), "BOARD");
         s3Service.deleteImage(requestDto);
-        boardRepository.delete(board);
-    }
-
-    @Transactional
-    public void deleteBoardByEmail(String email) {
-        boardRepository.deleteAllByEmail(email);
+        boardRepository.delete(id);
     }
 
     private void imageCheck(Board savedBoard, List<MultipartFile> images) {

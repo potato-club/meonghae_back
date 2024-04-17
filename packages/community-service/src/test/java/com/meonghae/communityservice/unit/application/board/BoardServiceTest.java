@@ -18,7 +18,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 // 단순한 로직만을 테스트하는 단위 테스트
 class BoardServiceTest {
@@ -293,28 +292,5 @@ class BoardServiceTest {
                 .isInstanceOf(BoardException.class)
                 .hasFieldOrPropertyWithValue("errorMessage", "글 작성자만 삭제 가능합니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.UNAUTHORIZED);
-    }
-
-    @Test
-    public void 이메일로_유저의_게시글을_전부_삭제할_수_있다() throws Exception {
-        //given
-        int typeKey = 1;
-
-        BoardRequest request = BoardRequest.builder()
-                .title("test title")
-                .content("test content")
-                .build();
-        String token = "test token";
-
-        String email = token + "@test.com";
-
-        //when
-        Long id = boardService.createBoard(typeKey, request, token).getId();
-        boardService.deleteBoardByEmail(email);
-
-        //then
-        assertThatThrownBy(() -> boardService.getBoard(id, token))
-                .isInstanceOf(BoardException.class)
-                .hasFieldOrPropertyWithValue("errorMessage", "board is not exist");
     }
 }

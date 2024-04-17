@@ -26,29 +26,43 @@ public class BoardLikeService {
     private final UserServicePort userService;
 
     @Transactional
-    public String addLike(Long id, String token) {
+    public String toggleLike(Long id, String token) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
         String email = userService.getUserEmail(token);
         BoardLike like = likeRepository.findByEmailAndBoardEntity_Id(email, id);
+
         // 좋아요
-        if (like != null && like.getStatus()) {
-            like.cancelLike();
-            boardRepository.save(board);
-            likeRepository.save(like);
-            return "추천 취소";
-        }
-
         if (like != null) {
-            like.addLike();
-        }
-
-        if (like == null) {
+            if (like.getStatus()) {
+                cancelLike(like, board);
+                return "추천 취소";
+            } else {
+                addLike(like, board);
+                return "추천 완료";
+            }
+        } else {
             like = BoardLike.create(email, board);
+            likeRepository.save(like);
+            board.incrementLikes();
+            boardRepository.save(board);
+            return "추천 완료";
         }
+    }
 
-        boardRepository.save(board);
+    private void addLike(BoardLike like, Board board) {
+        like.toggleLike();
         likeRepository.save(like);
-        return "추천 완료";
+
+        board.incrementLikes();
+        boardRepository.save(board);
+    }
+
+    private void cancelLike(BoardLike like, Board board) {
+        like.toggleLike();
+        likeRepository.save(like);
+
+        board.decrementLikes();
+        boardRepository.save(board);
     }
 }

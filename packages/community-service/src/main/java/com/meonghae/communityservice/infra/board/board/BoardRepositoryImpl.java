@@ -42,14 +42,10 @@ public class BoardRepositoryImpl implements BoardRepository {
                 .where(qBoard.type.eq(type), qBoard.createdDate.between(yesterday, now))
                 .orderBy(qBoard.likes.desc(), qBoard.createdDate.desc())
                 .limit(1)
-                .fetchOne()).filter(Objects::nonNull)
+                .fetchOne())
+                .filter(Objects::nonNull)
                 .map(BoardEntity::toModel)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteAllByEmail(String email) {
-        boardJpaRepository.deleteAllByEmail(email);
     }
 
     @Override
@@ -58,7 +54,7 @@ public class BoardRepositoryImpl implements BoardRepository {
     }
 
     @Override
-    public void delete(Board board) {
-        boardJpaRepository.delete(BoardEntity.fromModel(board));
+    public void delete(Long id) {
+        boardJpaRepository.deleteById(id);
     }
 }

@@ -43,10 +43,10 @@ public class BoardLikeEntity {
 
     public BoardLike toModel() {
         return BoardLike.builder()
-                .id(this.id)
-                .board(this.boardEntity.toModel())
-                .email(this.email)
-                .status(this.status)
+                .id(this.getId())
+                .board(this.getBoardEntity().toModel())
+                .email(this.getEmail())
+                .status(this.getStatus())
                 .build();
     }
 }

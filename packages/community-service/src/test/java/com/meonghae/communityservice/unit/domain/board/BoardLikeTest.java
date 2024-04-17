@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import static com.meonghae.communityservice.domain.board.BoardType.SHOW;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class BoardLikeTest {
 
@@ -28,7 +27,6 @@ class BoardLikeTest {
         assertThat(like.getBoard()).isEqualTo(board);
         assertThat(like.getEmail()).isEqualTo("likeUser@naver.com");
         assertThat(like.getStatus()).isTrue();
-        assertThat(board.getLikes()).isEqualTo(1); // 게시글 좋아요 수 확인
     }
 
     @Test
@@ -43,13 +41,12 @@ class BoardLikeTest {
         BoardLike like = BoardLike.create("likeUser@naver.com", board);
 
         //when
-        like.cancelLike();
+        like.toggleLike();
 
         //then
         assertThat(like.getBoard()).isEqualTo(board);
         assertThat(like.getEmail()).isEqualTo("likeUser@naver.com");
         assertThat(like.getStatus()).isFalse();
-        assertThat(board.getLikes()).isZero();
     }
 
     @Test
@@ -63,15 +60,14 @@ class BoardLikeTest {
         Board board = Board.create(request, SHOW, "board@naver.com");
         BoardLike like = BoardLike.create("likeUser@naver.com", board);
 
-        like.cancelLike();
+        like.toggleLike();
 
         //when
-        like.addLike();
+        like.toggleLike();
 
         //then
         assertThat(like.getBoard()).isEqualTo(board);
         assertThat(like.getEmail()).isEqualTo("likeUser@naver.com");
         assertThat(like.getStatus()).isTrue();
-        assertThat(board.getLikes()).isEqualTo(1);
     }
 }

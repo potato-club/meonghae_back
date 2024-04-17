@@ -1,7 +1,6 @@
 package com.meonghae.communityservice.dto.board;
 
 import com.meonghae.communityservice.domain.board.Board;
-import com.meonghae.communityservice.infra.board.board.BoardEntity;
 import com.meonghae.communityservice.domain.board.BoardType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -23,11 +22,11 @@ public class BoardMain {
     @ApiModelProperty("게시글 내 이미지 여부")
     private boolean image;
 
-    public BoardMain(Board board) {
+    public BoardMain(Board board, int commentCount) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.type = board.getType();
-        this.commentSize = board.getComments().isEmpty() ? 0 : board.getComments().size();
+        this.commentSize = commentCount;
         this.likes = board.getLikes();
         this.image = board.getHasImage();
     }

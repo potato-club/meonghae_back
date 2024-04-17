@@ -13,7 +13,8 @@ public class BoardLikeRepositoryImpl implements BoardLikeRepository {
 
     @Override
     public BoardLike findByEmailAndBoardEntity_Id(String email, Long boardId) {
-        return likeJpaRepository.findByEmailAndBoardEntity_Id(email, boardId).toModel();
+        BoardLikeEntity like = likeJpaRepository.findByEmailAndBoardEntity_Id(email, boardId);
+        return like == null ? null : like.toModel();
     }
 
     @Override

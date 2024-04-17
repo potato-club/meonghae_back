@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class Board {
@@ -17,13 +15,12 @@ public class Board {
     private final BoardType type;
     private int likes;
     private Boolean hasImage;
-    private final List<BoardComment> comments;
     private final LocalDateTime createdDate;
     private final LocalDateTime modifiedDate;
 
     @Builder
     public Board(Long id, String email, String title, String content, BoardType type, int likes, Boolean hasImage,
-                 List<BoardComment> comments, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+                 LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.email = email;
         this.title = title;
@@ -31,7 +28,6 @@ public class Board {
         this.type = type;
         this.likes = likes;
         this.hasImage = hasImage;
-        this.comments = comments != null ? comments : new ArrayList<>();
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
     }
@@ -57,15 +53,11 @@ public class Board {
 
     public Board updateBoard(String title, String content) {
         return new Board(this.id, this.email, title, content,
-                this.type, this.likes, this.hasImage, this.comments,
+                this.type, this.likes, this.hasImage,
                 this.createdDate, this.modifiedDate);
     }
 
     public void toggleHasImage() {
         this.hasImage = !this.hasImage;
-    }
-
-    public void addComment(BoardComment comment) {
-        this.comments.add(comment);
     }
 }
