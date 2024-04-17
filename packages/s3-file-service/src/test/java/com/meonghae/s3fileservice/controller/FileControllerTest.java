@@ -33,6 +33,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,7 +60,7 @@ public class FileControllerTest {
     void init() throws MalformedURLException {
         FakeS3URL s3URL = new FakeS3URL();
         given(amazonS3.putObject(any(PutObjectRequest.class))).willReturn(new PutObjectResult());
-        given(amazonS3.getUrl(any(), any())).willReturn(s3URL.getAmazonS3Url("test-s3", any()));
+        given(amazonS3.getUrl(anyString(), anyString())).willReturn(s3URL.getAmazonS3Url("test-s3", "test1.png"));
     }
 
     @BeforeAll
@@ -91,13 +92,20 @@ public class FileControllerTest {
                 .email("test@test.com")
                 .build();
 
+        String content = objectMapper.writeValueAsString(request);
+
+        MockMultipartFile json = new MockMultipartFile("data",
+                "jsonData",
+                MediaType.APPLICATION_JSON_VALUE,
+                content.getBytes(StandardCharsets.UTF_8));
+
         // when
         // then
         mockMvc.perform(
                         MockMvcRequestBuilders.multipart("/files/users")
                                 .file(mock)
-                                .part(new MockPart("data", objectMapper.writeValueAsBytes(request)))
-                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .file(json)
+                                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
@@ -229,8 +237,8 @@ public class FileControllerTest {
                         MockMvcRequestBuilders.multipart("/files")
                                 .file(mock)
                                 .file(mock2)
-                                .part(new MockPart("dataList", objectMapper.writeValueAsBytes(list)))
-                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .param("dataList", objectMapper.writeValueAsString(list))
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())

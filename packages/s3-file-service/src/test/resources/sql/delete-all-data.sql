@@ -1,1 +1,1 @@
-delete all from `files`;
+DELETE FROM `files`;

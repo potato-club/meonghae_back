@@ -10,4 +10,4 @@ CREATE TABLE `files` (
 );
 
 insert into `files` (`id`, `file_name`, `file_url`, `entity_type`, `type_id`, `email`, `created_date`, `modified_date`)
-values (null, 'test1.png', 'https://s3.ap-northeast-2.amazonaws.com/test-s3/image/test1.png', 'PET', 1L, 'test@test.com', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+values (null, 'test1.png', 'https://s3.ap-northeast-2.amazonaws.com/test-s3/image/test1.png', 'PET', 1L, null, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
