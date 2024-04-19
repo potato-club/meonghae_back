@@ -7,29 +7,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meonghae.s3fileservice.domain.enums.EntityType;
 import com.meonghae.s3fileservice.dto.*;
 import com.meonghae.s3fileservice.mock.FakeS3URL;
+import com.meonghae.s3fileservice.service.FileService;
 import com.meonghae.s3fileservice.service.port.FileRepository;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.mock.web.MockPart;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,13 +54,17 @@ public class FileControllerTest {
     private FileRepository fileRepository;
 
     @Autowired
+    private FileService fileService;
+
+    @Autowired
     private AmazonS3Client amazonS3;
 
     @BeforeEach
     void init() throws MalformedURLException {
         FakeS3URL s3URL = new FakeS3URL();
         given(amazonS3.putObject(any(PutObjectRequest.class))).willReturn(new PutObjectResult());
-        given(amazonS3.getUrl(anyString(), anyString())).willReturn(s3URL.getAmazonS3Url("test-s3", "test1.png"));
+        given(amazonS3.getUrl(anyString(), anyString()))
+                .willReturn(s3URL.getAmazonS3Url("test-s3", UUID.randomUUID() + "test1.png"));
     }
 
     @BeforeAll
@@ -71,8 +75,8 @@ public class FileControllerTest {
         pt.execute(dataSource);
     }
 
-    @AfterAll
-    public static void cleanUp(@Autowired DataSource dataSource) {
+    @AfterEach
+    void cleanUp(@Autowired DataSource dataSource) {
         // 모든 테스트가 완료된 후, 데이터 정리
         ResourceDatabasePopulator pt = new ResourceDatabasePopulator();
         pt.addScript(new ClassPathResource("/sql/delete-all-data.sql"));
@@ -93,7 +97,6 @@ public class FileControllerTest {
                 .build();
 
         String content = objectMapper.writeValueAsString(request);
-
         MockMultipartFile json = new MockMultipartFile("data",
                 "jsonData",
                 MediaType.APPLICATION_JSON_VALUE,
@@ -137,14 +140,20 @@ public class FileControllerTest {
                 .entityId(1L)
                 .build();
 
+        String content = objectMapper.writeValueAsString(request);
+        MockMultipartFile json = new MockMultipartFile("data",
+                "jsonData",
+                MediaType.APPLICATION_JSON_VALUE,
+                content.getBytes(StandardCharsets.UTF_8));
+
         // when
         // then
         mockMvc.perform(
                         MockMvcRequestBuilders.multipart("/files")
                                 .file(mock)
                                 .file(mock2)
-                                .part(new MockPart("data", objectMapper.writeValueAsBytes(request)))
-                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .file(json)
+                                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
@@ -170,6 +179,7 @@ public class FileControllerTest {
                 "image/png",
                 "test-file1-1".getBytes(StandardCharsets.UTF_8));
 
+        this.setMockFile(EntityType.USER);
         FileUserResponse file = fileRepository.getUserProfile("test@test.com");
 
         FileUpdate request = FileUpdate.builder()
@@ -182,13 +192,19 @@ public class FileControllerTest {
 
         list.add(request);
 
+        String content = objectMapper.writeValueAsString(list);
+        MockMultipartFile json = new MockMultipartFile("dataList",
+                "jsonData",
+                MediaType.APPLICATION_JSON_VALUE,
+                content.getBytes(StandardCharsets.UTF_8));
+
         // when
         // then
         mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/files")
+                        MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/files")
                                 .file(mock)
-                                .part(new MockPart("dataList", objectMapper.writeValueAsBytes(list)))
-                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .file(json)
+                                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
@@ -217,6 +233,7 @@ public class FileControllerTest {
                 "image/png",
                 "test-file2-1".getBytes(StandardCharsets.UTF_8));
 
+        this.setMockFile(EntityType.BOARD);
         List<FileResponse> files = fileRepository.getFileList(new FileRequest(EntityType.BOARD, 1L));
 
         for (FileResponse fileResponse : files) {
@@ -231,14 +248,20 @@ public class FileControllerTest {
             list.add(request);
         }
 
+        String content = objectMapper.writeValueAsString(list);
+        MockMultipartFile json = new MockMultipartFile("dataList",
+                "jsonData",
+                MediaType.APPLICATION_JSON_VALUE,
+                content.getBytes(StandardCharsets.UTF_8));
+
         // when
         // then
         mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/files")
+                        MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/files")
                                 .file(mock)
                                 .file(mock2)
-                                .param("dataList", objectMapper.writeValueAsString(list))
-                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .file(json)
+                                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
@@ -252,5 +275,29 @@ public class FileControllerTest {
             assertThat(responseList.get(i).getEntityType()).isEqualTo(list.get(i).getEntityType());
             assertThat(responseList.get(i).getTypeId()).isEqualTo(list.get(i).getEntityId());
         }
+    }
+
+    private void setMockFile(EntityType type) throws IOException {
+
+        MockMultipartFile mock = new MockMultipartFile("files",
+                "test1.png",
+                "image/png",
+                "test-file1".getBytes(StandardCharsets.UTF_8));
+
+        MockMultipartFile mock2 = new MockMultipartFile("files",
+                "test2.png",
+                "image/png",
+                "test-file2".getBytes(StandardCharsets.UTF_8));
+
+        if (type.equals(EntityType.USER)) {
+            fileService.uploadFileForUser(mock, new FileUser(type, "test@test.com"));
+        } else {
+            fileService.uploadImages(List.of(mock, mock2), new FileRequest(type, 1L));
+        }
+
+        FakeS3URL s3URL = new FakeS3URL();
+
+        given(amazonS3.getUrl(anyString(), anyString()))
+                .willReturn(s3URL.getAmazonS3Url("test-s3", UUID.randomUUID() + "test1-1.png"));
     }
 }
