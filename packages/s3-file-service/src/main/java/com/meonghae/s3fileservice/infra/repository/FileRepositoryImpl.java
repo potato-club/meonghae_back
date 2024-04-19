@@ -102,4 +102,14 @@ public class FileRepositoryImpl implements FileRepository {
                         .and(QFile.file.typeId.eq(request.getEntityId())))
                 .fetchOne();
     }
+
+    @Override
+    public boolean existsByEntityTypeAndEmail(EntityType entityType, String email) {
+        return fileRepository.existsByEntityTypeAndEmail(entityType, email);
+    }
+
+    @Override
+    public boolean existsByEntityTypeAndTypeId(EntityType entityType, Long id) {
+        return fileRepository.existsByEntityTypeAndTypeId(entityType, id);
+    }
 }

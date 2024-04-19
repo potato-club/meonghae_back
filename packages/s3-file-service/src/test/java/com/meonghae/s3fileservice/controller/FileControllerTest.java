@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -277,6 +278,52 @@ public class FileControllerTest {
         }
     }
 
+    @Test
+    void 유저_서비스_외_다른_서비스의_사진을_삭제한다() throws Exception {
+        // given
+        FileRequest request = FileRequest.builder()
+                .entityType(EntityType.BOARD)
+                .entityId(1L)
+                .build();
+
+        this.setMockFile(EntityType.BOARD);
+
+        // when
+        // then
+        mockMvc.perform(delete("/files")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        boolean existsFile = fileRepository.existsByEntityTypeAndTypeId(request.getEntityType(), request.getEntityId());
+
+        assertThat(existsFile).isFalse();
+    }
+
+    @Test
+    void 유저_서비스의_사진을_삭제한다() throws Exception {
+        // given
+        FileUser request = FileUser.builder()
+                .entityType(EntityType.USER)
+                .email("test@test.com")
+                .build();
+
+        this.setMockFile(EntityType.USER);
+
+        // when
+        // then
+        mockMvc.perform(delete("/files/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        boolean existsFile = fileRepository.existsByEntityTypeAndEmail(request.getEntityType(), request.getEmail());
+
+        assertThat(existsFile).isFalse();
+    }
+
     private void setMockFile(EntityType type) throws IOException {
 
         MockMultipartFile mock = new MockMultipartFile("files",
@@ -297,6 +344,7 @@ public class FileControllerTest {
 
         FakeS3URL s3URL = new FakeS3URL();
 
+        // mockMvc 로 테스트하는 값과 미리 저장하는 값을 다르게 하기 위해 재선언
         given(amazonS3.getUrl(anyString(), anyString()))
                 .willReturn(s3URL.getAmazonS3Url("test-s3", UUID.randomUUID() + "test1-1.png"));
     }

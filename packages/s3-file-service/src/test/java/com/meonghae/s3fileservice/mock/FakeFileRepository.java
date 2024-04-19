@@ -105,4 +105,24 @@ public class FakeFileRepository implements FileRepository {
                 .email(null)
                 .build();
     }
+
+    @Override
+    public boolean existsByEntityTypeAndEmail(EntityType entityType, String email) {
+        Optional<File> file = data.stream()
+                .filter(item -> item.getEntityType().equals(EntityType.USER))
+                .filter(item -> item.getEmail().equals(email))
+                .findAny();
+
+        return file.isPresent();
+    }
+
+    @Override
+    public boolean existsByEntityTypeAndTypeId(EntityType entityType, Long id) {
+        Optional<File> file = data.stream()
+                .filter(item -> item.getEntityType().equals(EntityType.USER))
+                .filter(item -> item.getTypeId().equals(id))
+                .findAny();
+
+        return file.isPresent();
+    }
 }

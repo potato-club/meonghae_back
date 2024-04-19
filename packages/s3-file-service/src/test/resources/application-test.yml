@@ -17,13 +17,13 @@ spring:
       max-file-size: 10MB
       max-request-size: 50MB
   datasource:
-    url: ENC(9PfL1V27LDaNPLBD4XBXvkWU0B7+qSxY33AJnDiR7lGX1rek91eV9mhJxGIwruSmITCtvfAtJPtpForipy2wMzAXWET15dirwbyeg3o+1Yqs03Vu8snF4cyKu2g+2FYV)
-    username: ENC(4d7BMWbeTcHgNa4Cmvsikw==)
-    password: ENC(4UgvBUNHRaveoEXRRHL2UDqyZ4kSwG0y)
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         enable_lazy_load_no_trans: true

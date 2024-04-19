@@ -23,4 +23,8 @@ public interface FileRepository {
     FileUserResponse getUserProfile(String email);
 
     FileUserResponse getPetProfile(FileRequest request);
+
+    boolean existsByEntityTypeAndEmail(EntityType entityType, String email);
+
+    boolean existsByEntityTypeAndTypeId(EntityType entityType, Long id);
 }

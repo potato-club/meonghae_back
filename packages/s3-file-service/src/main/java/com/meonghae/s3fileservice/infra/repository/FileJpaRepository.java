@@ -11,4 +11,8 @@ public interface FileJpaRepository extends JpaRepository<FileEntity, Long> {
     List<FileEntity> findByEntityTypeAndTypeId(EntityType entityType, Long typeId);
 
     List<FileEntity> findByEntityTypeAndEmail(EntityType entityType, String email);
+
+    boolean existsByEntityTypeAndEmail(EntityType entityType, String email);
+
+    boolean existsByEntityTypeAndTypeId(EntityType entityType, Long id);
 }
