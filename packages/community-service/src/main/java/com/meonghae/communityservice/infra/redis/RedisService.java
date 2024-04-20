@@ -73,6 +73,7 @@ public class RedisService implements RedisPort {
         List<S3Response> dtos;
         Cache.ValueWrapper value = cacheManager.getCache(getImages).get(reviewId);
         if (value != null) {
+            log.info("========== value 값 존재 ==========");
             dtos = (List<S3Response>) value.get();
         } else {
             log.info("=========== S3 Feign 호출 ===========");

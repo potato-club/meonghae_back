@@ -52,6 +52,8 @@ public class ReviewService {
                 getPagingReviewWithPhoto(page, catalog, keyword, sortType)
                 : getPagingReview(page, catalog, keyword, sortType);
 
+        log.info("========== review 개수 - " + reviews.getSize());
+
         List<Long> reviewIds = reviews.getContent().stream().map(Review::getId).collect(Collectors.toList());
         Map<Long, RecommendStatus> reactions = reactionService.getReviewReactions(reviewIds, token);
 
@@ -143,7 +145,9 @@ public class ReviewService {
         boolean isWriter = Objects.equals(review.getEmail(), email);
         ReviewList reviewDto = new ReviewList(review, nickname, url, status, isWriter);
         if (review.getHasImage()) {
+            log.info("======= 이미지 있어서 redis 서비스 호출");
             List<S3Response> reviewImages = redisService.getReviewImages(review.getId());
+            log.info("======= 이미지 성공적으로 반환");
             reviewDto.setImages(reviewImages);
         }
         return reviewDto;
