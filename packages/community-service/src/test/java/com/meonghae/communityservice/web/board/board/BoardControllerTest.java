@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
@@ -58,6 +59,20 @@ class BoardControllerTest {
 
     @MockBean
     private UserServicePort userService;
+
+    private final MockMultipartFile multipartFile_1 = new MockMultipartFile(
+            "testFile_1",
+            "originTestFile_1",
+            "testType",
+            "content".getBytes()
+    );
+
+    private final MockMultipartFile multipartFile_2 = new MockMultipartFile(
+            "testFile_2",
+            "originTestFile_2",
+            "testType",
+            "content".getBytes()
+    );
 
     private final String token = "test token";
 
@@ -145,8 +160,9 @@ class BoardControllerTest {
         //when
         //then
         mockMvc.perform(
-                post("/boards/1")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                multipart("/boards/1")
+                        .file(multipartFile_1)
+                        .file(multipartFile_2)
                         .param("title", title)
                         .param("content", content)
                         .header("Authorization", token))
