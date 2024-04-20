@@ -7,7 +7,7 @@ import com.meonghae.communityservice.application.port.UserServicePort;
 import com.meonghae.communityservice.application.review.ReviewService;
 import com.meonghae.communityservice.dto.review.ReviewListDto;
 import com.meonghae.communityservice.dto.review.ReviewReactionType;
-import com.meonghae.communityservice.dto.s3.S3Request;
+import com.meonghae.communityservice.dto.s3.S3RequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +71,7 @@ class ReviewControllerTest {
         when(userService.getUserEmail("test1"))
                 .thenReturn("test1@example.com");
 
-        when(s3Service.deleteImage(any(S3Request.class)))
+        when(s3Service.deleteImage(any(S3RequestDto.class)))
                 .thenReturn(ResponseEntity.ok("성공"));
     }
 

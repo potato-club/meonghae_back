@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class S3Request {
+public class S3RequestDto {
     private Long entityId;
     private String entityType;
 }

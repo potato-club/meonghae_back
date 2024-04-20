@@ -1,7 +1,7 @@
 package com.meonghae.communityservice.infra.feign;
 
 import com.meonghae.communityservice.infra.feign.config.FeignHeaderConfig;
-import com.meonghae.communityservice.dto.fcm.Fcm;
+import com.meonghae.communityservice.dto.fcm.FcmDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,5 +17,5 @@ public interface UserServiceClient {
     String getNickname(@PathVariable(value = "email") String email);
 
     @GetMapping("/send/token")
-    Fcm getFCMToken(@RequestParam String email);
+    FcmDto getFCMToken(@RequestParam String email);
 }

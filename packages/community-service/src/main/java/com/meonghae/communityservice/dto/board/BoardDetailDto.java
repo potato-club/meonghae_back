@@ -1,8 +1,8 @@
 package com.meonghae.communityservice.dto.board;
 
 import com.meonghae.communityservice.domain.board.Board;
-import com.meonghae.communityservice.dto.s3.ImageList;
-import com.meonghae.communityservice.dto.s3.S3Response;
+import com.meonghae.communityservice.dto.s3.ImageListDto;
+import com.meonghae.communityservice.dto.s3.S3ResponseDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +23,7 @@ public class BoardDetailDto {
     @ApiModelProperty("게시글 내용")
     private String content;
     @ApiModelProperty("게시글 이미지 리스트")
-    private List<ImageList> images;
+    private List<ImageListDto> images;
     @ApiModelProperty("게시글 댓글 총 개수")
     private int commentSize;
     @ApiModelProperty("게시글 좋아요 개수")
@@ -47,7 +47,7 @@ public class BoardDetailDto {
         this.date = board.getCreatedDate();
     }
 
-    public void setImages(List<S3Response> imageList) {
-        this.images = imageList.stream().map(ImageList::new).collect(Collectors.toList());
+    public void setImages(List<S3ResponseDto> imageList) {
+        this.images = imageList.stream().map(ImageListDto::new).collect(Collectors.toList());
     }
 }

@@ -5,7 +5,7 @@ import com.meonghae.communityservice.application.port.RedisPort;
 import com.meonghae.communityservice.application.port.S3ServicePort;
 import com.meonghae.communityservice.application.port.UserServicePort;
 import com.meonghae.communityservice.dto.board.BoardDetailDto;
-import com.meonghae.communityservice.dto.s3.S3Request;
+import com.meonghae.communityservice.dto.s3.S3RequestDto;
 import com.meonghae.communityservice.exception.custom.BoardException;
 import com.meonghae.communityservice.exception.error.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,7 +93,7 @@ class BoardControllerTest {
         when(redisService.getProfileImage(anyString()))
                 .thenReturn(null);
 
-        when(s3Service.getImages(any(S3Request.class)))
+        when(s3Service.getImages(any(S3RequestDto.class)))
                 .thenReturn(new ArrayList<>());
     }
 

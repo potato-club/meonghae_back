@@ -3,7 +3,7 @@ package com.meonghae.communityservice.dto.s3;
 import lombok.Data;
 
 @Data
-public class UserImage {
+public class UserImageDto {
     private String fileName;
 
     private String fileUrl;

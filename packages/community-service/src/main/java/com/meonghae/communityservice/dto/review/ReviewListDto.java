@@ -1,8 +1,8 @@
 package com.meonghae.communityservice.dto.review;
 
 import com.meonghae.communityservice.domain.review.Review;
-import com.meonghae.communityservice.dto.s3.ImageList;
-import com.meonghae.communityservice.dto.s3.S3Response;
+import com.meonghae.communityservice.dto.s3.ImageListDto;
+import com.meonghae.communityservice.dto.s3.S3ResponseDto;
 import com.meonghae.communityservice.domain.review.RecommendStatus;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -26,7 +26,7 @@ public class ReviewListDto {
     @ApiModelProperty("리뷰 내용")
     private String content;
     @ApiModelProperty("리뷰 이미지 리스트")
-    private List<ImageList> images;
+    private List<ImageListDto> images;
     @ApiModelProperty("리뷰 별점")
     private int rating;
     @ApiModelProperty("리뷰 추천 수")
@@ -54,7 +54,7 @@ public class ReviewListDto {
         this.date = review.getCreatedDate();
     }
 
-    public void setImages(List<S3Response> imageList) {
-        this.images = imageList.stream().map(ImageList::new).collect(Collectors.toList());
+    public void setImages(List<S3ResponseDto> imageList) {
+        this.images = imageList.stream().map(ImageListDto::new).collect(Collectors.toList());
     }
 }

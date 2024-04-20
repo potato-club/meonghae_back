@@ -1,7 +1,7 @@
 package com.meonghae.communityservice.infra.feign;
 
 import com.meonghae.communityservice.application.port.UserServicePort;
-import com.meonghae.communityservice.dto.fcm.Fcm;
+import com.meonghae.communityservice.dto.fcm.FcmDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ public class UserFeignImpl implements UserServicePort {
     }
 
     @Override
-    public Fcm getFCMToken(String email) {
+    public FcmDto getFCMToken(String email) {
         return serviceClient.getFCMToken(email);
     }
 }

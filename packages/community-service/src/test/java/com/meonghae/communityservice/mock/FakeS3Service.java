@@ -1,10 +1,10 @@
 package com.meonghae.communityservice.mock;
 
 import com.meonghae.communityservice.application.port.S3ServicePort;
-import com.meonghae.communityservice.dto.s3.S3Request;
-import com.meonghae.communityservice.dto.s3.S3Response;
-import com.meonghae.communityservice.dto.s3.S3Update;
-import com.meonghae.communityservice.dto.s3.UserImage;
+import com.meonghae.communityservice.dto.s3.S3RequestDto;
+import com.meonghae.communityservice.dto.s3.S3ResponseDto;
+import com.meonghae.communityservice.dto.s3.S3UpdateDto;
+import com.meonghae.communityservice.dto.s3.UserImageDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,23 +14,23 @@ import java.util.stream.Collectors;
 
 public class FakeS3Service implements S3ServicePort {
 
-    private final List<S3Response> list = new ArrayList<>();
+    private final List<S3ResponseDto> list = new ArrayList<>();
 
     @Override
-    public List<S3Response> getImages(S3Request requestDto) {
+    public List<S3ResponseDto> getImages(S3RequestDto requestDto) {
         return list.stream().filter(item -> item.getEntityType().equals(requestDto.getEntityType()) &&
                 item.getTypeId().equals(requestDto.getEntityId())).collect(Collectors.toList());
     }
 
     @Override
-    public UserImage getUserImage(String email) {
+    public UserImageDto getUserImage(String email) {
         return null;
     }
 
     @Override
-    public ResponseEntity<String> uploadImage(List<MultipartFile> files, S3Request data) {
+    public ResponseEntity<String> uploadImage(List<MultipartFile> files, S3RequestDto data) {
         for (MultipartFile file : files) {
-            S3Response response = S3Response.builder()
+            S3ResponseDto response = S3ResponseDto.builder()
                     .fileName(file.getOriginalFilename())
                     .fileUrl("testUrl")
                     .entityType(data.getEntityType())
@@ -44,7 +44,7 @@ public class FakeS3Service implements S3ServicePort {
     }
 
     @Override
-    public ResponseEntity<String> updateImage(List<MultipartFile> files, List<S3Update> dataList) {
+    public ResponseEntity<String> updateImage(List<MultipartFile> files, List<S3UpdateDto> dataList) {
         Long id = dataList.get(0).getEntityId();
         String type = dataList.get(0).getEntityType();
 
@@ -52,7 +52,7 @@ public class FakeS3Service implements S3ServicePort {
                && item.getEntityType().equals(type));
 
         for (MultipartFile file : files) {
-            S3Response response = S3Response.builder()
+            S3ResponseDto response = S3ResponseDto.builder()
                     .fileName(file.getOriginalFilename())
                     .fileUrl("testUrl - " + file.getOriginalFilename())
                     .entityType(type)
@@ -66,7 +66,7 @@ public class FakeS3Service implements S3ServicePort {
     }
 
     @Override
-    public ResponseEntity<String> deleteImage(S3Request requestDto) {
+    public ResponseEntity<String> deleteImage(S3RequestDto requestDto) {
         list.removeIf(item -> item.getTypeId().equals(requestDto.getEntityId())
                 && item.getEntityType().equals(requestDto.getEntityType()));
 

@@ -3,7 +3,7 @@ package com.meonghae.communityservice.dto.fcm;
 import lombok.Data;
 
 @Data
-public class Fcm {
+public class FcmDto {
     private String email;
     private String FCMToken;
 }

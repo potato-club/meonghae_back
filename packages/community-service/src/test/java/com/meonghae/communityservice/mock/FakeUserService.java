@@ -1,7 +1,7 @@
 package com.meonghae.communityservice.mock;
 
 import com.meonghae.communityservice.application.port.UserServicePort;
-import com.meonghae.communityservice.dto.fcm.Fcm;
+import com.meonghae.communityservice.dto.fcm.FcmDto;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
@@ -24,7 +24,7 @@ public class FakeUserService implements UserServicePort {
     }
 
     @Override
-    public Fcm getFCMToken(String email) {
+    public FcmDto getFCMToken(String email) {
         return null;
     }
 }

@@ -9,9 +9,9 @@ import com.meonghae.communityservice.application.port.UserServicePort;
 import com.meonghae.communityservice.domain.board.Board;
 import com.meonghae.communityservice.domain.board.BoardLike;
 import com.meonghae.communityservice.dto.board.*;
-import com.meonghae.communityservice.dto.s3.S3Request;
-import com.meonghae.communityservice.dto.s3.S3Response;
-import com.meonghae.communityservice.dto.s3.S3Update;
+import com.meonghae.communityservice.dto.s3.S3RequestDto;
+import com.meonghae.communityservice.dto.s3.S3ResponseDto;
+import com.meonghae.communityservice.dto.s3.S3UpdateDto;
 import com.meonghae.communityservice.domain.board.BoardType;
 import com.meonghae.communityservice.exception.custom.BoardException;
 import lombok.Builder;
@@ -75,7 +75,7 @@ public class BoardService {
         BoardDetailDto detailDto = new BoardDetailDto(board, url, likeStatus, isWriter, commentCount);
 
         if (board.getHasImage()) {
-            List<S3Response> images = s3Service.getImages(new S3Request(board.getId(), "BOARD"));
+            List<S3ResponseDto> images = s3Service.getImages(new S3RequestDto(board.getId(), "BOARD"));
             detailDto.setImages(images);
         }
 
@@ -105,7 +105,7 @@ public class BoardService {
         List<MultipartFile> images = requestDto.getImages();
         if (!CollectionUtils.isEmpty(images)) {
             imageCheck(savedBoard, images);
-            S3Request s3Dto = new S3Request(savedBoard.getId(), "BOARD");
+            S3RequestDto s3Dto = new S3RequestDto(savedBoard.getId(), "BOARD");
             s3Service.uploadImage(images, s3Dto);
             savedBoard.toggleHasImage();
 
@@ -131,7 +131,7 @@ public class BoardService {
         }
         Board updateBoard = board.updateBoard(updateDto.getTitle(), updateDto.getContent());
 
-        S3Request requestDto = new S3Request(board.getId(), "BOARD");
+        S3RequestDto requestDto = new S3RequestDto(board.getId(), "BOARD");
         List<MultipartFile> images = updateDto.getImages(); // 새롭게 저장할 이미지 데이터
 
         // 기존 이미지 없음 & 새로운 이미지 있음 -> 업로드 + 이미지 상태변경
@@ -144,8 +144,8 @@ public class BoardService {
 
         // 기존 이미지 있음
         if (updateBoard.getHasImage()) {
-            List<S3Response> response = s3Service.getImages(requestDto);
-            List<S3Update> originImages = response.stream().map(S3Update::new).collect(Collectors.toList());
+            List<S3ResponseDto> response = s3Service.getImages(requestDto);
+            List<S3UpdateDto> originImages = response.stream().map(S3UpdateDto::new).collect(Collectors.toList());
 
             if (!CollectionUtils.isEmpty(images)) { // 새로운 이미지 있음 -> 업데이트
                 imageCheck(updateBoard, images); // 새로운 이미지 검증
@@ -167,7 +167,7 @@ public class BoardService {
         if (!board.getEmail().equals(email)) {
             throw new BoardException(UNAUTHORIZED, "글 작성자만 삭제 가능합니다.");
         }
-        S3Request requestDto = new S3Request(board.getId(), "BOARD");
+        S3RequestDto requestDto = new S3RequestDto(board.getId(), "BOARD");
         s3Service.deleteImage(requestDto);
         boardRepository.delete(id);
     }

@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Getter
 @Builder
 @AllArgsConstructor
-public class S3Response implements Serializable {
+public class S3ResponseDto implements Serializable {
     private String fileName;
 
     private String fileUrl;

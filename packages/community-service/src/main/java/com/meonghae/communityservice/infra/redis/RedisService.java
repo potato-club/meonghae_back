@@ -3,10 +3,10 @@ package com.meonghae.communityservice.infra.redis;
 import com.meonghae.communityservice.application.port.RedisPort;
 import com.meonghae.communityservice.application.port.S3ServicePort;
 import com.meonghae.communityservice.application.port.UserServicePort;
-import com.meonghae.communityservice.dto.fcm.Fcm;
-import com.meonghae.communityservice.dto.s3.S3Request;
-import com.meonghae.communityservice.dto.s3.S3Response;
-import com.meonghae.communityservice.dto.s3.UserImage;
+import com.meonghae.communityservice.dto.fcm.FcmDto;
+import com.meonghae.communityservice.dto.s3.S3RequestDto;
+import com.meonghae.communityservice.dto.s3.S3ResponseDto;
+import com.meonghae.communityservice.dto.s3.UserImageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +57,7 @@ public class RedisService implements RedisPort {
         String url = cacheManager.getCache(getProfile).get(email, String.class);
         if(url == null) {
             log.info("=========== S3 Feign 호출 ===========");
-            UserImage dto = s3Service.getUserImage(email);
+            UserImageDto dto = s3Service.getUserImage(email);
             if(dto == null) {
                 log.info("========= null 리턴 =========");
                 return null;
@@ -69,15 +69,15 @@ public class RedisService implements RedisPort {
         return url;
     }
 
-    public List<S3Response> getReviewImages(Long reviewId) {
-        List<S3Response> dtos;
+    public List<S3ResponseDto> getReviewImages(Long reviewId) {
+        List<S3ResponseDto> dtos;
         Cache.ValueWrapper value = cacheManager.getCache(getImages).get(reviewId);
         if (value != null) {
             log.info("========== value 값 존재 ==========");
-            dtos = (List<S3Response>) value.get();
+            dtos = (List<S3ResponseDto>) value.get();
         } else {
             log.info("=========== S3 Feign 호출 ===========");
-            dtos = s3Service.getImages(new S3Request(reviewId, "REVIEW"));
+            dtos = s3Service.getImages(new S3RequestDto(reviewId, "REVIEW"));
             if(dtos == null) return null;
             cacheManager.getCache(getImages).put(reviewId, dtos);
         }
@@ -88,7 +88,7 @@ public class RedisService implements RedisPort {
         String fcm = cacheManager.getCache(getFCM).get(email, String.class);
         if(fcm == null) {
             log.info("=========== User Feign 호출 ===========");
-            Fcm fcmDto = userService.getFCMToken(email);
+            FcmDto fcmDto = userService.getFCMToken(email);
             if(fcmDto == null) {
                 return null;
             }

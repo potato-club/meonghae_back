@@ -1,7 +1,7 @@
 package com.meonghae.communityservice.mock;
 
 import com.meonghae.communityservice.application.port.RedisPort;
-import com.meonghae.communityservice.dto.s3.S3Response;
+import com.meonghae.communityservice.dto.s3.S3ResponseDto;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class FakeRedis implements RedisPort {
     }
 
     @Override
-    public List<S3Response> getReviewImages(Long reviewId) {
+    public List<S3ResponseDto> getReviewImages(Long reviewId) {
         return null;
     }
 

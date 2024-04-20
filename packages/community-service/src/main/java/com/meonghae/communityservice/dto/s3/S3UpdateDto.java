@@ -3,7 +3,7 @@ package com.meonghae.communityservice.dto.s3;
 import lombok.Getter;
 
 @Getter
-public class S3Update {
+public class S3UpdateDto {
     private String fileName;
 
     private String fileUrl;
@@ -16,7 +16,7 @@ public class S3Update {
 
     private boolean deleted;
 
-    public S3Update(S3Response responseDto) {
+    public S3UpdateDto(S3ResponseDto responseDto) {
         this.fileName = responseDto.getFileName();
         this.fileUrl = responseDto.getFileUrl();
         this.entityType = responseDto.getEntityType();
