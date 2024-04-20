@@ -1,7 +1,7 @@
 package com.meonghae.communityservice.infra.feign;
 
-import com.meonghae.communityservice.core.FeignHeaderConfig;
-import com.meonghae.communityservice.core.FeignUploadConfig;
+import com.meonghae.communityservice.infra.feign.config.FeignHeaderConfig;
+import com.meonghae.communityservice.infra.feign.config.FeignUploadConfig;
 import com.meonghae.communityservice.dto.s3.S3Request;
 import com.meonghae.communityservice.dto.s3.S3Response;
 import com.meonghae.communityservice.dto.s3.S3Update;

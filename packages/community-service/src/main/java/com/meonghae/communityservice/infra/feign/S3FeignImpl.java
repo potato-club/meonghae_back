@@ -6,6 +6,7 @@ import com.meonghae.communityservice.dto.s3.S3Response;
 import com.meonghae.communityservice.dto.s3.S3Update;
 import com.meonghae.communityservice.dto.s3.UserImage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class S3FeignImpl implements S3ServicePort {
 
@@ -25,7 +27,10 @@ public class S3FeignImpl implements S3ServicePort {
 
     @Override
     public UserImage getUserImage(String email) {
-        return serviceClient.getUserImage(email);
+        log.info("호출 대기");
+        UserImage userImage = serviceClient.getUserImage(email);
+        log.info("호출 완료");
+        return userImage;
     }
 
     @Override

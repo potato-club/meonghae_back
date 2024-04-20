@@ -1,4 +1,4 @@
-package com.meonghae.communityservice.core;
+package com.meonghae.communityservice.infra.feign.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.meonghae.communityservice.infra.feign;
 
-import com.meonghae.communityservice.core.FeignHeaderConfig;
+import com.meonghae.communityservice.infra.feign.config.FeignHeaderConfig;
 import com.meonghae.communityservice.dto.fcm.Fcm;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

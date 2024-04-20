@@ -44,10 +44,12 @@ public class RedisService implements RedisPort {
             log.info("=========== User Feign 호출 ===========");
             nickname = userService.getNickname(email);
             if(nickname == null) {
+                log.info("======== 유저 정보 없음 ========");
                 return "탈퇴한 회원";
             }
             cacheManager.getCache(byEmail).put(email, nickname);
         }
+        log.info("======== 유저 정보 있음 ========");
         return nickname;
     }
 
@@ -57,11 +59,13 @@ public class RedisService implements RedisPort {
             log.info("=========== S3 Feign 호출 ===========");
             UserImage dto = s3Service.getUserImage(email);
             if(dto == null) {
+                log.info("========= null 리턴 =========");
                 return null;
             }
             url = dto.getFileUrl();
             cacheManager.getCache(getProfile).put(email, dto.getFileUrl());
         }
+        log.info("========= url 리턴 =========");
         return url;
     }
 

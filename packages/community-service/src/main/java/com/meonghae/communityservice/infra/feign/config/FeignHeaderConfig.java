@@ -1,4 +1,4 @@
-package com.meonghae.communityservice.core;
+package com.meonghae.communityservice.infra.feign.config;
 
 import org.springframework.context.annotation.Bean;
 
