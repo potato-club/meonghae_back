@@ -52,13 +52,15 @@ public class ReviewService {
                 getPagingReviewWithPhoto(page, catalog, keyword, sortType)
                 : getPagingReview(page, catalog, keyword, sortType);
 
-        log.info("========== review 개수 - " + reviews.getSize());
+        log.info("========== review 개수 - " + reviews.getNumberOfElements());
 
         List<Long> reviewIds = reviews.getContent().stream().map(Review::getId).collect(Collectors.toList());
         Map<Long, RecommendStatus> reactions = reactionService.getReviewReactions(reviewIds, token);
 
         String email = userService.getUserEmail(token);
-        return reviews.map(r -> convertTypeAndAddImage(r, email, reactions.get(r.getId())));
+        Slice<ReviewList> slice = reviews.map(r -> convertTypeAndAddImage(r, email, reactions.get(r.getId())));
+        log.info("첫번째 인덱스의 제목 : " + slice.getContent().get(0).getTitle());
+        return slice;
     }
     private Slice<Review> getPagingReview(int page, ReviewCatalog catalog, String keyword, ReviewSortType sort) {
         PageRequest request;
