@@ -9,9 +9,9 @@ import com.meonghae.communityservice.application.port.S3ServicePort;
 import com.meonghae.communityservice.application.port.UserServicePort;
 import com.meonghae.communityservice.domain.board.Board;
 import com.meonghae.communityservice.domain.board.BoardType;
-import com.meonghae.communityservice.dto.board.BoardDetail;
-import com.meonghae.communityservice.dto.board.BoardList;
-import com.meonghae.communityservice.dto.board.BoardMain;
+import com.meonghae.communityservice.dto.board.BoardDetailDto;
+import com.meonghae.communityservice.dto.board.BoardListDto;
+import com.meonghae.communityservice.dto.board.BoardMainDto;
 import com.meonghae.communityservice.dto.board.BoardRequest;
 import com.meonghae.communityservice.mock.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,7 +83,7 @@ public class BoardServiceTestWithMockito {
                 .thenReturn("testImage.jpg");
 
         //when
-        Slice<BoardList> result = boardService.getBoardList(1, 1);
+        Slice<BoardListDto> result = boardService.getBoardList(1, 1);
 
         //then
         assertThat(result.getContent()).hasSize(1);
@@ -124,7 +124,7 @@ public class BoardServiceTestWithMockito {
                 .thenReturn(new ArrayList<>());
 
         //when
-        BoardDetail result = boardService.getBoard(1L, token);
+        BoardDetailDto result = boardService.getBoard(1L, token);
 
         //then
         assertThat(result.getTitle()).isEqualTo("test title");
@@ -158,7 +158,7 @@ public class BoardServiceTestWithMockito {
                 .thenReturn(map);
 
         //when
-        List<BoardMain> mainBoard = boardService.getMainBoard();
+        List<BoardMainDto> mainBoard = boardService.getMainBoard();
 
         //then
 

@@ -25,25 +25,25 @@ public class BoardController {
 
     @Operation(summary = "게시글 리스트 호출 API")
     @GetMapping("")
-    public ResponseEntity<Slice<BoardList>> getBoardList(
+    public ResponseEntity<Slice<BoardListDto>> getBoardList(
             @RequestParam(required = false, defaultValue = "1", value = "type") int type,
             @RequestParam(required = false, defaultValue = "1", value = "p") int page) {
-        Slice<BoardList> listDto = boardService.getBoardList(type, page);
+        Slice<BoardListDto> listDto = boardService.getBoardList(type, page);
         return ResponseEntity.ok(listDto);
     }
 
     @Operation(summary = "특정 게시글 호출 API")
     @GetMapping("/{id}")
-    public ResponseEntity<BoardDetail> getBoard(@PathVariable(name = "id") Long id,
-                                                @RequestHeader("Authorization") String token) {
-        BoardDetail board = boardService.getBoard(id, token);
+    public ResponseEntity<BoardDetailDto> getBoard(@PathVariable(name = "id") Long id,
+                                                   @RequestHeader("Authorization") String token) {
+        BoardDetailDto board = boardService.getBoard(id, token);
         return ResponseEntity.ok(board);
     }
 
     @Operation(summary = "메인 페이지 인기게시글 호출 API")
     @GetMapping("/main")
-    public ResponseEntity<List<BoardMain>> getMainBoardList() {
-        List<BoardMain> mainDto = boardService.getMainBoard();
+    public ResponseEntity<List<BoardMainDto>> getMainBoardList() {
+        List<BoardMainDto> mainDto = boardService.getMainBoard();
         return ResponseEntity.ok(mainDto);
     }
 

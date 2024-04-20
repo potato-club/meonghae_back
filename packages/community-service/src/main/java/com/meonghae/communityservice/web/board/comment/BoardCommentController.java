@@ -1,7 +1,7 @@
 package com.meonghae.communityservice.web.board.comment;
 
-import com.meonghae.communityservice.dto.comment.CommentChild;
-import com.meonghae.communityservice.dto.comment.CommentParent;
+import com.meonghae.communityservice.dto.comment.CommentChildDto;
+import com.meonghae.communityservice.dto.comment.CommentParentDto;
 import com.meonghae.communityservice.dto.comment.CommentRequest;
 import com.meonghae.communityservice.application.board.BoardCommentService;
 import io.swagger.annotations.Api;
@@ -21,16 +21,16 @@ public class BoardCommentController {
 
     @Operation(summary = "부모 댓글 조회 API")
     @GetMapping("/{boardId}")
-    public Slice<CommentParent> getParentComments(@PathVariable(name = "boardId") Long id,
-                                                  @RequestParam(required = false,
+    public Slice<CommentParentDto> getParentComments(@PathVariable(name = "boardId") Long id,
+                                                     @RequestParam(required = false,
                                                             defaultValue = "1", value = "p") int page) {
         return commentService.getParentComments(page, id);
     }
 
     @Operation(summary = "자식 댓글 조회 API")
     @GetMapping("/{parentId}/reply")
-    public Slice<CommentChild> getChildComments(@PathVariable(name = "parentId") Long parentId,
-                                                @RequestParam(required = false,
+    public Slice<CommentChildDto> getChildComments(@PathVariable(name = "parentId") Long parentId,
+                                                   @RequestParam(required = false,
                                                           defaultValue = "1", value = "p") int page) {
         return commentService.getChildComments(page, parentId);
     }

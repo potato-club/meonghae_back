@@ -6,8 +6,8 @@ import com.meonghae.communityservice.application.port.RedisPort;
 import com.meonghae.communityservice.application.port.UserServicePort;
 import com.meonghae.communityservice.domain.board.Board;
 import com.meonghae.communityservice.domain.board.BoardComment;
-import com.meonghae.communityservice.dto.comment.CommentChild;
-import com.meonghae.communityservice.dto.comment.CommentParent;
+import com.meonghae.communityservice.dto.comment.CommentChildDto;
+import com.meonghae.communityservice.dto.comment.CommentParentDto;
 import com.meonghae.communityservice.dto.comment.CommentRequest;
 import com.meonghae.communityservice.exception.custom.BoardException;
 import com.meonghae.communityservice.exception.custom.CommentException;
@@ -36,7 +36,7 @@ public class BoardCommentService {
     private final UserServicePort userService;
 //    private final FcmService fcmService;
 
-    public Slice<CommentParent> getParentComments(int page, Long boardId) {
+    public Slice<CommentParentDto> getParentComments(int page, Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
         PageRequest request = PageRequest.of(page - 1, 20, Sort.by(Sort.Direction.DESC, "id"));
@@ -45,11 +45,11 @@ public class BoardCommentService {
         return comments.map(comment -> {
             String url = redisService.getProfileImage(comment.getEmail());
             return Objects.equals(comment.getEmail(), board.getEmail()) ?
-                    new CommentParent(comment, url, true) : new CommentParent(comment, url, false);
+                    new CommentParentDto(comment, url, true) : new CommentParentDto(comment, url, false);
         });
     }
 
-    public Slice<CommentChild> getChildComments(int page, Long parentId) {
+    public Slice<CommentChildDto> getChildComments(int page, Long parentId) {
         BoardComment parent = commentRepository.findById(parentId).orElse(null);
         if (parent == null || !parent.isParent()) {
             throw new CommentException(BAD_REQUEST, "this comment is not parent");
@@ -60,8 +60,8 @@ public class BoardCommentService {
         return childComments.map(comment -> {
             String url = redisService.getProfileImage(comment.getEmail());
             return Objects.equals(comment.getBoard().getEmail(), comment.getEmail()) ?
-                    new CommentChild(comment, parentId, url, true) :
-                    new CommentChild(comment, parentId, url, false);
+                    new CommentChildDto(comment, parentId, url, true) :
+                    new CommentChildDto(comment, parentId, url, false);
         });
     }
 

@@ -4,7 +4,7 @@ import com.meonghae.communityservice.application.board.BoardLikeService;
 import com.meonghae.communityservice.application.board.BoardService;
 import com.meonghae.communityservice.application.board.port.CommentRepository;
 import com.meonghae.communityservice.domain.board.Board;
-import com.meonghae.communityservice.dto.board.BoardDetail;
+import com.meonghae.communityservice.dto.board.BoardDetailDto;
 import com.meonghae.communityservice.dto.board.BoardRequest;
 import com.meonghae.communityservice.exception.custom.BoardException;
 import com.meonghae.communityservice.exception.error.ErrorCode;
@@ -54,7 +54,7 @@ class BoardLikeServiceTest {
         //then
         assertThat(res).isEqualTo("추천 완료");
 
-        BoardDetail detail = boardService.getBoard(1L, token2);
+        BoardDetailDto detail = boardService.getBoard(1L, token2);
         assertThat(detail.getLikes()).isEqualTo(1);
     } 
     
@@ -77,14 +77,14 @@ class BoardLikeServiceTest {
         String token = "test token 2";
         String res = likeService.toggleLike(board.getId(), token);
 
-        BoardDetail detail = boardService.getBoard(1L, token);
+        BoardDetailDto detail = boardService.getBoard(1L, token);
 
         assertThat(res).isEqualTo("추천 완료");
         assertThat(detail.getLikes()).isEqualTo(1);
 
         //when
         String res2 = likeService.toggleLike(board.getId(), token);
-        BoardDetail detail2 = boardService.getBoard(1L, token);
+        BoardDetailDto detail2 = boardService.getBoard(1L, token);
 
         //then
         assertThat(res2).isEqualTo("추천 취소");
@@ -99,7 +99,7 @@ class BoardLikeServiceTest {
         likeService.toggleLike(board.getId(), token);
         String res = likeService.toggleLike(board.getId(), token);
 
-        BoardDetail board1 = boardService.getBoard(1L, token);
+        BoardDetailDto board1 = boardService.getBoard(1L, token);
         assertThat(res).isEqualTo("추천 취소");
         assertThat(board1.getLikes()).isZero();
 
@@ -107,7 +107,7 @@ class BoardLikeServiceTest {
         String res2 = likeService.toggleLike(board.getId(), token);
 
         //then
-        BoardDetail board2 = boardService.getBoard(1L, token);
+        BoardDetailDto board2 = boardService.getBoard(1L, token);
         assertThat(res2).isEqualTo("추천 완료");
         assertThat(board2.getLikes()).isEqualTo(1);
     }

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
-public class ReviewList {
+public class ReviewListDto {
     @ApiModelProperty("리뷰 id")
     private Long id;
     @ApiModelProperty("리뷰 작성자 닉네임")
@@ -40,7 +40,7 @@ public class ReviewList {
     @ApiModelProperty("리뷰 등록 날짜")
     private LocalDateTime date;
 
-    public ReviewList(Review review, String nickname, String url, RecommendStatus status, boolean isWriter) {
+    public ReviewListDto(Review review, String nickname, String url, RecommendStatus status, boolean isWriter) {
         this.id = review.getId();
         this.nickname = nickname;
         this.profileUrl = url;

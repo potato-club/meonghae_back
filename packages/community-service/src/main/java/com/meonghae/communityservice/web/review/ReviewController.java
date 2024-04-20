@@ -1,6 +1,6 @@
 package com.meonghae.communityservice.web.review;
 
-import com.meonghae.communityservice.dto.review.ReviewList;
+import com.meonghae.communityservice.dto.review.ReviewListDto;
 import com.meonghae.communityservice.dto.review.ReviewReactionType;
 import com.meonghae.communityservice.dto.review.ReviewRequest;
 import com.meonghae.communityservice.application.review.ReviewReactionService;
@@ -28,21 +28,21 @@ public class ReviewController {
 
     @Operation(summary = "타입별 리뷰 조회 API")
     @GetMapping("/{type}")
-    public ResponseEntity<Slice<ReviewList>> getReviewList(@PathVariable(name = "type") int type,
-                                                           @RequestHeader("Authorization") String token,
-                                                           @RequestParam(value = "p",
+    public ResponseEntity<Slice<ReviewListDto>> getReviewList(@PathVariable(name = "type") int type,
+                                                              @RequestHeader("Authorization") String token,
+                                                              @RequestParam(value = "p",
                                                                      defaultValue = "1",
                                                                       required = false) int page,
-                                                           @RequestParam(value = "keyword",
+                                                              @RequestParam(value = "keyword",
                                                               required = false) String keyword,
-                                                           @RequestParam(value = "sort",
+                                                              @RequestParam(value = "sort",
                                                                       defaultValue = "LATEST",
                                                                       required = false) String sort,
-                                                           @RequestParam(value = "photo",
+                                                              @RequestParam(value = "photo",
                                                               defaultValue = "false",
                                                               required = false) boolean photoOnly
                                                               ) {
-        Slice<ReviewList> listDto = reviewService.getReviewByType(type, token, page, keyword, sort, photoOnly);
+        Slice<ReviewListDto> listDto = reviewService.getReviewByType(type, token, page, keyword, sort, photoOnly);
         return ResponseEntity.ok(listDto);
     }
 

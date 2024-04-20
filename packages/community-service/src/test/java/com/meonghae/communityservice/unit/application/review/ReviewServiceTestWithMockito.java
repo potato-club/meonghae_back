@@ -8,7 +8,7 @@ import com.meonghae.communityservice.application.review.ReviewService;
 import com.meonghae.communityservice.application.review.port.ReviewRepository;
 import com.meonghae.communityservice.domain.review.Review;
 import com.meonghae.communityservice.domain.review.ReviewCatalog;
-import com.meonghae.communityservice.dto.review.ReviewList;
+import com.meonghae.communityservice.dto.review.ReviewListDto;
 import com.meonghae.communityservice.dto.review.ReviewRequest;
 import com.meonghae.communityservice.exception.custom.ReviewException;
 import com.meonghae.communityservice.exception.error.ErrorCode;
@@ -88,7 +88,7 @@ public class ReviewServiceTestWithMockito {
                 .thenReturn("test.jpg");
 
         //when
-        Slice<ReviewList> reviewList = reviewService
+        Slice<ReviewListDto> reviewList = reviewService
                 .getReviewByType(1, token, 1, null, "LATEST", false);
 
         //then
@@ -124,7 +124,7 @@ public class ReviewServiceTestWithMockito {
                 .thenReturn("test.jpg");
 
         //when
-        Slice<ReviewList> reviewList = reviewService.getReviewByType(1, token, 1, null, "LATEST", true);
+        Slice<ReviewListDto> reviewList = reviewService.getReviewByType(1, token, 1, null, "LATEST", true);
 
         //then
         assertThat(reviewList.getNumberOfElements()).isEqualTo(1);

@@ -5,7 +5,7 @@ import com.meonghae.communityservice.application.port.RedisPort;
 import com.meonghae.communityservice.application.port.S3ServicePort;
 import com.meonghae.communityservice.application.port.UserServicePort;
 import com.meonghae.communityservice.application.review.ReviewService;
-import com.meonghae.communityservice.dto.review.ReviewList;
+import com.meonghae.communityservice.dto.review.ReviewListDto;
 import com.meonghae.communityservice.dto.review.ReviewReactionType;
 import com.meonghae.communityservice.dto.s3.S3Request;
 import org.junit.jupiter.api.BeforeEach;
@@ -128,7 +128,7 @@ class ReviewControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string("리뷰 등록 완료"));
 
-        Slice<ReviewList> slice = reviewService.getReviewByType(1, token, 1,
+        Slice<ReviewListDto> slice = reviewService.getReviewByType(1, token, 1,
                 null, "RATING_DESC", false);
 
         assertThat(slice.getNumberOfElements()).isEqualTo(4);
@@ -161,7 +161,7 @@ class ReviewControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("추천 완료"));
 
-        Slice<ReviewList> slice = reviewService.getReviewByType(1, token, 1,
+        Slice<ReviewListDto> slice = reviewService.getReviewByType(1, token, 1,
                 null, "RATING_DESC", false);
 
         assertThat(slice.getContent().get(0).getLikes()).isEqualTo(4);
@@ -176,7 +176,7 @@ class ReviewControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("비추 완료"));
 
-        Slice<ReviewList> slice2 = reviewService.getReviewByType(1, token, 1,
+        Slice<ReviewListDto> slice2 = reviewService.getReviewByType(1, token, 1,
                 null, "RATING_DESC", false);
 
         assertThat(slice2.getContent().get(0).getLikes()).isEqualTo(3);
@@ -197,7 +197,7 @@ class ReviewControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("삭제 완료"));
 
-        Slice<ReviewList> slice = reviewService.getReviewByType(1, token, 1,
+        Slice<ReviewListDto> slice = reviewService.getReviewByType(1, token, 1,
                 null, "LATEST", false);
 
         assertThat(slice.getNumberOfElements()).isEqualTo(2);

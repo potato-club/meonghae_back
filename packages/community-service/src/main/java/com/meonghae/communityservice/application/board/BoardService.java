@@ -44,7 +44,7 @@ public class BoardService {
     private final UserServicePort userService;
     private final S3ServicePort s3Service;
 
-    public Slice<BoardList> getBoardList(int typeKey, int page) {
+    public Slice<BoardListDto> getBoardList(int typeKey, int page) {
         BoardType type = BoardType.findWithKey(typeKey);
         PageRequest request = PageRequest.of(page - 1, 20,
                 Sort.by(Sort.Direction.DESC, "createdDate"));
@@ -57,11 +57,11 @@ public class BoardService {
         return list.map(board -> {
             String url = redisService.getProfileImage(board.getEmail());
             int commentSize = commentCount.getOrDefault(board.getId(), 0L).intValue();
-            return new BoardList(board, url, commentSize);
+            return new BoardListDto(board, url, commentSize);
         });
     }
 
-    public BoardDetail getBoard(Long id, String token) {
+    public BoardDetailDto getBoard(Long id, String token) {
         String userEmail = userService.getUserEmail(token);
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BAD_REQUEST, "board is not exist"));
@@ -72,7 +72,7 @@ public class BoardService {
         boolean likeStatus = like != null ? like.getStatus() : false;
         boolean isWriter = Objects.equals(board.getEmail(), userEmail);
         String url = redisService.getProfileImage(board.getEmail());
-        BoardDetail detailDto = new BoardDetail(board, url, likeStatus, isWriter, commentCount);
+        BoardDetailDto detailDto = new BoardDetailDto(board, url, likeStatus, isWriter, commentCount);
 
         if (board.getHasImage()) {
             List<S3Response> images = s3Service.getImages(new S3Request(board.getId(), "BOARD"));
@@ -82,14 +82,14 @@ public class BoardService {
         return detailDto;
     }
 
-    public List<BoardMain> getMainBoard() {
+    public List<BoardMainDto> getMainBoard() {
         LocalDateTime now = LocalDateTime.now();
         List<Board> boardList = boardRepository.findBoardListForMain(now);
 
         Map<Long, Long> commentCount = commentRepository.findCommentCountByBoardIds(boardList.stream()
                 .map(Board::getId).collect(Collectors.toList()));
 
-        return boardList.stream().map(board -> new BoardMain(board,
+        return boardList.stream().map(board -> new BoardMainDto(board,
                         commentCount.getOrDefault(board.getId(), 0L).intValue()))
                 .collect(Collectors.toList());
     }

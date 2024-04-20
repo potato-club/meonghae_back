@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class BoardList {
+public class BoardListDto {
     @ApiModelProperty("게시글 id")
     private Long id;
     @ApiModelProperty("게시글 작성자 프로필 사진")
@@ -27,7 +27,7 @@ public class BoardList {
     @ApiModelProperty("게시글 작성 시간")
     private LocalDateTime date;
 
-    public BoardList(Board board, String profileUrl, int commentSize) {
+    public BoardListDto(Board board, String profileUrl, int commentSize) {
         this.id = board.getId();
         this.profileUrl = profileUrl;
         this.title = board.getTitle();

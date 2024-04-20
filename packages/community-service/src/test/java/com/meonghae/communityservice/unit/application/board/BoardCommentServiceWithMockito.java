@@ -9,8 +9,8 @@ import com.meonghae.communityservice.domain.board.Board;
 import com.meonghae.communityservice.domain.board.BoardComment;
 import com.meonghae.communityservice.domain.board.BoardType;
 import com.meonghae.communityservice.dto.board.BoardRequest;
-import com.meonghae.communityservice.dto.comment.CommentChild;
-import com.meonghae.communityservice.dto.comment.CommentParent;
+import com.meonghae.communityservice.dto.comment.CommentChildDto;
+import com.meonghae.communityservice.dto.comment.CommentParentDto;
 import com.meonghae.communityservice.exception.custom.CommentException;
 import com.meonghae.communityservice.exception.error.ErrorCode;
 import com.meonghae.communityservice.mock.*;
@@ -69,7 +69,7 @@ public class BoardCommentServiceWithMockito {
                 .thenReturn("testImage.jpg");
 
         //when
-        Slice<CommentParent> parentComments = commentService.getParentComments(1, 1L);
+        Slice<CommentParentDto> parentComments = commentService.getParentComments(1, 1L);
 
         //then
         assertThat(parentComments.getNumberOfElements()).isEqualTo(2);
@@ -107,7 +107,7 @@ public class BoardCommentServiceWithMockito {
                 .thenReturn("child.jpg");
 
         //when
-        Slice<CommentChild> childSlice = commentService.getChildComments(1, 1L);
+        Slice<CommentChildDto> childSlice = commentService.getChildComments(1, 1L);
 
         //then
         assertThat(childSlice.getNumberOfElements()).isEqualTo(2);

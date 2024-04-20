@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
-public class BoardDetail {
+public class BoardDetailDto {
     @ApiModelProperty("게시글 id")
     private Long id;
     @ApiModelProperty("게시글 작성자 프로필 사진")
@@ -35,7 +35,7 @@ public class BoardDetail {
     @ApiModelProperty("게시글 작성 시간")
     private LocalDateTime date;
 
-    public BoardDetail(Board board, String url, boolean status, boolean isWriter, int commentCount) {
+    public BoardDetailDto(Board board, String url, boolean status, boolean isWriter, int commentCount) {
         this.id = board.getId();
         this.profileUrl = url;
         this.title = board.getTitle();

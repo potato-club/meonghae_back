@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class CommentChild {
+public class CommentChildDto {
     @ApiModelProperty("자식댓글 id")
     private Long id;
     @ApiModelProperty("댓글 작성자 프로필 사진")
@@ -25,7 +25,7 @@ public class CommentChild {
     @ApiModelProperty("댓글 작성 시간")
     private LocalDateTime date;
 
-    public CommentChild(BoardComment child, Long parentId, String url, boolean isWriter) {
+    public CommentChildDto(BoardComment child, Long parentId, String url, boolean isWriter) {
         this.id = child.getId();
         this.comment = child.getComment();
         this.isWriter = isWriter;

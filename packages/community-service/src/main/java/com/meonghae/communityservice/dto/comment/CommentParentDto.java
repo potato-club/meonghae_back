@@ -1,7 +1,6 @@
 package com.meonghae.communityservice.dto.comment;
 
 import com.meonghae.communityservice.domain.board.BoardComment;
-import com.meonghae.communityservice.infra.board.comment.CommentEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class CommentParent {
+public class CommentParentDto {
     @ApiModelProperty("부모댓글 id")
     private Long id;
     @ApiModelProperty("댓글 작성자 프로필 사진")
@@ -27,7 +26,7 @@ public class CommentParent {
     @ApiModelProperty("댓글 작성 시간")
     private LocalDateTime date;
 
-    public CommentParent(BoardComment comment, String url, boolean isWriter) {
+    public CommentParentDto(BoardComment comment, String url, boolean isWriter) {
         this.id = comment.getId();
         this.profileUrl = url;
         this.comment = comment.getComment();

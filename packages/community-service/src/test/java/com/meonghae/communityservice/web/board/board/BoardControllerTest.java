@@ -4,7 +4,7 @@ import com.meonghae.communityservice.application.board.BoardService;
 import com.meonghae.communityservice.application.port.RedisPort;
 import com.meonghae.communityservice.application.port.S3ServicePort;
 import com.meonghae.communityservice.application.port.UserServicePort;
-import com.meonghae.communityservice.dto.board.BoardDetail;
+import com.meonghae.communityservice.dto.board.BoardDetailDto;
 import com.meonghae.communityservice.dto.s3.S3Request;
 import com.meonghae.communityservice.exception.custom.BoardException;
 import com.meonghae.communityservice.exception.error.ErrorCode;
@@ -170,7 +170,7 @@ class BoardControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string("게시글 생성 완료"));
 
-        BoardDetail board = boardService.getBoard(4L, token);
+        BoardDetailDto board = boardService.getBoard(4L, token);
         assertThat(board.getTitle()).isEqualTo(title);
         assertThat(board.getContent()).isEqualTo(content);
     }
@@ -187,7 +187,7 @@ class BoardControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("추천 완료"));
 
-        BoardDetail board = boardService.getBoard(2L, token);
+        BoardDetailDto board = boardService.getBoard(2L, token);
         assertThat(board.getLikes()).isEqualTo(1);
     }
 
@@ -210,7 +210,7 @@ class BoardControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("수정 완료"));
 
-        BoardDetail board = boardService.getBoard(1L, token);
+        BoardDetailDto board = boardService.getBoard(1L, token);
 
         assertThat(board.getTitle()).isEqualTo(updateTitle);
         assertThat(board.getContent()).isEqualTo(updateContent);

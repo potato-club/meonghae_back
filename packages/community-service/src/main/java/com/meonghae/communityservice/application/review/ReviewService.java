@@ -5,7 +5,7 @@ import com.meonghae.communityservice.application.port.S3ServicePort;
 import com.meonghae.communityservice.application.port.UserServicePort;
 import com.meonghae.communityservice.application.review.port.ReviewRepository;
 import com.meonghae.communityservice.domain.review.Review;
-import com.meonghae.communityservice.dto.review.ReviewList;
+import com.meonghae.communityservice.dto.review.ReviewListDto;
 import com.meonghae.communityservice.dto.review.ReviewRequest;
 import com.meonghae.communityservice.dto.s3.S3Request;
 import com.meonghae.communityservice.dto.s3.S3Response;
@@ -41,8 +41,8 @@ public class ReviewService {
     private final UserServicePort userService;
     private final S3ServicePort s3Service;
 
-    public Slice<ReviewList> getReviewByType(int key, String token, int page,
-                                             String keyword, String sort, boolean photoOnly) {
+    public Slice<ReviewListDto> getReviewByType(int key, String token, int page,
+                                                String keyword, String sort, boolean photoOnly) {
         ReviewCatalog catalog = ReviewCatalog.findWithKey(key);
         if(catalog == null) throw new ReviewException(BAD_REQUEST, "잘못된 Catalog Type 입니다.");
         ReviewSortType sortType = ReviewSortType.findType(sort);
@@ -52,15 +52,12 @@ public class ReviewService {
                 getPagingReviewWithPhoto(page, catalog, keyword, sortType)
                 : getPagingReview(page, catalog, keyword, sortType);
 
-        log.info("========== review 개수 - " + reviews.getNumberOfElements());
-
         List<Long> reviewIds = reviews.getContent().stream().map(Review::getId).collect(Collectors.toList());
         Map<Long, RecommendStatus> reactions = reactionService.getReviewReactions(reviewIds, token);
 
         String email = userService.getUserEmail(token);
-        Slice<ReviewList> slice = reviews.map(r -> convertTypeAndAddImage(r, email, reactions.get(r.getId())));
-        log.info("첫번째 인덱스의 제목 : " + slice.getContent().get(0).getTitle());
-        return slice;
+
+        return reviews.map(r -> convertTypeAndAddImage(r, email, reactions.get(r.getId())));
     }
     private Slice<Review> getPagingReview(int page, ReviewCatalog catalog, String keyword, ReviewSortType sort) {
         PageRequest request;
@@ -141,15 +138,13 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
-    private ReviewList convertTypeAndAddImage(Review review, String email, RecommendStatus status) {
+    private ReviewListDto convertTypeAndAddImage(Review review, String email, RecommendStatus status) {
         String nickname = redisService.getNickname(review.getEmail());
         String url = redisService.getProfileImage(review.getEmail());
         boolean isWriter = Objects.equals(review.getEmail(), email);
-        ReviewList reviewDto = new ReviewList(review, nickname, url, status, isWriter);
+        ReviewListDto reviewDto = new ReviewListDto(review, nickname, url, status, isWriter);
         if (review.getHasImage()) {
-            log.info("======= 이미지 있어서 redis 서비스 호출");
             List<S3Response> reviewImages = redisService.getReviewImages(review.getId());
-            log.info("======= 이미지 성공적으로 반환");
             reviewDto.setImages(reviewImages);
         }
         return reviewDto;

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class BoardMain {
+public class BoardMainDto {
     @ApiModelProperty("게시글 id")
     private Long id;
     @ApiModelProperty("게시글 제목")
@@ -22,7 +22,7 @@ public class BoardMain {
     @ApiModelProperty("게시글 내 이미지 여부")
     private boolean image;
 
-    public BoardMain(Board board, int commentCount) {
+    public BoardMainDto(Board board, int commentCount) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.type = board.getType();

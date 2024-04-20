@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meonghae.communityservice.application.board.BoardCommentService;
 import com.meonghae.communityservice.application.port.RedisPort;
 import com.meonghae.communityservice.application.port.UserServicePort;
-import com.meonghae.communityservice.dto.comment.CommentChild;
-import com.meonghae.communityservice.dto.comment.CommentParent;
+import com.meonghae.communityservice.dto.comment.CommentChildDto;
+import com.meonghae.communityservice.dto.comment.CommentParentDto;
 import com.meonghae.communityservice.dto.comment.CommentRequest;
 import com.meonghae.communityservice.exception.custom.CommentException;
 import com.meonghae.communityservice.exception.error.ErrorCode;
@@ -118,7 +118,7 @@ class BoardCommentControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string("댓글 생성 완료"));
 
-        Slice<CommentParent> comments = commentService.getParentComments(1, 1L);
+        Slice<CommentParentDto> comments = commentService.getParentComments(1, 1L);
         assertThat(comments.getNumberOfElements()).isEqualTo(3);
     }
 
@@ -142,7 +142,7 @@ class BoardCommentControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string("대댓글 생성 완료"));
 
-        Slice<CommentChild> comments = commentService.getChildComments(1, 1L);
+        Slice<CommentChildDto> comments = commentService.getChildComments(1, 1L);
 
         assertThat(comments.getNumberOfElements()).isEqualTo(1);
     }
@@ -167,7 +167,7 @@ class BoardCommentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("댓글 수정 완료"));
 
-        Slice<CommentParent> parents = commentService.getParentComments(1, 1L);
+        Slice<CommentParentDto> parents = commentService.getParentComments(1, 1L);
         assertThat(parents.getContent().get(1).getComment()).isEqualTo("update my comment");
         assertThat(parents.getContent().get(1).getUpdate()).isTrue();
     }
