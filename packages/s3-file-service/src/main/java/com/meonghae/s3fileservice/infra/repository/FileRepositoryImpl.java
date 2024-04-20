@@ -7,6 +7,7 @@ import com.meonghae.s3fileservice.dto.FileResponse;
 import com.meonghae.s3fileservice.dto.FileUserResponse;
 import com.meonghae.s3fileservice.entity.QFile;
 import com.meonghae.s3fileservice.infra.entity.FileEntity;
+import com.meonghae.s3fileservice.infra.entity.QFileEntity;
 import com.meonghae.s3fileservice.service.port.FileRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -55,16 +56,16 @@ public class FileRepositoryImpl implements FileRepository {
                 .select(
                         Projections.constructor(
                                 FileResponse.class,
-                                QFile.file.fileName,
-                                QFile.file.fileUrl,
-                                QFile.file.entityType,
-                                QFile.file.typeId
+                                QFileEntity.fileEntity.fileName,
+                                QFileEntity.fileEntity.fileUrl,
+                                QFileEntity.fileEntity.entityType,
+                                QFileEntity.fileEntity.typeId
                         )
                 )
-                .from(QFile.file)
-                .where(QFile.file.entityType.eq(request.getEntityType())
-                        .and(QFile.file.typeId.eq(request.getEntityId())))
-                .orderBy(QFile.file.id.asc())
+                .from(QFileEntity.fileEntity)
+                .where(QFileEntity.fileEntity.entityType.eq(request.getEntityType())
+                        .and(QFileEntity.fileEntity.typeId.eq(request.getEntityId())))
+                .orderBy(QFileEntity.fileEntity.id.asc())
                 .fetch();
     }
 
@@ -74,14 +75,14 @@ public class FileRepositoryImpl implements FileRepository {
                 .select(
                         Projections.constructor(
                                 FileUserResponse.class,
-                                QFile.file.fileName,
-                                QFile.file.fileUrl,
-                                QFile.file.entityType,
-                                QFile.file.email
+                                QFileEntity.fileEntity.fileName,
+                                QFileEntity.fileEntity.fileUrl,
+                                QFileEntity.fileEntity.entityType,
+                                QFileEntity.fileEntity.email
                         )
                 )
-                .from(QFile.file)
-                .where(QFile.file.email.eq(email))
+                .from(QFileEntity.fileEntity)
+                .where(QFileEntity.fileEntity.email.eq(email))
                 .fetchOne();
     }
 
@@ -91,15 +92,15 @@ public class FileRepositoryImpl implements FileRepository {
                 .select(
                         Projections.constructor(
                                 FileUserResponse.class,
-                                QFile.file.fileName,
-                                QFile.file.fileUrl,
-                                QFile.file.entityType,
-                                QFile.file.email
+                                QFileEntity.fileEntity.fileName,
+                                QFileEntity.fileEntity.fileUrl,
+                                QFileEntity.fileEntity.entityType,
+                                QFileEntity.fileEntity.email
                         )
                 )
-                .from(QFile.file)
-                .where(QFile.file.entityType.eq(request.getEntityType())
-                        .and(QFile.file.typeId.eq(request.getEntityId())))
+                .from(QFileEntity.fileEntity)
+                .where(QFileEntity.fileEntity.entityType.eq(request.getEntityType())
+                        .and(QFileEntity.fileEntity.typeId.eq(request.getEntityId())))
                 .fetchOne();
     }
 
