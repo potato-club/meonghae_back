@@ -5,7 +5,6 @@ import com.meonghae.s3fileservice.domain.enums.EntityType;
 import com.meonghae.s3fileservice.dto.FileRequest;
 import com.meonghae.s3fileservice.dto.FileResponse;
 import com.meonghae.s3fileservice.dto.FileUserResponse;
-import com.meonghae.s3fileservice.entity.QFile;
 import com.meonghae.s3fileservice.infra.entity.FileEntity;
 import com.meonghae.s3fileservice.infra.entity.QFileEntity;
 import com.meonghae.s3fileservice.service.port.FileRepository;
