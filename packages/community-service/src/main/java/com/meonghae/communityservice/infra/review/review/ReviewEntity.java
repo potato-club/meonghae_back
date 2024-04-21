@@ -59,10 +59,6 @@ public class ReviewEntity extends BaseTimeEntity {
         this.dislikes--;
     }
 
-    public void setHasImage() {
-        this.hasImage = true;
-    }
-
     public static ReviewEntity fromModel(Review review) {
         ReviewEntity entity = new ReviewEntity();
         entity.id = review.getId();
@@ -88,6 +84,8 @@ public class ReviewEntity extends BaseTimeEntity {
                 .catalog(this.catalog)
                 .likes(this.likes)
                 .dislikes(this.dislikes)
+                .createdDate(this.getCreatedDate())
+                .modifiedDate(this.getModifiedDate())
                 .build();
     }
 }

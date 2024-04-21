@@ -70,9 +70,6 @@ class ReviewControllerTest {
 
         when(userService.getUserEmail("test1"))
                 .thenReturn("test1@example.com");
-
-        when(s3Service.deleteImage(any(S3RequestDto.class)))
-                .thenReturn(ResponseEntity.ok("성공"));
     }
 
     @Test

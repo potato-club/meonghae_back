@@ -89,12 +89,6 @@ class BoardControllerTest {
 
         when(userService.getUserEmail("owner3"))
                 .thenReturn("test3@example.com");
-
-        when(redisService.getProfileImage(anyString()))
-                .thenReturn(null);
-
-        when(s3Service.getImages(any(S3RequestDto.class)))
-                .thenReturn(new ArrayList<>());
     }
 
     @Test

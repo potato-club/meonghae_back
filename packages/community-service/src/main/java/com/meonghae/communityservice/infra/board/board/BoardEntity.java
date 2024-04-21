@@ -51,6 +51,8 @@ public class BoardEntity extends BaseTimeEntity {
                 .type(this.getType())
                 .likes(this.getLikes())
                 .hasImage(this.getHasImage())
+                .createdDate(this.getCreatedDate())
+                .modifiedDate(this.getModifiedDate())
                 .build();
     }
 }

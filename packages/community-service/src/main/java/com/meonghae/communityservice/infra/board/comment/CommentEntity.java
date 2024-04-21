@@ -69,6 +69,7 @@ public class CommentEntity extends BaseTimeEntity {
                         new ArrayList<>() : this.getReplies().stream()
                         .map(CommentEntity::toModel).collect(Collectors.toList()))
                 .createdDate(this.getCreatedDate())
+                .modifiedDate(this.getModifiedDate())
                 .build();
     }
 
