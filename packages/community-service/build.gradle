@@ -50,6 +50,7 @@ dependencies {
 	implementation 'com.querydsl:querydsl-jpa'
 	implementation 'com.querydsl:querydsl-apt'
 	implementation 'mysql:mysql-connector-java:8.0.32'
+	implementation 'com.h2database:h2:1.4.200'
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
