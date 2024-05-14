@@ -59,14 +59,13 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public BoardComment saveChild(BoardComment parent, BoardComment child) {
-        CommentEntity parentEntity = CommentEntity.fromModel(parent);
+        CommentEntity parentEntity = commentJpaRepository.findById(parent.getId()).get();
         CommentEntity childEntity = CommentEntity.fromModel(child);
 
         childEntity.setParent(parentEntity);
         CommentEntity saveChild = commentJpaRepository.save(childEntity);
 
         parentEntity.addReply(saveChild);
-        commentJpaRepository.save(parentEntity);
 
         return saveChild.toModel();
     }
