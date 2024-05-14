@@ -43,34 +43,18 @@ public class ReviewEntity extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "int")
     private int dislikes;
 
-    public void addLikes() {
-        this.likes++;
-    }
-
-    public void addDislikes() {
-        this.dislikes++;
-    }
-
-    public void cancelLikes() {
-        this.likes--;
-    }
-
-    public void cancelDislikes() {
-        this.dislikes--;
-    }
-
     public static ReviewEntity fromModel(Review review) {
-        ReviewEntity entity = new ReviewEntity();
-        entity.id = review.getId();
-        entity.catalog = review.getCatalog();
-        entity.content = review.getContent();
-        entity.title = review.getTitle();
-        entity.email = review.getEmail();
-        entity.rating = review.getRating();
-        entity.hasImage = review.getHasImage();
-        entity.likes = review.getLikes();
-        entity.dislikes = review.getDislikes();
-        return entity;
+        return ReviewEntity.builder()
+                .id(review.getId())
+                .catalog(review.getCatalog())
+                .content(review.getContent())
+                .title(review.getTitle())
+                .email(review.getEmail())
+                .rating(review.getRating())
+                .hasImage(review.getHasImage())
+                .likes(review.getLikes())
+                .dislikes(review.getDislikes())
+                .build();
     }
 
     public Review toModel() {
@@ -87,5 +71,10 @@ public class ReviewEntity extends BaseTimeEntity {
                 .createdDate(this.getCreatedDate())
                 .modifiedDate(this.getModifiedDate())
                 .build();
+    }
+
+    public void updateReaction(Review review) {
+        this.likes = review.getLikes();
+        this.dislikes = review.getDislikes();
     }
 }

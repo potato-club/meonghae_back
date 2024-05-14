@@ -15,4 +15,5 @@ public interface BoardRepository {
     List<Board> findBoardListForMain(LocalDateTime now);
     Board save(Board board);
     void delete(Long id);
+    Board update(Board updateBoard);
 }

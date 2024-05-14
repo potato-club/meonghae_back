@@ -42,7 +42,7 @@ public class ReviewReactionService {
         if (reaction == null) {
             ReviewReaction newReaction = ReviewReaction.create(email, review, isLikes);
             reactionRepository.save(newReaction);
-            reviewRepository.save(review);
+            reviewRepository.updateReaction(review);
             if (isLikes) {
                 return "추천 완료";
             } else {
@@ -53,7 +53,7 @@ public class ReviewReactionService {
             reaction.updateStatus(isLikes);
             review = reaction.getReview();
             reactionRepository.save(reaction);
-            reviewRepository.save(review);
+            reviewRepository.updateReaction(review);
             return res;
         }
     }

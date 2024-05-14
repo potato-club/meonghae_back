@@ -139,7 +139,7 @@ public class BoardService {
             imageCheck(updateBoard, images); // 새로운 이미지 검증
             s3Service.uploadImage(images, requestDto);
             updateBoard.toggleHasImage();
-            return boardRepository.save(updateBoard);
+            return boardRepository.update(updateBoard);
         }
 
         // 기존 이미지 있음
@@ -153,10 +153,10 @@ public class BoardService {
             } else { // 새로운 이미지 없음 -> 이미지 전체 삭제 + 이미지 상태 변경
                 s3Service.deleteImage(requestDto);
                 updateBoard.toggleHasImage();
-                return boardRepository.save(updateBoard);
+                return boardRepository.update(updateBoard);
             }
         }
-        return boardRepository.save(updateBoard);
+        return boardRepository.update(updateBoard);
     }
 
     @Transactional
