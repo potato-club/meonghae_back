@@ -14,4 +14,6 @@ public interface ReviewRepository {
     Review save(Review review);
 
     void delete(Review review);
+
+    void updateReaction(Review review);
 }

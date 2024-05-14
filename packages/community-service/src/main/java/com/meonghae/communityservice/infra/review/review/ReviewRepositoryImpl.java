@@ -42,4 +42,10 @@ public class ReviewRepositoryImpl implements ReviewRepository {
     public void delete(Review review) {
         reviewJpaRepository.delete(ReviewEntity.fromModel(review));
     }
+
+    @Override
+    public void updateReaction(Review review) {
+        ReviewEntity entity = reviewJpaRepository.findById(review.getId()).get();
+        entity.updateReaction(review);
+    }
 }

@@ -55,4 +55,10 @@ public class BoardEntity extends BaseTimeEntity {
                 .modifiedDate(this.getModifiedDate())
                 .build();
     }
+
+    public void updateEntity(Board board) {
+        this.title = board.getTitle();
+        this.content = board.getContent();
+        this.hasImage = board.getHasImage();
+    }
 }

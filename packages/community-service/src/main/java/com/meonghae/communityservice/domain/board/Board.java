@@ -52,9 +52,16 @@ public class Board {
     }
 
     public Board updateBoard(String title, String content) {
-        return new Board(this.id, this.email, title, content,
-                this.type, this.likes, this.hasImage,
-                this.createdDate, this.modifiedDate);
+        return Board.builder()
+                .id(this.id)
+                .email(this.email)
+                .title(title)
+                .content(content)
+                .type(this.type)
+                .likes(this.likes)
+                .hasImage(this.hasImage)
+                .createdDate(this.createdDate)
+                .build();
     }
 
     public void toggleHasImage() {

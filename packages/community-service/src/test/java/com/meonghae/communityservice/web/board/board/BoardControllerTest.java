@@ -1,5 +1,6 @@
 package com.meonghae.communityservice.web.board.board;
 
+import com.jayway.jsonpath.JsonPath;
 import com.meonghae.communityservice.application.board.BoardService;
 import com.meonghae.communityservice.application.port.RedisPort;
 import com.meonghae.communityservice.application.port.S3ServicePort;
@@ -21,6 +22,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
 
@@ -192,6 +195,13 @@ class BoardControllerTest {
         String updateTitle= "update title";
         String updateContent = "update content";
 
+        MvcResult result = mockMvc.perform(
+                        get("/boards/1")
+                                .header("Authorization", token))
+                .andReturn();
+
+        String createdDate = JsonPath.read(result.getResponse().getContentAsString(), "$.date");
+
         //when
         //then
         mockMvc.perform(
@@ -208,6 +218,7 @@ class BoardControllerTest {
 
         assertThat(board.getTitle()).isEqualTo(updateTitle);
         assertThat(board.getContent()).isEqualTo(updateContent);
+        assertThat(board.getDate().toString()).isEqualTo(createdDate);
     }
 
     @Test
