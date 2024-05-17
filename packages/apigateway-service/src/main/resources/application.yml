@@ -8,7 +8,7 @@ server:
 
 eureka:
   instance:
-    hostname: meonghae.site
+    hostname: server-meonghae.site
 
   client:
     register-with-eureka: true
