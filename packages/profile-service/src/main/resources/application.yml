@@ -46,7 +46,7 @@ spring:
         show_sql: false
         format_sql: true
   datasource:
-    url: ENC(sJ/gqsMjQbAMh2bUiubUhoZ7fYilC+Q1I0nQkREt8UNsaEEi1ty8irzxmwKGovVojJ3bedhdubSDh8E+TcmTqeDbNEkBGxe+lOUKmq8BlpA3KkjD1i64CCRZ+zJ2jtOh)
+    url: ENC(Vx6YkP76j58e1cpZo8SnNW2unqR5APiSO+RsHdjFuWkzIjVmeuSTghNDjkuuApMvMcnLP5eAvnbWwrNs6klv4u9m7rkxrShXE3JqdK34eWbDDLcgYoct0QsrvJIdgGHS)
     username: ENC(akrFtN4LCfZKuIq9ICQUqw==)
     password: ENC(oKvUEiPXVPQ5Fqx2PKQ1pixQ39vCCN1i)
     driver-class-name: com.mysql.cj.jdbc.Driver
