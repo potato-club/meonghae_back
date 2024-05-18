@@ -8,7 +8,6 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -38,7 +37,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             ServerHttpRequest request = exchange.getRequest();
 
             String path = request.getURI().getPath();
-            String androidId = request.getHeaders().getFirst("AndroidId");
+            String androidId = request.getHeaders().getFirst("androidId");
             String accessToken = jwtTokenProvider.resolveAccessToken(request);
             String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
