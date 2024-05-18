@@ -107,20 +107,6 @@ public class PetService {
     return "저장완료";
   }
 
-//  @Transactional//한 마리 저장
-//  public String savePet(List<MultipartFile> images, PetInfoRequestDto petInfoRequestDto, String token) {
-//    String userEmail = feignService.getUserEmail(token);
-//    Pet pet = new Pet(petInfoRequestDto,userEmail);
-//
-//    Pet savedPet = petRepository.save(pet);
-//    if (images != null){
-//      S3RequestDto s3RequestDto = new S3RequestDto(savedPet.getId(),"PET");
-//      s3ServiceClient.uploadImages(images, s3RequestDto);
-//      savedPet.setHasImage();
-//    }
-//    return "저장 완료";
-//  }
-
   //===================
   @Transactional
   public String update(Long id, PetInfoRequestDto petDto) {
@@ -162,6 +148,8 @@ public class PetService {
   @Transactional
   public String deleteById(Long id) {
     petRepository.deleteById(id);
+    S3RequestDto requestDto = new S3RequestDto(id, "PET");
+    s3ServiceClient.deleteImage(requestDto);
     return "삭제 완료";
   }
   @Transactional

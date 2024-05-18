@@ -29,4 +29,7 @@ public interface S3ServiceClient {
   @PutMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   ResponseEntity<String> updateFiles(@RequestPart(value = "files", name = "files") List<MultipartFile> files,
                                      @RequestPart(value = "dataList", name = "dataList") List<S3UpdateDto> dataList);
+
+  @DeleteMapping("/files")
+  ResponseEntity<String> deleteImage(@RequestBody S3RequestDto requestDto);
 }
