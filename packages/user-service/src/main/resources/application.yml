@@ -63,7 +63,7 @@ jwt:
 eureka:
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    hostname: meonghae.site
+    hostname: server-meonghae.site
 
   client:
     register-with-eureka: true
