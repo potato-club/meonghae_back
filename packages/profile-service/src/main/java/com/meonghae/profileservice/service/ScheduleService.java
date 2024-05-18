@@ -1,5 +1,7 @@
 package com.meonghae.profileservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meonghae.profileservice.dto.schedule.*;
 import com.meonghae.profileservice.entity.*;
 import com.meonghae.profileservice.enumCustom.ScheduleCycleType;
@@ -8,6 +10,7 @@ import com.meonghae.profileservice.error.ErrorCode;
 import com.meonghae.profileservice.error.exception.NotFoundException;
 import com.meonghae.profileservice.repository.ScheduleRepository;
 import com.meonghae.profileservice.repository.PetRepository;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.time.LocalDate;
@@ -29,7 +32,15 @@ public class ScheduleService {
   private final ScheduleRepository scheduleRepository;
   private final JPAQueryFactory jpaQueryFactory;
   private final FeignService feignService;
+  private final RabbitService rabbitService;
 
+
+  public String fcmTest(ScheduleRequestDTO scheduleRequestDTO, String token) {
+    String userEmail = feignService.getUserEmail(token);
+    AlarmDto alarmDto = new AlarmDto(scheduleRequestDTO,userEmail);
+    rabbitService.sendToRabbitMq(alarmDto);
+    return "알람시간은 어느정도 여유를 두고 해주세요. 요청시 hasRepeat, text, ScheduleType은 Test로 필수 요소임";
+  }
   @Transactional
   public ScheduleResponseDTO getSchedule(Long id, String token) {
     String userEmail = feignService.getUserEmail(token);
@@ -37,12 +48,12 @@ public class ScheduleService {
     QSchedule qSchedule = QSchedule.schedule;
     QPet qPet = QPet.pet;
 
-    Schedule schedule = (Schedule) jpaQueryFactory
+    Schedule schedule = jpaQueryFactory
             .selectFrom(qSchedule)
             .leftJoin(qSchedule.pet,qPet)
             .where(qSchedule.userEmail.eq(userEmail)
                     .and(qSchedule.id.eq(id)))
-            .fetch();
+            .fetchOne();
 
     return new ScheduleResponseDTO(schedule);
   }
@@ -59,9 +70,8 @@ public class ScheduleService {
             .selectFrom(qSchedule)
             .leftJoin(qSchedule.pet,qPet)
             .where(qSchedule.userEmail.eq(userEmail)
-                    .and(qSchedule.scheduleEndTime.goe(LocalDateTime.now()))
-                    .or(qSchedule.hasRepeat.isFalse()
-                            .and(qSchedule.scheduleTime.goe(LocalDateTime.now()))))
+                    .and(qSchedule.scheduleEndTime.goe(LocalDateTime.now())
+                            .or(qSchedule.hasRepeat.isFalse().and(qSchedule.scheduleTime.goe(LocalDateTime.now())))))
             .fetch();
 
     List<SchedulePreviewResponseDto> resultList = new ArrayList<>();
@@ -107,7 +117,7 @@ public class ScheduleService {
 
   // 달력 월단위 일정들 보기 위한 함수 - 같은 해 같은 월 데이터 출력
   @Transactional
-  public List<SimpleMonthSchedule> getMonthOfSchedule(LocalDate targetDate, String token) {
+  public List<SimpleMonthSchedule> getMonthOfSchedule(LocalDate targetDate, String token) throws JsonProcessingException {
   //3달치 리턴하기!!
 
     String userEmail = feignService.getUserEmail(token);
@@ -164,10 +174,9 @@ public class ScheduleService {
         }
       }
       //주기타입이 month 인 것
-      else if (schedule.getCycleType().equals(ScheduleCycleType.Month)) {
+      else if (schedule.isHasRepeat() && schedule.getCycleType().equals(ScheduleCycleType.Month)) {
 
         for (int i = 0; i < 3; i++) { // 현재 달부터 2달 뒤까지 3번 반복
-
           LocalDate repeatedDate = targetDate.plusMonths(i);
           if ((repeatedDate.getMonthValue() - schedule.getScheduleTime().getMonthValue()) % schedule.getCycle() == 0) {
             addSimpleSchedule(monthToSchedulesMap, repeatedDate.withDayOfMonth(schedule.getScheduleTime().getDayOfMonth()).atStartOfDay(), schedule.getId());
@@ -175,19 +184,19 @@ public class ScheduleService {
         }
       }
       //반복 일정 && 타입이 커스텀이면서 주기타입이 day 인 것
-      else if (schedule.isHasRepeat() && schedule.getScheduleType().equals(ScheduleType.Custom)
+      else if (schedule.isHasRepeat()
               && schedule.getCycleType() == ScheduleCycleType.Day) {
-
         List<LocalDateTime> intendedTimeList = calculateRepeatedDays(schedule,targetDate);
 
         for (LocalDateTime intendedTime : intendedTimeList) {
-          addSimpleSchedule(monthToSchedulesMap, intendedTime, schedule.getId().intValue());
+          addSimpleSchedule(monthToSchedulesMap, intendedTime, schedule.getId());
         }
       } else throw new RuntimeException();
     }
-
+    ObjectMapper objectMapper = new ObjectMapper();
+    String json = objectMapper.writeValueAsString(monthToSchedulesMap);
+    log.info(json);
     List<SimpleMonthSchedule> result = new ArrayList<>();
-
     for (Map.Entry<Integer, List<SimpleSchedule>> entry : monthToSchedulesMap.entrySet()) {
       SimpleMonthSchedule monthSchedule = new SimpleMonthSchedule();
       monthSchedule.setMonth(entry.getKey());
@@ -210,12 +219,25 @@ public class ScheduleService {
     QSchedule qSchedule = QSchedule.schedule;
     QPet qPet = QPet.pet;
 
+//검색 키워드를 포함하는 ScheduleType
+    List<ScheduleType> matchingKeys = Arrays.stream(ScheduleType.values())
+            .filter(type -> type.getTitle().contains(key))
+            .collect(Collectors.toList());
+
+    BooleanExpression condition = null;
+    if (!matchingKeys.isEmpty() ) {
+      condition = qSchedule.scheduleType.in(matchingKeys);
+    }
+
     List<Schedule> scheduleList = jpaQueryFactory
             .selectFrom(qSchedule)
             .innerJoin(qSchedule.pet, qPet).fetchJoin()
             .where(qSchedule.userEmail.eq(userEmail)
                     .and((qSchedule.text.like("%"+key+"%")
-                            .or(qPet.petName.like("%"+key+"%")))))
+                            .or(qSchedule.customScheduleTitle.like("%"+key+"%"))
+                            .or(condition)
+                            .or(qPet.petName.like("%"+key+"%"))
+                    )))
             .orderBy(qSchedule.scheduleTime.asc())
             .fetch();
 
@@ -315,10 +337,11 @@ public class ScheduleService {
  //=========================================================
 
   private void addSimpleSchedule(Map<Integer, List<SimpleSchedule>> monthToSchedulesMap, LocalDateTime date, long scheduleId) {
-    //해당 달이 있는지 부터 체크하고
+    //해당 달이 있는지 부터 체크하고, 없으면 체크할 범위 아님
+
     List<SimpleSchedule> scheduleList = monthToSchedulesMap.get(date.getMonthValue());
-    if (scheduleList.isEmpty()) {
-      monthToSchedulesMap.put(date.getMonthValue(),scheduleList);
+    if (scheduleList == null) {
+      return;
     }
 
     //해당 일이 존재하는지 찾고 있으면 id 추가,

@@ -10,8 +10,6 @@ import com.meonghae.profileservice.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +28,7 @@ public class FcmConfig {
 //    private String firebaseJson;
 
     public void sendMessageTo(AlarmDto alarmDto) throws IOException {
+        log.info("line 31");
         String message = makeMessage(alarmDto);
         log.info("sendMessageTo: "+message);
         OkHttpClient client = new OkHttpClient();
@@ -50,7 +49,7 @@ public class FcmConfig {
     }
 
     private String makeMessage(AlarmDto alarmDto) throws JsonParseException, JsonProcessingException {
-
+        log.info("52line");
         FcmMessage message = FcmMessage.builder()
                 .message(FcmMessage.Message.builder()
                         .token(redisService.getFcmToken(alarmDto.getUserEmail()))
@@ -61,14 +60,7 @@ public class FcmConfig {
                         .build())
                 .build();
         log.info(message.getMessage().getToken() + ",  " +message.getMessage().getNotification().getBody());
-//        FcmMessage message = FcmMessage.builder()
-//                .to(redisService.getFcmToken(alarmDto.getUserEmail()))
-//                .notification(FcmMessage.Notification.builder()
-//                        .title("멍해")
-//                        .body(alarmDto.getText())
-//                        .build())
-//                .build();
-        log.info(objectMapper.writeValueAsString(message).toString());
+
         return objectMapper.writeValueAsString(message);
     }
 
