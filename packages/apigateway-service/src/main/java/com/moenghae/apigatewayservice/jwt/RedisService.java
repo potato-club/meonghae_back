@@ -6,8 +6,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -20,20 +18,6 @@ public class RedisService {
     public Map<String, String> getValues(String token){
         ValueOperations<String, Map<String, String>> values = redisTemplate.opsForValue();
         return values.get(token);
-    }
-
-    public void setValues(String token, String email) {
-        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
-        Map<String, String> map = new HashMap<>();
-        map.put("email", email);
-        operations.set(token, map, Duration.ofDays(7)); // 7일 뒤 메모리에서 삭제됨
-    }
-
-    public void setAndroidId(String email, String androidId) {
-        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
-        Map<String, String> map = new HashMap<>();
-        map.put("androidId", androidId);
-        operations.set(email, map, Duration.ofDays(7)); // 7일 뒤 메모리에서 삭제됨
     }
 
     public boolean isRefreshTokenValid(String token) {
@@ -57,10 +41,7 @@ public class RedisService {
         if (Boolean.TRUE.equals(redisTemplate.hasKey(token))) {
             throw new MalformedJwtException("Invalid JWT token");
         }
-        return false;
-    }
 
-    public void delValues(String token) {
-        redisTemplate.delete(token);
+        return false;
     }
 }

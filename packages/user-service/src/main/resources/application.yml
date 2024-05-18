@@ -25,7 +25,7 @@ spring:
     host: Redis-server
     port: 6379
   datasource:
-    url: ENC(9PfL1V27LDaNPLBD4XBXvkWU0B7+qSxY33AJnDiR7lGX1rek91eV9mhJxGIwruSmITCtvfAtJPtpForipy2wMzAXWET15dirwbyeg3o+1Yqs03Vu8snF4cyKu2g+2FYV)
+    url: ENC(Vx6YkP76j58e1cpZo8SnNW2unqR5APiSO+RsHdjFuWkzIjVmeuSTghNDjkuuApMvMcnLP5eAvnbWwrNs6klv4u9m7rkxrShXE3JqdK34eWbDDLcgYoct0QsrvJIdgGHS)
     username: ENC(4d7BMWbeTcHgNa4Cmvsikw==)
     password: ENC(4UgvBUNHRaveoEXRRHL2UDqyZ4kSwG0y)
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -59,7 +59,7 @@ spring:
 
 jwt:
   secret: ENC(j8sywLK8XrevBeAEriBL4luyhTxP/mLqrRWIWx/nODY0JFWpPNHffp3YgPx9B13XbLxPqCdWpO7UR5Kzm/Amp7vCJ+UiJ3inDtORX4+jRQ7bFeNV6NtuxwtxIeF73q91y4pzmcAXP4hX6WpSU0IDWmCoZaS6xCFhqWSGbCboKrNXMf8BFT9fMmpPx2NbCeJDzofmg8h4SbHJw/iy2isMQs14Awkc1ZPw)
-  accessTokenExpiration: ENC(cwLYRulU3JGGTXve+Abq1A==)
+  accessTokenExpiration: ENC(wZoewn+bdfTQSFXywSxXhA==)
   refreshTokenExpiration: ENC(uPhaFjWIZsHwnSRe9gpDcHInKKHi/Z//)
 
 eureka:
