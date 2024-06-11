@@ -119,7 +119,8 @@ public class ReviewService {
             S3RequestDto s3Dto = new S3RequestDto(savedReview.getId(), "REVIEW");
             s3Service.uploadImage(images, s3Dto);
             savedReview.setHasImage();
-            reviewRepository.save(savedReview);
+
+            savedReview = reviewRepository.save(savedReview);
         }
 
         return savedReview;

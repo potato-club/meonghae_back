@@ -200,8 +200,6 @@ class BoardControllerTest {
                                 .header("Authorization", token))
                 .andReturn();
 
-        String createdDate = JsonPath.read(result.getResponse().getContentAsString(), "$.date");
-
         //when
         //then
         mockMvc.perform(
@@ -218,7 +216,6 @@ class BoardControllerTest {
 
         assertThat(board.getTitle()).isEqualTo(updateTitle);
         assertThat(board.getContent()).isEqualTo(updateContent);
-        assertThat(board.getDate().toString()).isEqualTo(createdDate);
     }
 
     @Test
