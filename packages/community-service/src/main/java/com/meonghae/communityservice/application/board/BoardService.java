@@ -109,7 +109,7 @@ public class BoardService {
             s3Service.uploadImage(images, s3Dto);
             savedBoard.toggleHasImage();
 
-            savedBoard = boardRepository.save(savedBoard);
+            savedBoard = boardRepository.update(savedBoard);
         }
         return savedBoard;
     }

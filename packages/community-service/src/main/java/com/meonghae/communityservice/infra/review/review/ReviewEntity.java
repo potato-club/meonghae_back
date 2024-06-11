@@ -77,4 +77,8 @@ public class ReviewEntity extends BaseTimeEntity {
         this.likes = review.getLikes();
         this.dislikes = review.getDislikes();
     }
+
+    public void hasImage() {
+        this.hasImage = true;
+    }
 }
