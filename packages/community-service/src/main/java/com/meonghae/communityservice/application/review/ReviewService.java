@@ -120,7 +120,7 @@ public class ReviewService {
             s3Service.uploadImage(images, s3Dto);
             savedReview.setHasImage();
 
-            savedReview = reviewRepository.save(savedReview);
+            savedReview = reviewRepository.update(savedReview);
         }
 
         return savedReview;

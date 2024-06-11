@@ -62,6 +62,11 @@ public class FakeReviewRepo implements ReviewRepository {
     }
 
     @Override
+    public Review update(Review review) {
+        return null;
+    }
+
+    @Override
     public void delete(Review review) {
         data.removeIf(item -> Objects.equals(item.getId(), review.getId()));
     }

@@ -12,6 +12,7 @@ public interface ReviewRepository {
     Slice<Review> findByCatalogAndKeywordAndSortType(Pageable pageable, ReviewCatalog catalog, String keyword);
     Slice<Review> findByCatalogAndHasImageAndKeywordAndSortType(Pageable pageable, ReviewCatalog catalog, String keyword);
     Review save(Review review);
+    Review update(Review review);
 
     void delete(Review review);
 
