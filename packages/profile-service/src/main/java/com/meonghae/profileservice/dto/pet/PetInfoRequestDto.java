@@ -1,6 +1,6 @@
 package com.meonghae.profileservice.dto.pet;
 
-import com.meonghae.profileservice.enumCustom.PetGender;
+import com.meonghae.profileservice.enumcustom.PetGender;
 import java.time.LocalDate;
 
 import io.swagger.annotations.ApiModelProperty;

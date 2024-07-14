@@ -1,4 +1,4 @@
-package com.meonghae.profileservice.enumCustom;
+package com.meonghae.profileservice.enumcustom;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
