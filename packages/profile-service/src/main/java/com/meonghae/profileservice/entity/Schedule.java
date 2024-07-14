@@ -5,8 +5,8 @@ import com.meonghae.profileservice.dto.schedule.ScheduleRequestDTO;
 import java.time.LocalDateTime;
 import javax.persistence.*;
 
-import com.meonghae.profileservice.enumCustom.ScheduleCycleType;
-import com.meonghae.profileservice.enumCustom.ScheduleType;
+import com.meonghae.profileservice.enumcustom.ScheduleCycleType;
+import com.meonghae.profileservice.enumcustom.ScheduleType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

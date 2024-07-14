@@ -1,12 +1,10 @@
 package com.meonghae.profileservice.config;
 
 import com.meonghae.profileservice.dto.schedule.AlarmDto;
-import com.meonghae.profileservice.dto.schedule.SchedulePreviewResponseDto;
 import com.meonghae.profileservice.entity.QPet;
 import com.meonghae.profileservice.entity.QSchedule;
 import com.meonghae.profileservice.entity.Schedule;
-import com.meonghae.profileservice.enumCustom.ScheduleCycleType;
-import com.meonghae.profileservice.enumCustom.ScheduleType;
+import com.meonghae.profileservice.enumcustom.ScheduleCycleType;
 import com.meonghae.profileservice.service.RabbitService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +24,6 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 @Configuration
 @EnableScheduling

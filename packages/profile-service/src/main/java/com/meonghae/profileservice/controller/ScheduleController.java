@@ -2,7 +2,7 @@ package com.meonghae.profileservice.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.meonghae.profileservice.dto.schedule.*;
-import com.meonghae.profileservice.enumCustom.ScheduleType;
+import com.meonghae.profileservice.enumcustom.ScheduleType;
 import com.meonghae.profileservice.error.ErrorCode;
 import com.meonghae.profileservice.error.exception.BadRequestException;
 import com.meonghae.profileservice.service.ScheduleService;

@@ -1,7 +1,7 @@
 package com.meonghae.profileservice.dto.schedule;
 
 import com.meonghae.profileservice.entity.Schedule;
-import com.meonghae.profileservice.enumCustom.ScheduleType;
+import com.meonghae.profileservice.enumcustom.ScheduleType;
 import lombok.Getter;
 import lombok.Setter;
 

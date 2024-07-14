@@ -2,14 +2,11 @@ package com.meonghae.profileservice.dto.pet;
 
 import com.meonghae.profileservice.dto.S3.S3ResponseDto;
 import com.meonghae.profileservice.entity.Pet;
-import com.meonghae.profileservice.enumCustom.PetGender;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter

@@ -51,7 +51,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse login(String email, HttpServletRequest request, HttpServletResponse response) {
-
         if (userRepository.existsByEmailAndDeleted(email, false)) {
             Optional<User> user = userRepository.findByEmail(email);
 
@@ -131,7 +130,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void signUp(UserRequest userDto, HttpServletRequest request, HttpServletResponse response) {
-
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new UnAuthorizedException("이미 회원이거나 탈퇴 대기 중인 유저입니다.", ACCESS_DENIED_EXCEPTION);
         }
@@ -228,7 +226,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void reissueToken(HttpServletRequest request, HttpServletResponse response) {
-
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
         String androidId = request.getHeader("androidId");
 

@@ -1,7 +1,7 @@
 package com.meonghae.profileservice.dto.schedule;
 
-import com.meonghae.profileservice.enumCustom.ScheduleCycleType;
-import com.meonghae.profileservice.enumCustom.ScheduleType;
+import com.meonghae.profileservice.enumcustom.ScheduleCycleType;
+import com.meonghae.profileservice.enumcustom.ScheduleType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
